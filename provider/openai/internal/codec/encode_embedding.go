@@ -21,14 +21,11 @@ func EncodeEmbedding(
 
 	var reqOpts []option.RequestOption
 	if eo.Headers != nil {
-		applyHeaders := func(h http.Header) {
-			for k, vs := range h {
-				for _, v := range vs {
-					reqOpts = append(reqOpts, option.WithHeader(k, v))
-				}
-			}
-		}
 		applyHeaders(eo.Headers)
+	}
+
+	if eo.BaseURL != nil {
+		reqOpts = append(reqOpts, option.WithBaseURL(*eo.BaseURL))
 	}
 
 	params := openai.EmbeddingNewParams{
@@ -42,4 +39,15 @@ func EncodeEmbedding(
 	var warnings []api.CallWarning
 
 	return params, reqOpts, warnings, nil
+}
+
+// applyHeaders applies the provided HTTP headers to the request options.
+func applyHeaders(headers http.Header) []option.RequestOption {
+	var reqOpts []option.RequestOption
+	for k, vs := range headers {
+		for _, v := range vs {
+			reqOpts = append(reqOpts, option.WithHeaderAdd(k, v))
+		}
+	}
+	return reqOpts
 }

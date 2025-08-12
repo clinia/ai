@@ -6,6 +6,19 @@ import (
 	"go.jetify.com/ai/api"
 )
 
+func EmbedMany[T any](
+	ctx context.Context, model api.EmbeddingModel[T], values []T, opts ...EmbeddingOption[T],
+) (api.EmbeddingResponse, error) {
+	config := buildEmbeddingConfig(model, opts)
+	return embed(ctx, values, config)
+}
+
+func embed[T any](
+	ctx context.Context, values []T, opts EmbeddingOptions[T],
+) (api.EmbeddingResponse, error) {
+	return opts.Model.DoEmbed(ctx, values, opts.EmbeddingOptions)
+}
+
 // GenerateText uses a language model to generate a text response from a given prompt.
 //
 // This function does not stream its output.

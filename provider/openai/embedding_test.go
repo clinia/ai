@@ -168,13 +168,8 @@ func runDoEmbedTests(t *testing.T, tests []struct {
 			// Create model with the provider
 			model := provider.NewEmbeddingModel(modelID)
 
-			// Call DoEmbed with the test's options
-			var opts []api.EmbeddingOption
-			if testCase.options.Headers != nil {
-				opts = append(opts, api.WithEmbeddingHeaders(testCase.options.Headers))
-			}
-
-			resp, err := model.DoEmbed(t.Context(), testCase.input, opts...)
+			// Build embedding options
+			resp, err := model.DoEmbed(t.Context(), testCase.input, testCase.options)
 
 			if testCase.wantErr {
 				require.Error(t, err)

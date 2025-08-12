@@ -57,7 +57,7 @@ func (m *EmbeddingModel) MaxEmbeddingsPerCall() *int {
 func (m *EmbeddingModel) DoEmbed(
 	ctx context.Context,
 	values []string,
-	opts ...api.EmbeddingOption,
+	opts api.EmbeddingOptions,
 ) (api.EmbeddingResponse, error) {
 	embeddingParams, openaiOpts, _, err := codec.EncodeEmbedding(
 		m.modelID,

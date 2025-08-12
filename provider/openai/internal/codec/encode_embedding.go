@@ -12,16 +12,11 @@ import (
 func EncodeEmbedding(
 	modelID string,
 	values []string,
-	opts []api.EmbeddingOption,
+	opts api.EmbeddingOptions,
 ) (openai.EmbeddingNewParams, []option.RequestOption, []api.CallWarning, error) {
-	eo := api.EmbeddingOptions{}
-	for _, opt := range opts {
-		opt(&eo)
-	}
-
 	var reqOpts []option.RequestOption
-	if eo.Headers != nil {
-		reqOpts = append(reqOpts, applyHeaders(eo.Headers)...)
+	if opts.Headers != nil {
+		reqOpts = append(reqOpts, applyHeaders(opts.Headers)...)
 	}
 
 	params := openai.EmbeddingNewParams{

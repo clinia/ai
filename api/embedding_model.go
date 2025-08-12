@@ -38,7 +38,7 @@ type EmbeddingModel[T any] interface {
 	//
 	// Naming: "do" prefix to prevent accidental direct usage of the method
 	// by the user.
-	DoEmbed(ctx context.Context, values []T, opts ...EmbeddingOption) EmbeddingResponse
+	DoEmbed(ctx context.Context, values []T, opts ...EmbeddingOption) (EmbeddingResponse, error)
 }
 
 // EmbeddingResponse represents the response from generating embeddings.
@@ -55,7 +55,7 @@ type EmbeddingResponse struct {
 
 // EmbeddingUsage represents token usage information.
 type EmbeddingUsage struct {
-	Tokens int
+	Tokens int64
 }
 
 // EmbeddingRawResponse contains raw response information for debugging.

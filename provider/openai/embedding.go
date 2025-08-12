@@ -3,11 +3,11 @@ package openai
 import (
 	"context"
 	"fmt"
-	"net/http"
 
 	"github.com/openai/openai-go"
 	"github.com/openai/openai-go/option"
 	"go.jetify.com/ai/api"
+	"go.jetify.com/ai/provider/openai/internal/codec"
 )
 
 // EmbeddingModel represents an OpenAI embedding model.
@@ -87,22 +87,5 @@ func (m *EmbeddingModel) DoEmbed(
 		return api.EmbeddingResponse{}, err
 	}
 
-	embeddings := make([]api.Embedding, len(resp.Data))
-	for i, d := range resp.Data {
-		// d.Embedding is []float64 already in openai-go
-		// If it were []float32, convert here.
-		vec := make([]float64, len(d.Embedding))
-		copy(vec, d.Embedding)
-		embeddings[i] = vec
-	}
-
-	usage := &api.EmbeddingUsage{Tokens: resp.Usage.PromptTokens}
-
-	return api.EmbeddingResponse{
-		Embeddings: embeddings,
-		Usage:      usage,
-		RawResponse: &api.EmbeddingRawResponse{
-			Headers: http.Header{},
-		},
-	}, nil
+	return codec.DecodeEmbedding(resp)
 }

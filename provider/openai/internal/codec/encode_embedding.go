@@ -14,14 +14,14 @@ func EncodeEmbedding(
 	values []string,
 	opts []api.EmbeddingOption,
 ) (openai.EmbeddingNewParams, []option.RequestOption, []api.CallWarning, error) {
-	var eo api.EmbeddingOptions
+	eo := api.EmbeddingOptions{}
 	for _, opt := range opts {
 		opt(&eo)
 	}
 
 	var reqOpts []option.RequestOption
 	if eo.Headers != nil {
-		applyHeaders(eo.Headers)
+		reqOpts = append(reqOpts, applyHeaders(eo.Headers)...)
 	}
 
 	if eo.BaseURL != nil {

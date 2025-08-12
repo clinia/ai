@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/openai/openai-go"
-	"github.com/openai/openai-go/option"
 	"go.jetify.com/ai/api"
 	"go.jetify.com/ai/provider/openai/internal/codec"
 )
@@ -61,28 +59,16 @@ func (m *EmbeddingModel) DoEmbed(
 	values []string,
 	opts ...api.EmbeddingOption,
 ) (api.EmbeddingResponse, error) {
-	options := api.EmbeddingOptions{}
-	for _, opt := range opts {
-		opt(&options)
+	embeddingParams, openaiOpts, _, error := codec.EncodeEmbedding(
+		m.modelID,
+		values,
+		opts,
+	)
+	if error != nil {
+		return api.EmbeddingResponse{}, fmt.Errorf("encoding embedding params: %w", error)
 	}
 
-	var openaiOpts []option.RequestOption
-	if options.Headers != nil {
-		for k, vals := range options.Headers {
-			for _, v := range vals {
-				openaiOpts = append(openaiOpts, option.WithHeader(k, v))
-			}
-		}
-	}
-
-	resp, err := m.pc.client.Embeddings.New(ctx, openai.EmbeddingNewParams{
-		Input: openai.EmbeddingNewParamsInputUnion{
-			OfArrayOfStrings: values,
-		},
-		// TODO: pick model dynamically; this is just an example:
-		Model:          openai.EmbeddingModelTextEmbeddingAda002,
-		EncodingFormat: openai.EmbeddingNewParamsEncodingFormatFloat,
-	}, openaiOpts...)
+	resp, err := m.pc.client.Embeddings.New(ctx, embeddingParams, openaiOpts...)
 	if err != nil {
 		return api.EmbeddingResponse{}, err
 	}

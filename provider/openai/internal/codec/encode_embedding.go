@@ -24,10 +24,6 @@ func EncodeEmbedding(
 		reqOpts = append(reqOpts, applyHeaders(eo.Headers)...)
 	}
 
-	if eo.BaseURL != nil {
-		reqOpts = append(reqOpts, option.WithBaseURL(*eo.BaseURL))
-	}
-
 	params := openai.EmbeddingNewParams{
 		Model: openai.EmbeddingModel(modelID),
 		Input: openai.EmbeddingNewParamsInputUnion{

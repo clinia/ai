@@ -59,13 +59,13 @@ func (m *EmbeddingModel) DoEmbed(
 	values []string,
 	opts ...api.EmbeddingOption,
 ) (api.EmbeddingResponse, error) {
-	embeddingParams, openaiOpts, _, error := codec.EncodeEmbedding(
+	embeddingParams, openaiOpts, _, err := codec.EncodeEmbedding(
 		m.modelID,
 		values,
 		opts,
 	)
-	if error != nil {
-		return api.EmbeddingResponse{}, fmt.Errorf("encoding embedding params: %w", error)
+	if err != nil {
+		return api.EmbeddingResponse{}, err
 	}
 
 	resp, err := m.pc.client.Embeddings.New(ctx, embeddingParams, openaiOpts...)

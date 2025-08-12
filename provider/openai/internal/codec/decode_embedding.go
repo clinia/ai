@@ -10,7 +10,7 @@ import (
 // DecodeEmbedding maps the OpenAI embedding API response to the unified api.EmbeddingResponse.
 func DecodeEmbedding(resp *openai.CreateEmbeddingResponse) (api.EmbeddingResponse, error) {
 	if resp == nil {
-		return api.EmbeddingResponse{}, api.NewEmptyResponseBodyError("openai embeddings")
+		return api.EmbeddingResponse{}, api.NewEmptyResponseBodyError("response from OpenAI embeddings API is nil")
 	}
 
 	embs := make([]api.Embedding, len(resp.Data))
@@ -20,7 +20,10 @@ func DecodeEmbedding(resp *openai.CreateEmbeddingResponse) (api.EmbeddingRespons
 		embs[i] = vec
 	}
 
-	usage := &api.EmbeddingUsage{Tokens: resp.Usage.PromptTokens}
+	usage := &api.EmbeddingUsage{
+		PromptTokens: resp.Usage.PromptTokens,
+		TotalTokens:  resp.Usage.TotalTokens,
+	}
 
 	return api.EmbeddingResponse{
 		Embeddings: embs,

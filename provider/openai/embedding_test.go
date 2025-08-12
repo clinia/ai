@@ -75,7 +75,8 @@ func TestDoEmbed(t *testing.T) {
 					{0.0072664247, -0.008545238, 0.017125098},
 				},
 				Usage: &api.EmbeddingUsage{
-					Tokens: 2,
+					PromptTokens: 2,
+					TotalTokens:  2,
 				},
 				RawResponse: &api.EmbeddingRawResponse{
 					Headers: http.Header{},
@@ -117,7 +118,8 @@ func TestDoEmbed(t *testing.T) {
 					{0.0072664247, -0.008545238, 0.017125098},
 				},
 				Usage: &api.EmbeddingUsage{
-					Tokens: 2,
+					PromptTokens: 2,
+					TotalTokens:  2,
 				},
 				RawResponse: &api.EmbeddingRawResponse{
 					Headers: http.Header{},

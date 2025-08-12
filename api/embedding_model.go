@@ -55,7 +55,8 @@ type EmbeddingResponse struct {
 
 // EmbeddingUsage represents token usage information.
 type EmbeddingUsage struct {
-	Tokens int64
+	PromptTokens int64
+	TotalTokens  int64
 }
 
 // EmbeddingRawResponse contains raw response information for debugging.

@@ -6,8 +6,6 @@ import (
 	"go.jetify.com/ai/provider/jina/client/option"
 )
 
-const defaultBaseURL = "https://api.jina.ai/v1/embeddings"
-
 type Client struct {
 	Options    []option.RequestOption
 	Embeddings EmbeddingService

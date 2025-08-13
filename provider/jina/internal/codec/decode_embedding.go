@@ -3,14 +3,14 @@ package codec
 import (
 	"net/http"
 
-	"github.com/openai/openai-go"
 	"go.jetify.com/ai/api"
+	jina "go.jetify.com/ai/provider/jina/client"
 )
 
-// DecodeEmbedding maps the OpenAI embedding API response to the unified api.EmbeddingResponse.
-func DecodeEmbedding(resp *openai.CreateEmbeddingResponse) (api.EmbeddingResponse, error) {
+// DecodeEmbedding maps the Jina embedding API response to the unified api.EmbeddingResponse.
+func DecodeEmbedding(resp *jina.CreateEmbeddingResponse) (api.EmbeddingResponse, error) {
 	if resp == nil {
-		return api.EmbeddingResponse{}, api.NewEmptyResponseBodyError("response from OpenAI embeddings API is nil")
+		return api.EmbeddingResponse{}, api.NewEmptyResponseBodyError("response from Jina embeddings API is nil")
 	}
 
 	embs := make([]api.Embedding, len(resp.Data))

@@ -4,10 +4,10 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/openai/openai-go"
-	"github.com/openai/openai-go/option"
 	"github.com/stretchr/testify/require"
 	"go.jetify.com/ai/api"
+	jina "go.jetify.com/ai/provider/jina/client"
+	"go.jetify.com/ai/provider/jina/client/option"
 	"go.jetify.com/pkg/httpmock"
 )
 
@@ -43,8 +43,7 @@ func TestDoEmbed(t *testing.T) {
 				Path:   "/embeddings",
 				Body: `{
                     "input": ["Hello", "World"],
-                    "model": "text-embedding-ada-002",
-                    "encoding_format": "float"
+                    "model": "text-embedding-ada-002"
                 }`,
 			},
 			Response: httpmock.Response{
@@ -102,8 +101,7 @@ func TestDoEmbed(t *testing.T) {
 						},
 						Body: `{
                             "input": ["Hello", "World"],
-                            "model": "text-embedding-ada-002",
-                            "encoding_format": "float"
+                            "model": "text-embedding-ada-002"
                         }`,
 					},
 					Response: httpmock.Response{
@@ -155,11 +153,10 @@ func runDoEmbedTests(t *testing.T, tests []struct {
 			clientOptions := []option.RequestOption{
 				option.WithBaseURL(server.BaseURL()),
 				option.WithAPIKey("test-key"),
-				option.WithMaxRetries(0), // Disable retries
 			}
 
 			// Create client with options
-			client := openai.NewClient(clientOptions...)
+			client := jina.NewClient(clientOptions...)
 
 			// Use custom model ID
 			modelID := testCase.modelID

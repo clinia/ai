@@ -3,9 +3,9 @@ package codec
 import (
 	"net/http"
 
-	"github.com/openai/openai-go"
-	"github.com/openai/openai-go/option"
 	"go.jetify.com/ai/api"
+	jina "go.jetify.com/ai/provider/jina/client"
+	"go.jetify.com/ai/provider/jina/client/option"
 )
 
 // EncodeEmbedding builds OpenAI params + request options from the unified API options.
@@ -13,18 +13,15 @@ func EncodeEmbedding(
 	modelID string,
 	values []string,
 	opts api.EmbeddingOptions,
-) (openai.EmbeddingNewParams, []option.RequestOption, []api.CallWarning, error) {
+) (jina.TextEmbeddingNewParams, []option.RequestOption, []api.CallWarning, error) {
 	var reqOpts []option.RequestOption
 	if opts.Headers != nil {
 		reqOpts = append(reqOpts, applyHeaders(opts.Headers)...)
 	}
 
-	params := openai.EmbeddingNewParams{
-		Model: openai.EmbeddingModel(modelID),
-		Input: openai.EmbeddingNewParamsInputUnion{
-			OfArrayOfStrings: values,
-		},
-		EncodingFormat: openai.EmbeddingNewParamsEncodingFormatFloat,
+	params := jina.TextEmbeddingNewParams{
+		Model: jina.EmbeddingModel(modelID),
+		Input: values,
 	}
 
 	var warnings []api.CallWarning

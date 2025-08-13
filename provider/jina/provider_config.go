@@ -1,9 +1,11 @@
 package jina
 
-import "net/http"
+import (
+	jina "go.jetify.com/ai/provider/jina/client"
+)
 
 type ProviderConfig struct {
 	providerName string
-	client       http.Client
+	client       jina.Client
 	apiKey       string
 }

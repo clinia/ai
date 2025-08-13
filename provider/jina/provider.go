@@ -1,14 +1,14 @@
 package jina
 
 import (
-	"net/http"
+	jina "go.jetify.com/ai/provider/jina/client"
 )
 
 type Provider struct {
-	// client is the OpenAI client used to make API calls.
-	client http.Client
+	// client is the Jina client used to make API calls.
+	client jina.Client
 
-	// name is the name of the provider, overrides the default "openai".
+	// name is the name of the provider, overrides the default "jina".
 	name string
 
 	// apiKey is the API key used for authentication.
@@ -17,7 +17,7 @@ type Provider struct {
 
 type ProviderOption func(*Provider)
 
-func WithClient(c http.Client) ProviderOption {
+func WithClient(c jina.Client) ProviderOption {
 	return func(p *Provider) { p.client = c }
 }
 
@@ -30,7 +30,7 @@ func WithAPIKey(apiKey string) ProviderOption {
 }
 
 func NewProvider(opts ...ProviderOption) *Provider {
-	p := &Provider{client: http.Client{}}
+	p := &Provider{client: jina.NewClient()}
 
 	for _, opt := range opts {
 		opt(p)

@@ -20,10 +20,7 @@ func example() error {
 	modelID := os.Getenv("BASETEN_MODEL_ID")
 	modelEnv := os.Getenv("BASETEN_MODEL_ENV")
 
-	baseURL := fmt.Sprintf("https://%s.api.baseten.co/environments/%s/sync/v1", modelID, modelEnv)
-
 	clientOptions := []option.RequestOption{
-		option.WithBaseURL(baseURL),
 		option.WithAPIKey(apiKey),
 		option.WithMaxRetries(0), // Disable retries
 	}
@@ -35,7 +32,10 @@ func example() error {
 	provider := openaiprovider.NewProvider(openaiprovider.WithClient(client))
 
 	// Create a model
+	// NOTE: for baseten models we need to render the base URL in respect to the model ID
 	model := provider.NewEmbeddingModel("text-embedding-3-small")
+
+	baseURL := fmt.Sprintf("https://%s.api.baseten.co/environments/%s/sync/v1", modelID, modelEnv)
 
 	// Generate text
 	response, err := ai.EmbedMany(
@@ -45,6 +45,7 @@ func example() error {
 			"Artificial intelligence is the simulation of human intelligence in machines.",
 			"Machine learning is a subset of AI that enables systems to learn from data.",
 		},
+		ai.WithEmbeddingBaseURL[string](baseURL),
 	)
 	if err != nil {
 		return err

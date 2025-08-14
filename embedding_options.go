@@ -33,6 +33,14 @@ func WithEmbeddingProviderMetadata[T any](provider string, metadata any) Embeddi
 	}
 }
 
+// WithEmbeddingBaseURL sets the base URL for the embedding API endpoint.
+func WithEmbeddingBaseURL[T any](baseURL string) EmbeddingOption[T] {
+	url := baseURL
+	return func(o *EmbeddingOptions[T]) {
+		o.EmbeddingOptions.BaseURL = &url
+	}
+}
+
 // WithEmbeddingEmbeddingOptions sets the entire api.EmbeddingOptions struct.
 func WithEmbeddingEmbeddingOptions[T any](embeddingOptions api.EmbeddingOptions) EmbeddingOption[T] {
 	return func(o *EmbeddingOptions[T]) {

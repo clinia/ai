@@ -34,3 +34,5 @@ type EmbeddingOptions struct {
 	// provider-specific functionality that can be fully encapsulated in the provider.
 	ProviderMetadata *ProviderMetadata `json:"provider_metadata,omitzero"`
 }
+
+func (o EmbeddingOptions) GetProviderMetadata() *ProviderMetadata { return o.ProviderMetadata }

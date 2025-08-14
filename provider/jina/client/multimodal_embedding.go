@@ -10,14 +10,14 @@ import (
 	"go.jetify.com/ai/provider/jina/client/option"
 )
 
-type MultimodalEmbeddingNewParams = embeddingNewParams[[]MultiModalEmbeddingInput]
+type MultimodalEmbeddingNewParams = embeddingNewParams[[]MultimodalEmbeddingInput]
 
 type multimodalNewParamsConcrete struct {
 	MultimodalEmbeddingNewParams
 }
 
-// MultiModalEmbeddingInput matches Jina's multimodal item shape (one of text or image).
-type MultiModalEmbeddingInput struct {
+// MultimodalEmbeddingInput matches Jina's multimodal item shape (one of text or image).
+type MultimodalEmbeddingInput struct {
 	Text  *string `json:"text,omitempty"`
 	Image *string `json:"image,omitempty"`
 }
@@ -37,7 +37,7 @@ func (p multimodalNewParamsConcrete) validate() error {
 	return nil
 }
 
-func (it MultiModalEmbeddingInput) validate() error {
+func (it MultimodalEmbeddingInput) validate() error {
 	hasText := it.Text != nil && *it.Text != ""
 	hasImage := it.Image != nil && *it.Image != ""
 	switch {

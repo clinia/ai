@@ -23,6 +23,16 @@ func WithEmbeddingHeaders[T any](headers http.Header) EmbeddingOption[T] {
 	}
 }
 
+// WithEmbeddingProviderMetadata sets provider-specific metadata for the embedding call.
+func WithEmbeddingProviderMetadata[T any](provider string, metadata any) EmbeddingOption[T] {
+	return func(o *EmbeddingOptions[T]) {
+		if o.EmbeddingOptions.ProviderMetadata == nil {
+			o.EmbeddingOptions.ProviderMetadata = api.NewProviderMetadata(map[string]any{})
+		}
+		o.EmbeddingOptions.ProviderMetadata.Set(provider, metadata)
+	}
+}
+
 // WithEmbeddingEmbeddingOptions sets the entire api.EmbeddingOptions struct.
 func WithEmbeddingEmbeddingOptions[T any](embeddingOptions api.EmbeddingOptions) EmbeddingOption[T] {
 	return func(o *EmbeddingOptions[T]) {

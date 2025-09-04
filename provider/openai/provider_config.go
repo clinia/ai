@@ -1,6 +1,6 @@
 package openai
 
-import "github.com/openai/openai-go"
+import "github.com/openai/openai-go/v2"
 
 type ProviderConfig struct {
 	providerName string

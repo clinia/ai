@@ -3,7 +3,7 @@ package api
 import (
 	"encoding/json"
 
-	"github.com/modelcontextprotocol/go-sdk/jsonschema"
+	"github.com/google/jsonschema-go/jsonschema"
 )
 
 // ToolChoice specifies how tools should be selected by the model.
@@ -28,6 +28,9 @@ type ToolDefinition interface {
 	isToolDefinition() bool
 }
 
+// For the equivalent of ToolDefinition in MCP, see the Tool struct in:
+// https://github.com/modelcontextprotocol/go-sdk/blob/main/mcp/protocol.go#L854
+
 // FunctionTool represents a tool that has a name, description, and set of input arguments.
 // Note: this is not the user-facing tool definition. The AI SDK methods will
 // map the user-facing tool definitions to this format.
@@ -48,20 +51,20 @@ type FunctionTool struct {
 var _ ToolDefinition = &FunctionTool{}
 
 // Type is the type of the tool (always "function")
-func (t FunctionTool) Type() string { return "function" }
+func (t *FunctionTool) Type() string { return "function" }
 
 // isToolDefinition is a marker method to satisfy the ToolDefinition interface
-func (t FunctionTool) isToolDefinition() bool { return true }
+func (t *FunctionTool) isToolDefinition() bool { return true }
 
 // FunctionTool JSON marshaling - automatically includes "type" field
-func (t FunctionTool) MarshalJSON() ([]byte, error) {
+func (t *FunctionTool) MarshalJSON() ([]byte, error) {
 	type Alias FunctionTool
 	return json.Marshal(struct {
 		Type string `json:"type"`
 		*Alias
 	}{
 		Type:  "function",
-		Alias: (*Alias)(&t),
+		Alias: (*Alias)(t),
 	})
 }
 
@@ -85,19 +88,19 @@ type ProviderDefinedTool struct {
 var _ ToolDefinition = &ProviderDefinedTool{}
 
 // Type is the type of the tool (always "provider-defined")
-func (t ProviderDefinedTool) Type() string { return "provider-defined" }
+func (t *ProviderDefinedTool) Type() string { return "provider-defined" }
 
 // isToolDefinition is a marker method to satisfy the ToolDefinition interface
-func (t ProviderDefinedTool) isToolDefinition() bool { return true }
+func (t *ProviderDefinedTool) isToolDefinition() bool { return true }
 
 // ProviderDefinedTool JSON marshaling - automatically includes "type" field
-func (t ProviderDefinedTool) MarshalJSON() ([]byte, error) {
+func (t *ProviderDefinedTool) MarshalJSON() ([]byte, error) {
 	type Alias ProviderDefinedTool
 	return json.Marshal(struct {
 		Type string `json:"type"`
 		*Alias
 	}{
 		Type:  "provider-defined",
-		Alias: (*Alias)(&t),
+		Alias: (*Alias)(t),
 	})
 }

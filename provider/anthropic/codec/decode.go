@@ -9,19 +9,18 @@ import (
 )
 
 // DecodeResponse converts an Anthropic Message to the AI SDK Response type
-func DecodeResponse(msg *anthropic.BetaMessage) (api.Response, error) {
+func DecodeResponse(msg *anthropic.BetaMessage) (*api.Response, error) {
 	if msg == nil {
-		return api.Response{}, errors.New("nil message provided")
+		return nil, errors.New("nil message provided")
 	}
 
-	response := api.Response{
+	response := &api.Response{
 		FinishReason:     decodeFinishReason(msg.StopReason),
 		Usage:            decodeUsage(msg.Usage),
 		ResponseInfo:     decodeResponseInfo(msg),
 		ProviderMetadata: decodeProviderMetadata(msg),
+		Content:          decodeContent(msg.Content),
 	}
-
-	response.Content = decodeContent(msg.Content)
 
 	return response, nil
 }
@@ -102,7 +101,8 @@ func decodeToolUse(block anthropic.BetaContentBlockUnion) *api.ToolCallBlock {
 
 // decodeReasoning converts an Anthropic thinking block to an AI SDK ReasoningBlock
 func decodeReasoning(block anthropic.BetaContentBlockUnion) api.Reasoning {
-	if block.Type == "thinking" {
+	switch block.Type {
+	case "thinking":
 		// Check for nil or empty thinking text
 		if block.Thinking == "" {
 			return nil
@@ -111,7 +111,7 @@ func decodeReasoning(block anthropic.BetaContentBlockUnion) api.Reasoning {
 			Text:      block.Thinking,
 			Signature: block.Signature,
 		}
-	} else if block.Type == "redacted_thinking" {
+	case "redacted_thinking":
 		// Check for nil or empty data
 		if block.Data == "" {
 			return nil

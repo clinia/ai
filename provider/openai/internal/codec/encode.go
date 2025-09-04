@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/openai/openai-go"
-	"github.com/openai/openai-go/packages/param"
-	"github.com/openai/openai-go/responses"
-	"github.com/openai/openai-go/shared"
+	"github.com/openai/openai-go/v2"
+	"github.com/openai/openai-go/v2/packages/param"
+	"github.com/openai/openai-go/v2/responses"
+	"github.com/openai/openai-go/v2/shared"
 	"go.jetify.com/ai/api"
 )
 
@@ -133,25 +133,21 @@ func applyJSONResponseFormat(params *responses.ResponseNewParams, opts api.CallO
 		if err != nil {
 			return fmt.Errorf("failed to convert JSON schema: %w", err)
 		}
-		params.Text = responses.ResponseTextConfigParam{
-			Format: responses.ResponseFormatTextConfigUnionParam{
-				OfJSONSchema: &responses.ResponseFormatTextJSONSchemaConfigParam{
-					Type:   "json_schema",
-					Name:   opts.ResponseFormat.Name,
-					Schema: schemaMap,
-					Strict: openai.Bool(isStrict),
-				},
+		params.Text.Format = responses.ResponseFormatTextConfigUnionParam{
+			OfJSONSchema: &responses.ResponseFormatTextJSONSchemaConfigParam{
+				Type:   "json_schema",
+				Name:   opts.ResponseFormat.Name,
+				Schema: schemaMap,
+				Strict: openai.Bool(isStrict),
 			},
 		}
 		if opts.ResponseFormat.Description != "" {
 			params.Text.Format.OfJSONSchema.Description = openai.String(opts.ResponseFormat.Description)
 		}
 	} else {
-		params.Text = responses.ResponseTextConfigParam{
-			Format: responses.ResponseFormatTextConfigUnionParam{
-				OfJSONObject: &shared.ResponseFormatJSONObjectParam{
-					Type: "json_object",
-				},
+		params.Text.Format = responses.ResponseFormatTextConfigUnionParam{
+			OfJSONObject: &shared.ResponseFormatJSONObjectParam{
+				Type: "json_object",
 			},
 		}
 	}
@@ -162,7 +158,7 @@ func applyJSONResponseFormat(params *responses.ResponseNewParams, opts api.CallO
 // applyProviderMetadata applies metadata-specific options to the parameters
 func applyProviderMetadata(params *responses.ResponseNewParams, opts api.CallOptions) {
 	if opts.ProviderMetadata != nil {
-		metadata := GetMetadata(opts)
+		metadata := GetMetadata(&opts)
 		if metadata != nil {
 			if metadata.ParallelToolCalls != nil {
 				params.ParallelToolCalls = openai.Bool(*metadata.ParallelToolCalls)
@@ -192,7 +188,7 @@ func applyReasoningSettings(params *responses.ResponseNewParams, opts api.CallOp
 
 	// Apply reasoning settings for reasoning models
 	if modelConfig.IsReasoningModel {
-		metadata := GetMetadata(opts)
+		metadata := GetMetadata(&opts)
 		if metadata != nil && (metadata.ReasoningEffort != "" || metadata.ReasoningSummary != "") {
 			params.Reasoning = shared.ReasoningParam{}
 			if metadata.ReasoningEffort != "" {

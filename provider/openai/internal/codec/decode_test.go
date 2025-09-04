@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/openai/openai-go/responses"
+	"github.com/openai/openai-go/v2/responses"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.jetify.com/ai/aitesting"
@@ -15,7 +15,7 @@ func TestDecodeResponse(t *testing.T) {
 	tests := []struct {
 		name  string
 		input string
-		want  api.Response
+		want  *api.Response
 	}{
 		{
 			name: "simple message",
@@ -36,7 +36,7 @@ func TestDecodeResponse(t *testing.T) {
 					"output_tokens": 50
 				}
 			}`,
-			want: api.Response{
+			want: &api.Response{
 				Content: []api.ContentBlock{
 					&api.TextBlock{Text: "Hello world"},
 				},
@@ -75,7 +75,7 @@ func TestDecodeResponse(t *testing.T) {
 					"output_tokens": 75
 				}
 			}`,
-			want: api.Response{
+			want: &api.Response{
 				Content: []api.ContentBlock{
 					&api.TextBlock{Text: "Info from [example](https://example.com)"},
 					&api.SourceBlock{
@@ -108,7 +108,7 @@ func TestDecodeResponse(t *testing.T) {
 					"output_tokens": 100
 				}
 			}`,
-			want: api.Response{
+			want: &api.Response{
 				Content: []api.ContentBlock{
 					&api.ToolCallBlock{
 						ToolCallID: "call1",
@@ -150,7 +150,7 @@ func TestDecodeResponse(t *testing.T) {
 					}
 				}
 			}`,
-			want: api.Response{
+			want: &api.Response{
 				Content: []api.ContentBlock{
 					&api.TextBlock{Text: "Test message"},
 				},

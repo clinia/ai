@@ -13,10 +13,6 @@ type FileProcessor interface {
 	// ModelID returns the provider-specific model/service ID for logging purposes.
 	ModelID() string
 
-	// SupportedUrls allows the SDK to bypass pre-downloading for some URLs (like LanguageModel).
-	// If empty, the SDK downloads inputs itself.
-	SupportedUrls() []SupportedURL
-
 	// MaxBytesPerCall optionally announces input size limits (nil if unknown).
 	MaxBytesPerCall() *int64
 

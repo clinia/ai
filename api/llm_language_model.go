@@ -36,7 +36,7 @@ type LanguageModel interface {
 	// The prompt parameter is a standardized prompt type, not the user-facing prompt.
 	// The AI SDK methods will map the user-facing prompt types such as chat or
 	// instruction prompts to this format.
-	Generate(ctx context.Context, prompt []Message, opts CallOptions) (Response, error)
+	Generate(ctx context.Context, prompt []Message, opts CallOptions) (*Response, error)
 
 	// Stream generates a language model output (streaming).
 	// Returns a stream of events from the model.
@@ -44,7 +44,7 @@ type LanguageModel interface {
 	// The prompt parameter is a standardized prompt type, not the user-facing prompt.
 	// The AI SDK methods will map the user-facing prompt types such as chat or
 	// instruction prompts to this format.
-	Stream(ctx context.Context, prompt []Message, opts CallOptions) (StreamResponse, error)
+	Stream(ctx context.Context, prompt []Message, opts CallOptions) (*StreamResponse, error)
 }
 
 // SupportedURL defines URL patterns supported for a specific media type
@@ -83,9 +83,14 @@ type Response struct {
 	// Warnings is a list of warnings that occurred during the call,
 	// e.g. unsupported settings.
 	Warnings []CallWarning `json:"warnings,omitempty"`
+
+	// TODO:
+	// - Consider promoting "response id" (like in OpenAI's responses API) to a top-level
+	//  field.
+	// - Should we make the entire response is serializable including RequestInfo and ResponseInfo?
 }
 
-func (r Response) GetProviderMetadata() *ProviderMetadata { return r.ProviderMetadata }
+func (r *Response) GetProviderMetadata() *ProviderMetadata { return r.ProviderMetadata }
 
 // UnmarshalJSON implements custom JSON unmarshaling for Response
 func (r *Response) UnmarshalJSON(data []byte) error {
@@ -150,10 +155,12 @@ type Usage struct {
 
 	// CachedInputTokens is the number of input tokens that were cached from a previous call.
 	CachedInputTokens int `json:"cached_input_tokens,omitzero"`
+
+	// TODO: consider adding ToolCount, StepCount fields
 }
 
 // IsZero returns true if all fields of the Usage struct are zero.
-func (u Usage) IsZero() bool {
+func (u *Usage) IsZero() bool {
 	return u.InputTokens == 0 &&
 		u.OutputTokens == 0 &&
 		u.TotalTokens == 0 &&
@@ -174,6 +181,7 @@ type ResponseInfo struct {
 
 	// Timestamp for the start of the generated response, if the provider sends one.
 	Timestamp time.Time `json:"timestamp,omitzero"`
+	// TODO: what should we do about fields like timestamp when replaying from a cache?
 
 	// ModelID of the model that was used to generate the response, if the provider sends one.
 	ModelID string `json:"model_id,omitzero"`

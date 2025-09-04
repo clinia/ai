@@ -34,12 +34,12 @@ func example() error {
 	return nil
 }
 
-func printResponse(response api.Response) {
+func printResponse(response *api.Response) {
 	response.ProviderMetadata = nil
 	response.Warnings = nil
 	printer := pp.New()
 	printer.SetOmitEmpty(true)
-	printer.Print(response)
+	_, _ = printer.Print(response)
 }
 
 func main() {

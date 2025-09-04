@@ -1,20 +1,19 @@
-// codec/decode_embedding_test.go
 package codec
 
 import (
 	"net/http"
 	"testing"
 
-	"github.com/openai/openai-go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.jetify.com/ai/api"
+	jina "go.jetify.com/ai/provider/jina/client"
 )
 
 func TestDecodeEmbedding(t *testing.T) {
 	type tc struct {
 		name       string
-		in         *openai.CreateEmbeddingResponse
+		in         *jina.CreateEmbeddingResponse
 		want       api.EmbeddingResponse
 		wantErrSub string
 	}
@@ -27,12 +26,12 @@ func TestDecodeEmbedding(t *testing.T) {
 		},
 		{
 			name: "maps data and usage; copies vectors; empty headers",
-			in: &openai.CreateEmbeddingResponse{
-				Data: []openai.Embedding{
+			in: &jina.CreateEmbeddingResponse{
+				Data: []jina.Embedding{
 					{Embedding: []float64{0.1, 0.2, 0.3}},
 					{Embedding: []float64{0.4, 0.5}},
 				},
-				Usage: openai.CreateEmbeddingResponseUsage{
+				Usage: jina.CreateEmbeddingResponseUsage{
 					PromptTokens: 27,
 					TotalTokens:  27,
 				},
@@ -53,9 +52,9 @@ func TestDecodeEmbedding(t *testing.T) {
 		},
 		{
 			name: "empty data yields empty embeddings and zero usage",
-			in: &openai.CreateEmbeddingResponse{
-				Data: []openai.Embedding{},
-				Usage: openai.CreateEmbeddingResponseUsage{
+			in: &jina.CreateEmbeddingResponse{
+				Data: []jina.Embedding{},
+				Usage: jina.CreateEmbeddingResponseUsage{
 					PromptTokens: 0,
 					TotalTokens:  0,
 				},
@@ -73,11 +72,11 @@ func TestDecodeEmbedding(t *testing.T) {
 		},
 		{
 			name: "single long vector",
-			in: &openai.CreateEmbeddingResponse{
-				Data: []openai.Embedding{
+			in: &jina.CreateEmbeddingResponse{
+				Data: []jina.Embedding{
 					{Embedding: []float64{1, 2, 3, 4, 5, 6}},
 				},
-				Usage: openai.CreateEmbeddingResponseUsage{
+				Usage: jina.CreateEmbeddingResponseUsage{
 					PromptTokens: 12,
 					TotalTokens:  12,
 				},

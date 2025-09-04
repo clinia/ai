@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/openai/openai-go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.jetify.com/ai/api"
@@ -53,7 +52,7 @@ func TestEncodeEmbedding(t *testing.T) {
 				wantReqOptsLen:  3,
 				wantWarningsLen: 0,
 				expectedParams: jina.TextEmbeddingNewParams{
-					Model: openai.EmbeddingModel("text-embedding-3-small"),
+					Model: jina.EmbeddingModel("text-embedding-3-small"),
 					Input: []string{"a", "b", "c"},
 				},
 			},
@@ -97,7 +96,7 @@ func TestEncodeEmbedding(t *testing.T) {
 				assert.Len(t, warnings, tt.wantWarningsLen)
 
 				// Params: model id
-				assert.Equal(t, openai.EmbeddingModel(tt.modelID), params.Model)
+				assert.Equal(t, jina.EmbeddingModel(tt.modelID), params.Model)
 
 				// Params: input union mirrors provided values
 				assert.Equal(t, tt.values, params.Input)
@@ -199,7 +198,7 @@ func TestEncodeEmbedding(t *testing.T) {
 				assert.Len(t, warnings, tt.wantWarningsLen)
 
 				// Params: model id
-				assert.Equal(t, openai.EmbeddingModel(tt.modelID), params.Model)
+				assert.Equal(t, jina.EmbeddingModel(tt.modelID), params.Model)
 
 				// Params: input union mirrors provided values
 				assert.Equal(t, tt.values, params.Input)

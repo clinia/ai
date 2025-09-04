@@ -1,11 +1,10 @@
-// codec/decode_embedding_test.go
 package codec
 
 import (
 	"net/http"
 	"testing"
 
-	"github.com/openai/openai-go"
+	"github.com/openai/openai-go/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.jetify.com/ai/api"

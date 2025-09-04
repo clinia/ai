@@ -3,7 +3,7 @@ package codec
 import (
 	"net/http"
 
-	"github.com/openai/openai-go"
+	"github.com/openai/openai-go/v2"
 	"go.jetify.com/ai/api"
 )
 

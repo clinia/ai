@@ -8,8 +8,8 @@ import (
 	"iter"
 	"time"
 
-	"github.com/openai/openai-go/packages/param"
-	"github.com/openai/openai-go/responses"
+	"github.com/openai/openai-go/v2/packages/param"
+	"github.com/openai/openai-go/v2/responses"
 	"go.jetify.com/ai/api"
 )
 
@@ -23,7 +23,7 @@ type StreamReader interface {
 
 // DecodeStream converts an OpenAI SSE stream to our API's StreamResponse.
 // This is the main entry point for decoding OpenAI streams.
-func DecodeStream(stream StreamReader) (api.StreamResponse, error) {
+func DecodeStream(stream StreamReader) (*api.StreamResponse, error) {
 	decoder := &streamDecoder{}
 	return decoder.DecodeStream(stream)
 }
@@ -62,12 +62,12 @@ type toolCallInfo struct {
 }
 
 // DecodeStream processes an OpenAI stream and returns our API stream format.
-func (d *streamDecoder) DecodeStream(stream StreamReader) (api.StreamResponse, error) {
+func (d *streamDecoder) DecodeStream(stream StreamReader) (*api.StreamResponse, error) {
 	if d.ongoingToolCalls == nil {
 		d.ongoingToolCalls = make(map[int64]toolCallInfo)
 	}
 
-	return api.StreamResponse{
+	return &api.StreamResponse{
 		Stream: d.decodeEvents(stream),
 	}, nil
 }
@@ -336,7 +336,8 @@ func (d *streamDecoder) decodeResponseCompleted(event responses.ResponseStreamEv
 // The final finish event's reason is affected, and errors might be reported via FinishEvent.
 func (d *streamDecoder) decodeResponseFailedOrIncomplete(event responses.ResponseStreamEventUnion) api.StreamEvent {
 	var reason string
-	if event.Type == "response.failed" {
+	switch event.Type {
+	case "response.failed":
 		failedEvent := event.AsResponseFailed()
 		reason = failedEvent.Response.IncompleteDetails.Reason
 		// Potentially, if failedEvent.Response.Error is not nil, we could also emit an ErrorEvent here.
@@ -344,7 +345,7 @@ func (d *streamDecoder) decodeResponseFailedOrIncomplete(event responses.Respons
 		// if errDetails := failedEvent.Response.Error; errDetails.Code != "" || errDetails.Message != "" {
 		//  // This would be a place to consider if a direct error event is also needed
 		// }
-	} else if event.Type == "response.incomplete" {
+	case "response.incomplete":
 		incompleteEvent := event.AsResponseIncomplete()
 		reason = incompleteEvent.Response.IncompleteDetails.Reason
 	}

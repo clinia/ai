@@ -12,7 +12,7 @@ type EmbeddingOptions[T any] struct {
 	Model            api.EmbeddingModel[T]
 }
 
-// EmbeddingOption mutates EmbeddingOptions (builder pattern).
+// EmbeddingOption mutates EmbeddingOptions.
 type EmbeddingOption[T any] func(*EmbeddingOptions[T])
 
 // WithEmbeddingHeaders sets extra HTTP headers for this embedding call.

@@ -8,11 +8,8 @@ import (
 	"go.jetify.com/ai/provider/jina/client/internal/requestconfig"
 )
 
-// RequestOption is an option for the requests made by the openai API Client
-// which can be supplied to clients, services, and methods. You can read more about this functional
-// options pattern in our [README].
-//
-// [README]: https://pkg.go.dev/github.com/openai/openai-go#readme-requestoptions
+// RequestOption is an option for the requests made by the jina API Client
+// which can be supplied to clients, services, and methods.
 type RequestOption = requestconfig.RequestOption
 
 func WithBaseURL(raw string) RequestOption {

@@ -22,7 +22,7 @@ func TestDecodeEmbedding(t *testing.T) {
 		{
 			name:       "nil response -> error",
 			in:         nil,
-			wantErrSub: "response from OpenAI embeddings API is nil",
+			wantErrSub: "response from Jina embeddings API is nil",
 		},
 		{
 			name: "maps data and usage; copies vectors; empty headers",

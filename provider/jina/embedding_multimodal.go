@@ -9,7 +9,7 @@ import (
 	"go.jetify.com/ai/provider/jina/internal/codec"
 )
 
-// EmbeddingModel represents an OpenAI embedding model.
+// EmbeddingModel represents an Jina embedding model.
 type MultimodalEmbeddingModel struct {
 	modelID string
 	pc      ProviderConfig
@@ -17,7 +17,7 @@ type MultimodalEmbeddingModel struct {
 
 var _ api.EmbeddingModel[string] = &EmbeddingModel{}
 
-// NewEmbeddingModel creates a new OpenAI embedding model.
+// NewEmbeddingModel creates a new Jina embedding model.
 func (p *Provider) NewMultimodalEmbeddingModel(modelID string) *MultimodalEmbeddingModel {
 	// Create model with provider's client
 	model := &MultimodalEmbeddingModel{
@@ -61,7 +61,7 @@ func (m *MultimodalEmbeddingModel) DoEmbed(
 	values []jina.MultimodalEmbeddingInput,
 	opts api.EmbeddingOptions,
 ) (api.EmbeddingResponse, error) {
-	embeddingParams, openaiOpts, _, err := codec.EncodeMultimodalEmbedding(
+	embeddingParams, jinaOpts, _, err := codec.EncodeMultimodalEmbedding(
 		m.modelID,
 		values,
 		opts,
@@ -70,7 +70,7 @@ func (m *MultimodalEmbeddingModel) DoEmbed(
 		return api.EmbeddingResponse{}, err
 	}
 
-	resp, err := m.pc.client.Embeddings.NewMultiModal(ctx, embeddingParams, openaiOpts...)
+	resp, err := m.pc.client.Embeddings.NewMultiModal(ctx, embeddingParams, jinaOpts...)
 	if err != nil {
 		return api.EmbeddingResponse{}, err
 	}

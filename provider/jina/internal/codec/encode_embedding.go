@@ -8,7 +8,7 @@ import (
 	"go.jetify.com/ai/provider/jina/client/option"
 )
 
-// EncodeEmbedding builds OpenAI params + request options from the unified API options.
+// EncodeEmbedding builds Jina params + request options from the unified API options.
 func EncodeMultimodalEmbedding(
 	modelID string,
 	values []jina.MultimodalEmbeddingInput,
@@ -31,7 +31,7 @@ func EncodeMultimodalEmbedding(
 	return params, reqOpts, warnings, nil
 }
 
-// EncodeEmbedding builds OpenAI params + request options from the unified API options.
+// EncodeEmbedding builds Jina params + request options from the unified API options.
 func EncodeEmbedding(
 	modelID string,
 	values []string,

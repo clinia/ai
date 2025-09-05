@@ -14,7 +14,7 @@ import (
 func TestDoEmbed(t *testing.T) {
 	standardInput := []string{"Hello", "World"}
 
-	// Standard OpenAI response body used across tests
+	// Standard Jina response body used across tests
 	standardResponseBody := `{
         "object": "list",
         "data": [
@@ -149,7 +149,7 @@ func runDoEmbedTests(t *testing.T, tests []struct {
 			server := httpmock.NewServer(t, testCase.exchanges)
 			defer server.Close()
 
-			// Set up client options for the OpenAI client
+			// Set up client options for the Jina client
 			clientOptions := []option.RequestOption{
 				option.WithBaseURL(server.BaseURL()),
 				option.WithAPIKey("test-key"),

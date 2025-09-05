@@ -80,10 +80,6 @@ type embeddingNewParams[T any] struct {
 	// The input must not exceed the max input tokens for the model (8192 tokens for
 	// all embedding models), cannot be an empty string, and any array must be 2048
 	// dimensions or less.
-	// [Example Python code](https://cookbook.openai.com/examples/how_to_count_tokens_with_tiktoken)
-	// for counting tokens. In addition to the per-input token limit, all embedding
-	// models enforce a maximum of 300,000 tokens summed across all inputs in a single
-	// request.
 	Input T `json:"input"`
 	// Task to perform. e.g. "text-matching", "retrieval.query", "retrieval.passage".
 	Task *string `json:"task,omitempty"`
@@ -114,5 +110,5 @@ const (
 func NewEmbeddingService(opts ...option.RequestOption) (r EmbeddingService) {
 	r = EmbeddingService{}
 	r.Options = opts
-	return
+	return r
 }

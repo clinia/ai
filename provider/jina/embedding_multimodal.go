@@ -15,7 +15,7 @@ type MultimodalEmbeddingModel struct {
 	pc      ProviderConfig
 }
 
-var _ api.EmbeddingModel[string] = &EmbeddingModel{}
+var _ api.EmbeddingModel[jina.MultimodalEmbeddingInput] = &MultimodalEmbeddingModel{}
 
 // NewEmbeddingModel creates a new Jina embedding model.
 func (p *Provider) NewMultimodalEmbeddingModel(modelID string) *MultimodalEmbeddingModel {

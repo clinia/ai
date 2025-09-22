@@ -30,7 +30,7 @@ func example() error {
 			{Text: &Text1},
 			{Text: &Text2},
 		},
-		ai.WithEmbeddingProviderMetadata[jina.MultimodalEmbeddingInput](
+		ai.WithEmbeddingProviderMetadata(
 			"jina",
 			jina.MultimodalEmbeddingNewParams{
 				Task: &task,

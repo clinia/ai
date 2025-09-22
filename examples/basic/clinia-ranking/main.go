@@ -38,7 +38,7 @@ func run() error {
 		return err
 	}
 
-	ranker, err := provider.NewRankingModel("hybrid-ranker:1")
+	ranker, err := provider.NewRankingModel("hybrid-ranker", "1")
 	if err != nil {
 		return err
 	}

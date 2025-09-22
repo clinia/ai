@@ -3,6 +3,7 @@ package clinia
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"go.jetify.com/ai/api"
 	"go.jetify.com/ai/provider/clinia/internal/codec"
@@ -19,17 +20,23 @@ type ChunkingModel struct {
 var _ api.ChunkingModel = (*ChunkingModel)(nil)
 
 // NewChunkingModel constructs a chunking model wrapper.
-func (p *Provider) NewChunkingModel(modelID string) (*ChunkingModel, error) {
-	const defaultModelVersion = "1"
-
+func (p *Provider) NewChunkingModel(modelName, modelVersion string) (*ChunkingModel, error) {
 	if p.chunker == nil {
 		return nil, fmt.Errorf("clinia/chunk: provider chunker is nil")
 	}
 
-	name, version := splitModelIdentifier(modelID, defaultModelVersion)
+	name := strings.TrimSpace(modelName)
+	if name == "" {
+		return nil, fmt.Errorf("clinia/chunk: model name is required")
+	}
+
+	version := strings.TrimSpace(modelVersion)
+	if version == "" {
+		return nil, fmt.Errorf("clinia/chunk: model version is required")
+	}
 
 	return &ChunkingModel{
-		modelID:      modelID,
+		modelID:      buildModelID(name, version),
 		modelName:    name,
 		modelVersion: version,
 		config: ProviderConfig{

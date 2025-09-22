@@ -33,25 +33,31 @@ func TestRankingModel(t *testing.T) {
 	ctx := context.Background()
 
 	tests := []struct {
-		name     string
-		modelID  string
-		query    string
-		texts    []string
-		opts     api.RankingOptions
-		ranker   *fakeRanker
-		wantErr  bool
-		wantResp *api.RankingResponse
-		after    func(t *testing.T, ranker *fakeRanker)
+		name         string
+		modelName    string
+		modelVersion string
+		query        string
+		texts        []string
+		opts         api.RankingOptions
+		ranker       *fakeRanker
+		wantModelErr bool
+		wantErr      bool
+		wantResp     *api.RankingResponse
+		wantModelID  string
+		after        func(t *testing.T, ranker *fakeRanker)
 	}{
 		{
-			name:    "successful ranking",
-			modelID: "ranker:2",
-			query:   "heart",
-			texts:   []string{"a", "b"},
+			name:         "successful ranking",
+			modelName:    "ranker",
+			modelVersion: "2",
+			query:        "heart",
+			texts:        []string{"a", "b"},
 			ranker: &fakeRanker{
 				response: &cliniaclient.RankResponse{ID: "req", Scores: []float32{0.9, 0.2}},
 			},
-			wantResp: &api.RankingResponse{RequestID: "req", Scores: []float64{0.9, 0.2}},
+			wantModelErr: false,
+			wantResp:     &api.RankingResponse{RequestID: "req", Scores: []float64{0.9, 0.2}},
+			wantModelID:  "ranker:2",
 			after: func(t *testing.T, ranker *fakeRanker) {
 				require.Equal(t, 1, ranker.calls)
 				require.Equal(t, "ranker", ranker.lastModelName)
@@ -63,34 +69,52 @@ func TestRankingModel(t *testing.T) {
 			},
 		},
 		{
-			name:    "propagates provider error",
-			modelID: "ranker",
-			query:   "q",
-			texts:   []string{"a"},
-			ranker:  &fakeRanker{err: errors.New("boom")},
-			wantErr: true,
+			name:         "propagates provider error",
+			modelName:    "ranker",
+			modelVersion: "2",
+			query:        "q",
+			texts:        []string{"a"},
+			ranker:       &fakeRanker{err: errors.New("boom")},
+			wantModelErr: false,
+			wantErr:      true,
+			wantModelID:  "ranker:2",
 			after: func(t *testing.T, ranker *fakeRanker) {
 				require.Equal(t, 1, ranker.calls)
 			},
 		},
 		{
-			name:    "validates query",
-			modelID: "ranker",
-			query:   "",
-			texts:   []string{"a"},
-			ranker:  &fakeRanker{},
-			wantErr: true,
+			name:         "requires model version",
+			modelName:    "ranker",
+			modelVersion: "",
+			query:        "q",
+			texts:        []string{"a"},
+			ranker:       &fakeRanker{},
+			wantModelErr: true,
+		},
+		{
+			name:         "validates query",
+			modelName:    "ranker",
+			modelVersion: "2",
+			query:        "",
+			texts:        []string{"a"},
+			ranker:       &fakeRanker{},
+			wantModelErr: false,
+			wantErr:      true,
+			wantModelID:  "ranker:2",
 			after: func(t *testing.T, ranker *fakeRanker) {
 				require.Equal(t, 0, ranker.calls)
 			},
 		},
 		{
-			name:    "validates texts",
-			modelID: "ranker",
-			query:   "q",
-			texts:   []string{},
-			ranker:  &fakeRanker{},
-			wantErr: true,
+			name:         "validates texts",
+			modelName:    "ranker",
+			modelVersion: "2",
+			query:        "q",
+			texts:        []string{},
+			ranker:       &fakeRanker{},
+			wantModelErr: false,
+			wantErr:      true,
+			wantModelID:  "ranker:2",
 			after: func(t *testing.T, ranker *fakeRanker) {
 				require.Equal(t, 0, ranker.calls)
 			},
@@ -104,8 +128,13 @@ func TestRankingModel(t *testing.T) {
 			require.NoError(t, err)
 			provider.ranker = tc.ranker
 
-			model, err := provider.NewRankingModel(tc.modelID)
+			model, err := provider.NewRankingModel(tc.modelName, tc.modelVersion)
+			if tc.wantModelErr {
+				require.Error(t, err)
+				return
+			}
 			require.NoError(t, err)
+			require.Equal(t, tc.wantModelID, model.ModelID())
 			resp, err := model.Rank(ctx, tc.query, tc.texts, tc.opts)
 			if tc.wantErr {
 				require.Error(t, err)

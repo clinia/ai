@@ -20,17 +20,23 @@ type EmbeddingModel struct {
 var _ api.EmbeddingModel[string] = (*EmbeddingModel)(nil)
 
 // NewEmbeddingModel constructs a new embedding model wrapper.
-func (p *Provider) NewEmbeddingModel(modelID string) (*EmbeddingModel, error) {
-	const defaultModelVersion = "1"
-
+func (p *Provider) NewEmbeddingModel(modelName, modelVersion string) (*EmbeddingModel, error) {
 	if p.embedder == nil {
 		return nil, fmt.Errorf("clinia/embed: provider embedder is nil")
 	}
 
-	name, version := splitModelIdentifier(modelID, defaultModelVersion)
+	name := strings.TrimSpace(modelName)
+	if name == "" {
+		return nil, fmt.Errorf("clinia/embed: model name is required")
+	}
+
+	version := strings.TrimSpace(modelVersion)
+	if version == "" {
+		return nil, fmt.Errorf("clinia/embed: model version is required")
+	}
 
 	model := &EmbeddingModel{
-		modelID:      modelID,
+		modelID:      buildModelID(name, version),
 		modelName:    name,
 		modelVersion: version,
 		config: ProviderConfig{
@@ -75,26 +81,4 @@ func (m *EmbeddingModel) DoEmbed(ctx context.Context, values []string, opts api.
 	}
 
 	return codec.DecodeEmbedding(resp)
-}
-
-func splitModelIdentifier(modelID string, defaultVersion string) (string, string) {
-	trimmed := strings.TrimSpace(modelID)
-	if trimmed == "" {
-		return "", defaultVersion
-	}
-
-	parts := strings.Split(trimmed, ":")
-	if len(parts) > 1 {
-		name := strings.TrimSpace(parts[0])
-		version := strings.TrimSpace(parts[1])
-		if name == "" {
-			name = trimmed
-		}
-		if version == "" {
-			version = defaultVersion
-		}
-		return name, version
-	}
-
-	return trimmed, defaultVersion
 }

@@ -3,6 +3,7 @@ package clinia
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"go.jetify.com/ai/api"
 	"go.jetify.com/ai/provider/clinia/internal/codec"
@@ -17,17 +18,23 @@ type RankingModel struct {
 
 var _ api.RankingModel = (*RankingModel)(nil)
 
-func (p *Provider) NewRankingModel(modelID string) (*RankingModel, error) {
-	const defaultModelVersion = "1"
-
+func (p *Provider) NewRankingModel(modelName, modelVersion string) (*RankingModel, error) {
 	if p.ranker == nil {
 		return nil, fmt.Errorf("clinia/rank: provider ranker is nil")
 	}
 
-	name, version := splitModelIdentifier(modelID, defaultModelVersion)
+	name := strings.TrimSpace(modelName)
+	if name == "" {
+		return nil, fmt.Errorf("clinia/rank: model name is required")
+	}
+
+	version := strings.TrimSpace(modelVersion)
+	if version == "" {
+		return nil, fmt.Errorf("clinia/rank: model version is required")
+	}
 
 	return &RankingModel{
-		modelID:      modelID,
+		modelID:      buildModelID(name, version),
 		modelName:    name,
 		modelVersion: version,
 		config: ProviderConfig{

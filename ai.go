@@ -13,6 +13,20 @@ func EmbedMany[T any](
 	return embed(ctx, values, config)
 }
 
+func RankMany(
+	ctx context.Context, model api.RankingModel, query string, texts []string, opts ...RankingOption,
+) (api.RankingResponse, error) {
+	config := buildRankingConfig(opts)
+	return model.Rank(ctx, query, texts, config.RankingOptions)
+}
+
+func ChunkMany(
+	ctx context.Context, model api.ChunkingModel, texts []string, opts ...ChunkingOption,
+) (api.ChunkingResponse, error) {
+	config := buildChunkingConfig(opts)
+	return model.Chunk(ctx, texts, config.ChunkingOptions)
+}
+
 func embed[T any](
 	ctx context.Context, values []T, opts EmbeddingOptions[T],
 ) (api.EmbeddingResponse, error) {

@@ -7,16 +7,10 @@ import (
 )
 
 func EmbedMany[T any](
-	ctx context.Context, model api.EmbeddingModel[T], values []T, opts ...EmbeddingOption[T],
+	ctx context.Context, model api.EmbeddingModel[T], values []T, opts ...EmbeddingOption,
 ) (api.EmbeddingResponse, error) {
-	config := buildEmbeddingConfig(model, opts)
-	return embed(ctx, values, config)
-}
-
-func embed[T any](
-	ctx context.Context, values []T, opts EmbeddingOptions[T],
-) (api.EmbeddingResponse, error) {
-	return opts.Model.DoEmbed(ctx, values, opts.EmbeddingOptions)
+	config := buildEmbeddingConfig(opts)
+	return model.DoEmbed(ctx, values, config)
 }
 
 // TODO: do we want to rename from GenerateText to Generate and from StreamText to Stream?

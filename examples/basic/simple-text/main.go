@@ -7,12 +7,12 @@ import (
 	"github.com/k0kubun/pp/v3"
 	"go.jetify.com/ai"
 	"go.jetify.com/ai/api"
-	openaiprovider "go.jetify.com/ai/provider/openai"
+	"go.jetify.com/ai/provider/openai"
 )
 
 func example() error {
 	// Initialize the OpenAI provider
-	provider := openaiprovider.NewProvider()
+	provider := openai.NewProvider()
 
 	// Create a model
 	model := provider.NewLanguageModel("gpt-4o-mini")

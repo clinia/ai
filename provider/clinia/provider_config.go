@@ -7,4 +7,5 @@ type ProviderConfig struct {
 	embedder     cliniaclient.Embedder
 	ranker       cliniaclient.Ranker
 	chunker      cliniaclient.Chunker
+	sparse       cliniaclient.SparseEmbedder
 }

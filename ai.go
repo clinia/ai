@@ -17,14 +17,21 @@ func RankMany(
 	ctx context.Context, model api.RankingModel, query string, texts []string, opts ...RankingOption,
 ) (api.RankingResponse, error) {
 	config := buildRankingConfig(opts)
-	return model.Rank(ctx, query, texts, config.RankingOptions)
+	return model.Rank(ctx, query, texts, config)
 }
 
 func ChunkMany(
 	ctx context.Context, model api.ChunkingModel, texts []string, opts ...ChunkingOption,
 ) (api.ChunkingResponse, error) {
 	config := buildChunkingConfig(opts)
-	return model.Chunk(ctx, texts, config.ChunkingOptions)
+	return model.Chunk(ctx, texts, config)
+}
+
+func SparseEmbedMany(
+	ctx context.Context, model api.SparseEmbeddingModel, texts []string, opts ...SparseEmbeddingOption,
+) (api.SparseEmbeddingResponse, error) {
+	config := buildSparseEmbeddingConfig(opts)
+	return model.SparseEmbed(ctx, texts, config)
 }
 
 // TODO: do we want to rename from GenerateText to Generate and from StreamText to Stream?

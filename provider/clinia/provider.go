@@ -15,6 +15,7 @@ type Provider struct {
 	embedder      cliniaclient.Embedder
 	ranker        cliniaclient.Ranker
 	chunker       cliniaclient.Chunker
+	sparse        cliniaclient.SparseEmbedder
 }
 
 // Option configures the Provider during construction.
@@ -71,6 +72,7 @@ func NewProvider(ctx context.Context, opts ...Option) (*Provider, error) {
 	embedder := cliniaclient.NewEmbedder(ctx, clientOpts)
 	ranker := cliniaclient.NewRanker(clientOpts)
 	chunker := cliniaclient.NewChunker(ctx, clientOpts)
+	sparse := cliniaclient.NewSparseEmbedder(ctx, clientOpts)
 
 	return &Provider{
 		name:          options.name,
@@ -78,6 +80,7 @@ func NewProvider(ctx context.Context, opts ...Option) (*Provider, error) {
 		embedder:      embedder,
 		ranker:        ranker,
 		chunker:       chunker,
+		sparse:        sparse,
 	}, nil
 }
 
@@ -95,6 +98,9 @@ func (p *Provider) Ranker() cliniaclient.Ranker { return p.ranker }
 
 // Chunker exposes the underlying Clinia chunker implementation.
 func (p *Provider) Chunker() cliniaclient.Chunker { return p.chunker }
+
+// SparseEmbedder exposes the underlying Clinia sparse embedder implementation.
+func (p *Provider) SparseEmbedder() cliniaclient.SparseEmbedder { return p.sparse }
 
 func (p *Provider) providerNameFor(component string) string {
 	return fmt.Sprintf("%s.%s", p.name, component)

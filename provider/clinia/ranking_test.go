@@ -30,7 +30,7 @@ func (f *fakeRanker) Rank(ctx context.Context, modelName, modelVersion string, r
 func (f *fakeRanker) Ready(ctx context.Context, modelName, modelVersion string) error { return nil }
 
 func TestRankingModel(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 
 	tests := []struct {
 		name         string

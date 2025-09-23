@@ -55,7 +55,7 @@ func (m *ChunkingModel) ModelID() string { return m.modelID }
 func (m *ChunkingModel) SupportsParallelCalls() bool { return true }
 
 func (m *ChunkingModel) Chunk(ctx context.Context, texts []string, opts api.ChunkingOptions) (api.ChunkingResponse, error) {
-	params, err := codec.EncodeChunk(m.modelName, m.modelVersion, texts)
+	params, err := codec.EncodeChunk(texts)
 	if err != nil {
 		return api.ChunkingResponse{}, err
 	}
@@ -64,7 +64,7 @@ func (m *ChunkingModel) Chunk(ctx context.Context, texts []string, opts api.Chun
 		return api.ChunkingResponse{}, fmt.Errorf("clinia/chunk: chunker is nil")
 	}
 
-	resp, err := m.config.chunker.Chunk(ctx, params.ModelName, params.ModelVersion, params.Request)
+	resp, err := m.config.chunker.Chunk(ctx, m.modelName, m.modelVersion, params.Request)
 	if err != nil {
 		return api.ChunkingResponse{}, err
 	}

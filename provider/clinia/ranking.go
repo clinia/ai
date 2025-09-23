@@ -53,7 +53,7 @@ func (m *RankingModel) ModelID() string { return m.modelID }
 func (m *RankingModel) SupportsParallelCalls() bool { return true }
 
 func (m *RankingModel) Rank(ctx context.Context, query string, texts []string, opts api.RankingOptions) (api.RankingResponse, error) {
-	params, err := codec.EncodeRank(m.modelName, m.modelVersion, query, texts, opts)
+	params, err := codec.EncodeRank(query, texts, opts)
 	if err != nil {
 		return api.RankingResponse{}, err
 	}
@@ -62,7 +62,7 @@ func (m *RankingModel) Rank(ctx context.Context, query string, texts []string, o
 		return api.RankingResponse{}, fmt.Errorf("clinia/rank: ranker is nil")
 	}
 
-	res, err := m.config.ranker.Rank(ctx, params.ModelName, params.ModelVersion, params.Request)
+	res, err := m.config.ranker.Rank(ctx, m.modelName, m.modelVersion, params.Request)
 	if err != nil {
 		return api.RankingResponse{}, err
 	}

@@ -9,13 +9,11 @@ import (
 
 // ChunkParams holds the Clinia chunk request.
 type ChunkParams struct {
-	ModelName    string
-	ModelVersion string
-	Request      cliniaclient.ChunkRequest
+	Request cliniaclient.ChunkRequest
 }
 
 // EncodeChunk builds the Clinia chunk request from SDK inputs.
-func EncodeChunk(modelName, modelVersion string, texts []string) (ChunkParams, error) {
+func EncodeChunk(texts []string) (ChunkParams, error) {
 	if len(texts) == 0 {
 		return ChunkParams{}, fmt.Errorf("clinia/chunk: texts cannot be empty")
 	}
@@ -25,9 +23,7 @@ func EncodeChunk(modelName, modelVersion string, texts []string) (ChunkParams, e
 	}
 
 	return ChunkParams{
-		ModelName:    modelName,
-		ModelVersion: modelVersion,
-		Request:      req,
+		Request: req,
 	}, nil
 }
 

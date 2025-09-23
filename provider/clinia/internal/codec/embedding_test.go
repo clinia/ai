@@ -23,9 +23,7 @@ func TestEncodeEmbedding(t *testing.T) {
 			modelVersion: "2",
 			values:       []string{"foo", "bar"},
 			want: EmbeddingParams{
-				ModelName:    "dense",
-				ModelVersion: "2",
-				Request:      cliniaclient.EmbedRequest{Texts: []string{"foo", "bar"}},
+				Request: cliniaclient.EmbedRequest{Texts: []string{"foo", "bar"}},
 			},
 		},
 		{
@@ -34,15 +32,8 @@ func TestEncodeEmbedding(t *testing.T) {
 			modelVersion: "",
 			values:       []string{"foo"},
 			want: EmbeddingParams{
-				ModelName:    "dense",
-				ModelVersion: "",
-				Request:      cliniaclient.EmbedRequest{Texts: []string{"foo"}},
+				Request: cliniaclient.EmbedRequest{Texts: []string{"foo"}},
 			},
-		},
-		{
-			name:    "missing model name",
-			values:  []string{"foo"},
-			wantErr: true,
 		},
 		{
 			name:    "empty values",
@@ -53,7 +44,7 @@ func TestEncodeEmbedding(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			params, err := EncodeEmbedding(tt.modelName, tt.modelVersion, tt.values, api.EmbeddingOptions{})
+			params, err := EncodeEmbedding(tt.values, api.EmbeddingOptions{})
 			if tt.wantErr {
 				require.Error(t, err)
 				return

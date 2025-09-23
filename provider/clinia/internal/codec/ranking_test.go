@@ -26,8 +26,6 @@ func TestEncodeRank(t *testing.T) {
 			query:        "heart",
 			texts:        []string{"text1", "text2"},
 			want: RankParams{
-				ModelName:    "ranker",
-				ModelVersion: "2",
 				Request: cliniaclient.RankRequest{
 					Query: "heart",
 					Texts: []string{"text1", "text2"},
@@ -50,7 +48,7 @@ func TestEncodeRank(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			params, err := EncodeRank(tt.modelName, tt.modelVersion, tt.query, tt.texts, tt.opts)
+			params, err := EncodeRank(tt.query, tt.texts, tt.opts)
 			if tt.wantErr {
 				require.Error(t, err)
 				return

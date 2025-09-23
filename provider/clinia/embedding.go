@@ -70,12 +70,12 @@ func (m *EmbeddingModel) MaxEmbeddingsPerCall() *int {
 
 // DoEmbed executes an embedding call against the Clinia embedder.
 func (m *EmbeddingModel) DoEmbed(ctx context.Context, values []string, opts api.EmbeddingOptions) (api.EmbeddingResponse, error) {
-	params, err := codec.EncodeEmbedding(m.modelName, m.modelVersion, values, opts)
+	params, err := codec.EncodeEmbedding(values, opts)
 	if err != nil {
 		return api.EmbeddingResponse{}, err
 	}
 
-	resp, err := m.config.embedder.Embed(ctx, params.ModelName, params.ModelVersion, params.Request)
+	resp, err := m.config.embedder.Embed(ctx, m.modelName, m.modelVersion, params.Request)
 	if err != nil {
 		return api.EmbeddingResponse{}, err
 	}

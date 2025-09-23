@@ -29,101 +29,8 @@ func (f *fakeEmbedder) Embed(ctx context.Context, modelName, modelVersion string
 
 func (f *fakeEmbedder) Ready(ctx context.Context, modelName, modelVersion string) error { return nil }
 
-func TestNewProvider(t *testing.T) {
-	ctx := context.Background()
-
-	tests := []struct {
-		name         string
-		modelName    string
-		modelVersion string
-		values       []string
-		embedder     *fakeEmbedder
-		wantModelErr bool
-		wantErr      bool
-		wantResp     *api.EmbeddingResponse
-		wantModelID  string
-		after        func(t *testing.T, embedder *fakeEmbedder)
-	}{
-		{
-			name:         "successful embedding",
-			modelName:    "dense",
-			modelVersion: "2",
-			values:       []string{"hello"},
-			embedder: &fakeEmbedder{
-				response: &cliniaclient.EmbedResponse{Embeddings: [][]float32{{1, 2}}},
-			},
-			wantModelErr: false,
-			wantResp: &api.EmbeddingResponse{
-				Embeddings: []api.Embedding{
-					{1, 2},
-				},
-			},
-			wantModelID: "dense:2",
-			after: func(t *testing.T, embedder *fakeEmbedder) {
-				require.Equal(t, 1, embedder.calls)
-				require.Equal(t, "dense", embedder.lastModelName)
-				require.Equal(t, "2", embedder.lastModelVersion)
-				require.Equal(t, []string{"hello"}, embedder.lastRequest.Texts)
-			},
-		},
-		{
-			name:         "provider returns error",
-			modelName:    "dense",
-			modelVersion: "2",
-			values:       []string{"hi"},
-			embedder: &fakeEmbedder{
-				err: errors.New("boom"),
-			},
-			wantModelErr: false,
-			wantErr:      true,
-			wantModelID:  "dense:2",
-			after: func(t *testing.T, embedder *fakeEmbedder) {
-				require.Equal(t, 1, embedder.calls)
-			},
-		},
-		{
-			name:         "requires model version",
-			modelName:    "dense",
-			modelVersion: "",
-			values:       []string{"hi"},
-			embedder:     &fakeEmbedder{},
-			wantModelErr: true,
-		},
-		{
-			name:         "empty values produce validation error",
-			modelName:    "dense",
-			modelVersion: "2",
-			values:       []string{},
-			embedder: &fakeEmbedder{
-				response: &cliniaclient.EmbedResponse{Embeddings: [][]float32{}},
-			},
-			wantModelErr: false,
-			wantErr:      true,
-			wantModelID:  "dense:2",
-			after: func(t *testing.T, embedder *fakeEmbedder) {
-				require.Equal(t, 0, embedder.calls)
-			},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			provider, err := NewProvider(ctx, tt.opts...)
-			if tt.wantErr {
-				require.Error(t, err)
-				return
-			}
-			require.NoError(t, err)
-			require.NotNil(t, provider)
-			if tt.assert != nil {
-				tt.assert(t, provider)
-			}
-		})
-	}
-}
-
 func TestEmbeddingModelDoEmbed(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 
 	tests := []struct {
 		name         string
@@ -198,7 +105,6 @@ func TestEmbeddingModelDoEmbed(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			provider, err := NewProvider(ctx, WithRequester(requesterStub{}))
 			require.NoError(t, err)

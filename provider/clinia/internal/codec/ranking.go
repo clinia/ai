@@ -9,13 +9,11 @@ import (
 
 // RankParams holds the resolved Clinia request.
 type RankParams struct {
-	ModelName    string
-	ModelVersion string
-	Request      cliniaclient.RankRequest
+	Request cliniaclient.RankRequest
 }
 
 // EncodeRank converts the SDK call into a Clinia rank request.
-func EncodeRank(modelName, modelVersion, query string, texts []string, opts api.RankingOptions) (RankParams, error) {
+func EncodeRank(query string, texts []string, opts api.RankingOptions) (RankParams, error) {
 	if query == "" {
 		return RankParams{}, fmt.Errorf("clinia/rank: query cannot be empty")
 	}
@@ -29,9 +27,7 @@ func EncodeRank(modelName, modelVersion, query string, texts []string, opts api.
 	}
 
 	return RankParams{
-		ModelName:    modelName,
-		ModelVersion: modelVersion,
-		Request:      req,
+		Request: req,
 	}, nil
 }
 

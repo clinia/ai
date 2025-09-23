@@ -30,7 +30,7 @@ func (f *chunkerStub) Chunk(ctx context.Context, modelName, modelVersion string,
 func (f *chunkerStub) Ready(ctx context.Context, modelName, modelVersion string) error { return nil }
 
 func TestChunkingModel(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 
 	tests := []struct {
 		name         string

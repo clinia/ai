@@ -2994,7 +2994,7 @@ func runGenerateTests(t *testing.T, tests []struct {
 			provider := NewProvider(WithClient(client))
 
 			// Create model with the provider
-			model := provider.NewLanguageModel(modelID)
+			model, _ := provider.LanguageModel(modelID)
 
 			// Call Generate with the test's options (or empty if not specified)
 			resp, err := model.Generate(t.Context(), testCase.prompt, testCase.options)
@@ -3050,7 +3050,7 @@ func runStreamTests(t *testing.T, tests []struct {
 			provider := NewProvider(WithClient(client))
 
 			// Create model with the provider
-			model := provider.NewLanguageModel(modelID)
+			model, _ := provider.LanguageModel(modelID)
 
 			// Call Stream with the test's options (or empty if not specified)
 			resp, err := model.Stream(t.Context(), testCase.prompt, testCase.options)

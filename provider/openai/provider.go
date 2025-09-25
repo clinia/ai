@@ -2,6 +2,7 @@ package openai
 
 import (
 	"github.com/openai/openai-go/v2"
+	"go.jetify.com/ai/api"
 )
 
 type Provider struct {
@@ -10,6 +11,8 @@ type Provider struct {
 	// name is the name of the provider, overrides the default "openai".
 	name string
 }
+
+var _ api.Provider = &Provider{}
 
 type ProviderOption func(*Provider)
 

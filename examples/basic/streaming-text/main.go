@@ -13,7 +13,7 @@ import (
 func example() error {
 	// Create a model
 	provider := openai.NewProvider()
-	model := provider.NewLanguageModel("gpt-4o-mini")
+	model, _ := provider.LanguageModel("gpt-4o-mini")
 
 	// Stream text
 	response, err := ai.StreamTextStr(

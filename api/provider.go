@@ -22,6 +22,7 @@ type Provider interface {
 	// Returns:
 	//   The text embedding model associated with the id
 	//   error of type NoSuchModelError if no such model exists
+	// TODO: uncomment when we're ready to support embeddings.
 	TextEmbeddingModel(modelID string) (EmbeddingModel[string], error)
 
 	// ImageModel returns the image model with the given id.
@@ -34,5 +35,6 @@ type Provider interface {
 	// Returns:
 	//   The image model associated with the id, or nil if image models are not supported
 	//   error of type NoSuchModelError if no such model exists and image models are supported
-	ImageModel(modelID string) (*ImageModel, error)
+	// TODO: Uncomment when we're ready to support images models.
+	// ImageModel(modelID string) (*ImageModel, error)
 }

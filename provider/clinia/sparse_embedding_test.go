@@ -97,7 +97,11 @@ func TestSparseEmbeddingModel(t *testing.T) {
 			require.NoError(t, err)
 			p.sparse = tc.sparse
 
-			m, err := p.SparseEmbeddingModel(tc.modelName, tc.modelVersion)
+			modelID := tc.modelName
+			if tc.modelVersion != "" {
+				modelID = tc.modelName + ":" + tc.modelVersion
+			}
+			m, err := p.SparseEmbeddingModel(modelID)
 			if tc.wantCtorErr {
 				require.Error(t, err)
 				return

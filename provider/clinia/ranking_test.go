@@ -128,7 +128,11 @@ func TestRankingModel(t *testing.T) {
 			require.NoError(t, err)
 			provider.ranker = tc.ranker
 
-			model, err := provider.RankingModel(tc.modelName, tc.modelVersion)
+			modelID := tc.modelName
+			if tc.modelVersion != "" {
+				modelID = tc.modelName + ":" + tc.modelVersion
+			}
+			model, err := provider.RankingModel(modelID)
 			if tc.wantModelErr {
 				require.Error(t, err)
 				return

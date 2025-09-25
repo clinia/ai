@@ -3,7 +3,6 @@ package clinia
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"go.jetify.com/ai/api"
 	"go.jetify.com/ai/provider/clinia/internal/codec"
@@ -19,24 +18,19 @@ type ChunkingModel struct {
 
 var _ api.ChunkingModel = (*ChunkingModel)(nil)
 
-// ChunkingModel constructs a chunking model wrapper.
-func (p *Provider) ChunkingModel(modelName, modelVersion string) (*ChunkingModel, error) {
+// ChunkingModel constructs a chunking model wrapper from a model ID ("name:version").
+func (p *Provider) ChunkingModel(modelID string) (*ChunkingModel, error) {
 	if p.chunker == nil {
-		return nil, fmt.Errorf("clinia/chunk: provider chunker is nil")
+		return nil, fmt.Errorf("%s: provider chunker is nil", p.name)
 	}
 
-	name := strings.TrimSpace(modelName)
-	if name == "" {
-		return nil, fmt.Errorf("clinia/chunk: model name is required")
-	}
-
-	version := strings.TrimSpace(modelVersion)
-	if version == "" {
-		return nil, fmt.Errorf("clinia/chunk: model version is required")
+	name, version, err := splitModelID(p.name, modelID)
+	if err != nil {
+		return nil, err
 	}
 
 	return &ChunkingModel{
-		modelID:      buildModelID(name, version),
+		modelID:      joinModelID(name, version),
 		modelName:    name,
 		modelVersion: version,
 		config: ProviderConfig{
@@ -61,7 +55,7 @@ func (m *ChunkingModel) Chunk(ctx context.Context, texts []string, opts api.Chun
 	}
 
 	if m.config.chunker == nil {
-		return api.ChunkingResponse{}, fmt.Errorf("clinia/chunk: chunker is nil")
+		return api.ChunkingResponse{}, fmt.Errorf("%s: chunker is nil", m.config.providerName)
 	}
 
 	resp, err := m.config.chunker.Chunk(ctx, m.modelName, m.modelVersion, params.Request)

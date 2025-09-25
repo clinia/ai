@@ -3,7 +3,6 @@ package clinia
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"go.jetify.com/ai/api"
 	"go.jetify.com/ai/provider/clinia/internal/codec"
@@ -18,23 +17,18 @@ type RankingModel struct {
 
 var _ api.RankingModel = (*RankingModel)(nil)
 
-func (p *Provider) RankingModel(modelName, modelVersion string) (*RankingModel, error) {
+func (p *Provider) RankingModel(modelID string) (*RankingModel, error) {
 	if p.ranker == nil {
-		return nil, fmt.Errorf("clinia/rank: provider ranker is nil")
+		return nil, fmt.Errorf("%s: provider ranker is nil", p.name)
 	}
 
-	name := strings.TrimSpace(modelName)
-	if name == "" {
-		return nil, fmt.Errorf("clinia/rank: model name is required")
-	}
-
-	version := strings.TrimSpace(modelVersion)
-	if version == "" {
-		return nil, fmt.Errorf("clinia/rank: model version is required")
+	name, version, err := splitModelID(p.name, modelID)
+	if err != nil {
+		return nil, err
 	}
 
 	return &RankingModel{
-		modelID:      buildModelID(name, version),
+		modelID:      joinModelID(name, version),
 		modelName:    name,
 		modelVersion: version,
 		config: ProviderConfig{
@@ -59,7 +53,7 @@ func (m *RankingModel) Rank(ctx context.Context, query string, texts []string, o
 	}
 
 	if m.config.ranker == nil {
-		return api.RankingResponse{}, fmt.Errorf("clinia/rank: ranker is nil")
+		return api.RankingResponse{}, fmt.Errorf("%s: ranker is nil", m.config.providerName)
 	}
 
 	res, err := m.config.ranker.Rank(ctx, m.modelName, m.modelVersion, params.Request)

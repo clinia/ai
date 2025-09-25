@@ -3,7 +3,6 @@ package clinia
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"go.jetify.com/ai/api"
 	"go.jetify.com/ai/provider/clinia/internal/codec"
@@ -19,23 +18,18 @@ type SparseEmbeddingModel struct {
 
 var _ api.SparseEmbeddingModel = (*SparseEmbeddingModel)(nil)
 
-func (p *Provider) SparseEmbeddingModel(modelName, modelVersion string) (*SparseEmbeddingModel, error) {
+func (p *Provider) SparseEmbeddingModel(modelID string) (*SparseEmbeddingModel, error) {
 	if p.sparse == nil {
-		return nil, fmt.Errorf("clinia/sparse: provider sparse embedder is nil")
+		return nil, fmt.Errorf("%s: provider sparse embedder is nil", p.name)
 	}
 
-	name := strings.TrimSpace(modelName)
-	if name == "" {
-		return nil, fmt.Errorf("clinia/sparse: model name is required")
-	}
-
-	version := strings.TrimSpace(modelVersion)
-	if version == "" {
-		return nil, fmt.Errorf("clinia/sparse: model version is required")
+	name, version, err := splitModelID(p.name, modelID)
+	if err != nil {
+		return nil, err
 	}
 
 	return &SparseEmbeddingModel{
-		modelID:      buildModelID(modelName, modelVersion),
+		modelID:      joinModelID(name, version),
 		modelName:    name,
 		modelVersion: version,
 		config: ProviderConfig{
@@ -56,7 +50,7 @@ func (m *SparseEmbeddingModel) SparseEmbed(ctx context.Context, texts []string, 
 		return api.SparseEmbeddingResponse{}, err
 	}
 	if m.config.sparse == nil {
-		return api.SparseEmbeddingResponse{}, fmt.Errorf("clinia/sparse: sparse embedder is nil")
+		return api.SparseEmbeddingResponse{}, fmt.Errorf("%s: sparse embedder is nil", m.config.providerName)
 	}
 	res, err := m.config.sparse.SparseEmbed(ctx, params.ModelName, params.ModelVersion, params.Request)
 	if err != nil {

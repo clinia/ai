@@ -38,7 +38,7 @@ func run() error {
 		return err
 	}
 
-	chunker, err := provider.ChunkingModel("text-chunker", "1")
+	chunker, err := provider.ChunkingModel("text-chunker:1")
 	if err != nil {
 		return err
 	}

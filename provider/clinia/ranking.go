@@ -18,7 +18,7 @@ type RankingModel struct {
 
 var _ api.RankingModel = (*RankingModel)(nil)
 
-func (p *Provider) NewRankingModel(modelName, modelVersion string) (*RankingModel, error) {
+func (p *Provider) RankingModel(modelName, modelVersion string) (*RankingModel, error) {
 	if p.ranker == nil {
 		return nil, fmt.Errorf("clinia/rank: provider ranker is nil")
 	}

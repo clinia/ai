@@ -19,7 +19,7 @@ type SparseEmbeddingModel struct {
 
 var _ api.SparseEmbeddingModel = (*SparseEmbeddingModel)(nil)
 
-func (p *Provider) NewSparseEmbeddingModel(modelName, modelVersion string) (*SparseEmbeddingModel, error) {
+func (p *Provider) SparseEmbeddingModel(modelName, modelVersion string) (*SparseEmbeddingModel, error) {
 	if p.sparse == nil {
 		return nil, fmt.Errorf("clinia/sparse: provider sparse embedder is nil")
 	}

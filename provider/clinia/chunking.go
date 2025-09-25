@@ -19,8 +19,8 @@ type ChunkingModel struct {
 
 var _ api.ChunkingModel = (*ChunkingModel)(nil)
 
-// NewChunkingModel constructs a chunking model wrapper.
-func (p *Provider) NewChunkingModel(modelName, modelVersion string) (*ChunkingModel, error) {
+// ChunkingModel constructs a chunking model wrapper.
+func (p *Provider) ChunkingModel(modelName, modelVersion string) (*ChunkingModel, error) {
 	if p.chunker == nil {
 		return nil, fmt.Errorf("clinia/chunk: provider chunker is nil")
 	}

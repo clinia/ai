@@ -122,7 +122,7 @@ func TestChunkingModel(t *testing.T) {
 			require.NoError(t, err)
 			provider.chunker = tc.chunker
 
-			model, err := provider.NewChunkingModel(tc.modelName, tc.modelVersion)
+			model, err := provider.ChunkingModel(tc.modelName, tc.modelVersion)
 			if tc.wantModelErr {
 				require.Error(t, err)
 				return

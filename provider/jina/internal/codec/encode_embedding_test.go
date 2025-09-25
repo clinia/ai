@@ -104,21 +104,21 @@ func TestEncodeEmbedding(t *testing.T) {
 		}
 	})
 	t.Run("multimodal embedding", func(t *testing.T) {
-        tests := []struct {
-            name            string
-            modelID         string
-            values          []api.MultimodalEmbeddingInput
-            headers         http.Header
-            wantReqOptsLen  int
-            wantWarningsLen int
-            expectedParams  jina.MultimodalEmbeddingNewParams
-        }{
+		tests := []struct {
+			name            string
+			modelID         string
+			values          []api.MultimodalEmbeddingInput
+			headers         http.Header
+			wantReqOptsLen  int
+			wantWarningsLen int
+			expectedParams  jina.MultimodalEmbeddingNewParams
+		}{
 			{
 				name:    "no headers, two values",
 				modelID: "text-embedding-3-small",
-                values: []api.MultimodalEmbeddingInput{
-                    {Text: ptrString("hello")}, {Text: ptrString("world")}, {Image: ptrString("")},
-                },
+				values: []api.MultimodalEmbeddingInput{
+					{Text: ptrString("hello")}, {Text: ptrString("world")}, {Image: ptrString("")},
+				},
 				headers:         nil,
 				wantReqOptsLen:  0,
 				wantWarningsLen: 0,
@@ -134,11 +134,11 @@ func TestEncodeEmbedding(t *testing.T) {
 			{
 				name:    "with single and multi-value headers",
 				modelID: "text-embedding-3-small",
-                values: []api.MultimodalEmbeddingInput{
-                    {Text: ptrString("a")},
-                    {Image: ptrString("alsdkjfa")},
-                    {Text: ptrString("b")},
-                },
+				values: []api.MultimodalEmbeddingInput{
+					{Text: ptrString("a")},
+					{Image: ptrString("alsdkjfa")},
+					{Text: ptrString("b")},
+				},
 				headers: func() http.Header {
 					h := http.Header{}
 					h.Add("X-One", "1")
@@ -161,7 +161,7 @@ func TestEncodeEmbedding(t *testing.T) {
 			{
 				name:            "empty input slice",
 				modelID:         "text-embedding-3-large",
-                values:          []api.MultimodalEmbeddingInput{},
+				values:          []api.MultimodalEmbeddingInput{},
 				headers:         nil,
 				wantReqOptsLen:  0,
 				wantWarningsLen: 0,
@@ -173,7 +173,7 @@ func TestEncodeEmbedding(t *testing.T) {
 			{
 				name:            "different model id",
 				modelID:         "text-embedding-3-small",
-                values:          []api.MultimodalEmbeddingInput{{Text: ptrString("only one")}},
+				values:          []api.MultimodalEmbeddingInput{{Text: ptrString("only one")}},
 				headers:         http.Header{},
 				wantReqOptsLen:  0,
 				wantWarningsLen: 0,
@@ -188,8 +188,8 @@ func TestEncodeEmbedding(t *testing.T) {
 			t.Run(tt.name, func(t *testing.T) {
 				opts := api.EmbeddingOptions{Headers: tt.headers}
 
-                params, reqOpts, warnings, err := EncodeMultimodalEmbedding(tt.modelID, tt.values, opts)
-                require.NoError(t, err)
+				params, reqOpts, warnings, err := EncodeMultimodalEmbedding(tt.modelID, tt.values, opts)
+				require.NoError(t, err)
 
 				// Request options (opaque type): assert count derived from headers
 				assert.Len(t, reqOpts, tt.wantReqOptsLen)
@@ -201,13 +201,13 @@ func TestEncodeEmbedding(t *testing.T) {
 				assert.Equal(t, jina.EmbeddingModel(tt.modelID), params.Model)
 
 				// Params: input union mirrors provided values
-                // Map expected API values to Jina client values for comparison
-                mapped := make([]jina.MultimodalEmbeddingInput, len(tt.values))
-                for i, v := range tt.values {
-                    mapped[i] = jina.MultimodalEmbeddingInput{Text: v.Text, Image: v.Image}
-                }
-                assert.Equal(t, mapped, params.Input)
-            })
-        }
-    })
+				// Map expected API values to Jina client values for comparison
+				mapped := make([]jina.MultimodalEmbeddingInput, len(tt.values))
+				for i, v := range tt.values {
+					mapped[i] = jina.MultimodalEmbeddingInput{Text: v.Text, Image: v.Image}
+				}
+				assert.Equal(t, mapped, params.Input)
+			})
+		}
+	})
 }

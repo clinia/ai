@@ -23,7 +23,12 @@ type Provider interface {
 	//   The text embedding model associated with the id
 	//   error of type NoSuchModelError if no such model exists
 	// TODO: uncomment when we're ready to support embeddings.
-	TextEmbeddingModel(modelID string) (EmbeddingModel[string], error)
+    TextEmbeddingModel(modelID string) (EmbeddingModel[string], error)
+
+    // MultimodalEmbeddingModel returns the multimodal embedding model with the given id.
+    // Providers that don't support multimodal embeddings should return
+    // an UnsupportedFunctionalityError.
+    MultimodalEmbeddingModel(modelID string) (EmbeddingModel[MultimodalEmbeddingInput], error)
 
 	// ImageModel returns the image model with the given id.
 	// The model id is then passed to the provider function to get the model.

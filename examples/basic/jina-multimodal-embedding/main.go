@@ -8,7 +8,6 @@ import (
 	"go.jetify.com/ai"
 	"go.jetify.com/ai/api"
 	jinaprovider "go.jetify.com/ai/provider/jina"
-	jina "go.jetify.com/ai/provider/jina/client"
 )
 
 func example() error {
@@ -16,7 +15,7 @@ func example() error {
 	provider := jinaprovider.NewProvider()
 
 	// Create a model
-	model := provider.NewMultimodalEmbeddingModel("jina-embeddings-v4")
+	model, _ := provider.MultimodalEmbeddingModel("jina-embeddings-v4")
 
 	Text1 := "Artificial intelligence is the simulation of human intelligence in machines."
 
@@ -26,16 +25,11 @@ func example() error {
 	response, err := ai.EmbedMany(
 		context.Background(),
 		model,
-		[]jina.MultimodalEmbeddingInput{
+		[]api.MultimodalEmbeddingInput{
 			{Text: &Text1},
 			{Text: &Text2},
 		},
-		ai.WithEmbeddingProviderMetadata(
-			"jina",
-			jina.MultimodalEmbeddingNewParams{
-				Task: &task,
-			},
-		),
+		ai.WithEmbeddingProviderMetadata("jina", map[string]any{"task": task}),
 	)
 	if err != nil {
 		return err

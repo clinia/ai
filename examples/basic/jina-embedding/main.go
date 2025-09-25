@@ -15,7 +15,7 @@ func example() error {
 	provider := jinaprovider.NewProvider()
 
 	// Create a model
-	model := provider.NewEmbeddingModel("jina-embeddings-v2-base-es")
+	model, _ := provider.TextEmbeddingModel("jina-embeddings-v2-base-es")
 
 	// Generate text
 	response, err := ai.EmbedMany(

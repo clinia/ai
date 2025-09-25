@@ -34,7 +34,7 @@ func example() error {
 		return err
 	}
 
-	model, err := provider.NewEmbeddingModel("dense-embedder", "1")
+    model, err := provider.TextEmbeddingModel("dense-embedder:1")
 	if err != nil {
 		return err
 	}

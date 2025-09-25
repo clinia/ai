@@ -1,11 +1,12 @@
 package clinia
 
 import (
-	"context"
-	"fmt"
+    "context"
+    "fmt"
 
-	cliniaclient "github.com/clinia/models-client-go/cliniamodel"
-	"github.com/clinia/models-client-go/cliniamodel/common"
+    cliniaclient "github.com/clinia/models-client-go/cliniamodel"
+    "github.com/clinia/models-client-go/cliniamodel/common"
+    "go.jetify.com/ai/api"
 )
 
 // Provider wires the Clinia requester with AI SDK model interfaces.
@@ -17,6 +18,9 @@ type Provider struct {
 	chunker       cliniaclient.Chunker
 	sparse        cliniaclient.SparseEmbedder
 }
+
+// Assert Provider implements the api.Provider interface
+var _ api.Provider = (*Provider)(nil)
 
 // Option configures the Provider during construction.
 type Option func(*providerOptions)
@@ -103,5 +107,15 @@ func (p *Provider) Chunker() cliniaclient.Chunker { return p.chunker }
 func (p *Provider) SparseEmbedder() cliniaclient.SparseEmbedder { return p.sparse }
 
 func (p *Provider) providerNameFor(component string) string {
-	return fmt.Sprintf("%s.%s", p.name, component)
+    return fmt.Sprintf("%s.%s", p.name, component)
+}
+
+// LanguageModel is not supported by the Clinia provider.
+func (p *Provider) LanguageModel(modelID string) (api.LanguageModel, error) {
+    return nil, api.NewUnsupportedFunctionalityError("language_model", "Clinia provider does not expose a language model")
+}
+
+// MultimodalEmbeddingModel is not supported by the Clinia provider.
+func (p *Provider) MultimodalEmbeddingModel(modelID string) (api.EmbeddingModel[api.MultimodalEmbeddingInput], error) {
+    return nil, api.NewUnsupportedFunctionalityError("multimodal_embeddings", "Clinia provider does not support multimodal embeddings")
 }

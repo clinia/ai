@@ -1,12 +1,12 @@
 package clinia
 
 import (
-	"context"
-	"fmt"
-	"strings"
+    "context"
+    "fmt"
+    "strings"
 
-	"go.jetify.com/ai/api"
-	"go.jetify.com/ai/provider/clinia/internal/codec"
+    "go.jetify.com/ai/api"
+    "go.jetify.com/ai/provider/clinia/internal/codec"
 )
 
 // EmbeddingModel represents a Clinia embedding model backed by the models-client-go embedder.
@@ -19,33 +19,43 @@ type EmbeddingModel struct {
 
 var _ api.EmbeddingModel[string] = (*EmbeddingModel)(nil)
 
-// NewEmbeddingModel constructs a new embedding model wrapper.
-func (p *Provider) NewEmbeddingModel(modelName, modelVersion string) (*EmbeddingModel, error) {
-	if p.embedder == nil {
-		return nil, fmt.Errorf("clinia/embed: provider embedder is nil")
-	}
+// TextEmbeddingModel constructs a new text embedding model from a model ID in the form "name:version".
+// Implements api.Provider.TextEmbeddingModel.
+func (p *Provider) TextEmbeddingModel(modelID string) (api.EmbeddingModel[string], error) {
+    if p.embedder == nil {
+        return nil, fmt.Errorf("clinia/embed: provider embedder is nil")
+    }
 
-	name := strings.TrimSpace(modelName)
-	if name == "" {
-		return nil, fmt.Errorf("clinia/embed: model name is required")
-	}
+    id := strings.TrimSpace(modelID)
+    if id == "" {
+        return nil, fmt.Errorf("clinia/embed: model id is required (expected 'name:version')")
+    }
 
-	version := strings.TrimSpace(modelVersion)
-	if version == "" {
-		return nil, fmt.Errorf("clinia/embed: model version is required")
-	}
+    // Require explicit version; split on first ':'
+    parts := strings.SplitN(id, ":", 2)
+    if len(parts) != 2 {
+        return nil, fmt.Errorf("clinia/embed: model version is required in id (expected 'name:version')")
+    }
 
-	model := &EmbeddingModel{
-		modelID:      buildModelID(name, version),
-		modelName:    name,
-		modelVersion: version,
-		config: ProviderConfig{
-			providerName: p.providerNameFor("embedding"),
-			embedder:     p.embedder,
-		},
-	}
+    name := strings.TrimSpace(parts[0])
+    version := strings.TrimSpace(parts[1])
+    if name == "" {
+        return nil, fmt.Errorf("clinia/embed: model name is required")
+    }
+    if version == "" {
+        return nil, fmt.Errorf("clinia/embed: model version is required")
+    }
 
-	return model, nil
+    model := &EmbeddingModel{
+        modelID:      buildModelID(name, version),
+        modelName:    name,
+        modelVersion: version,
+        config: ProviderConfig{
+            providerName: p.providerNameFor("embedding"),
+            embedder:     p.embedder,
+        },
+    }
+    return model, nil
 }
 
 func (m *EmbeddingModel) ProviderName() string {

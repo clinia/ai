@@ -6,6 +6,13 @@ import (
 	"go.jetify.com/ai/api"
 )
 
+func EmbedMany[T any](
+	ctx context.Context, model api.EmbeddingModel[T], values []T, opts ...EmbeddingOption,
+) (api.EmbeddingResponse, error) {
+	config := buildEmbeddingConfig(opts)
+	return model.DoEmbed(ctx, values, config)
+}
+
 // TODO: do we want to rename from GenerateText to Generate and from StreamText to Stream?
 
 // GenerateText uses a language model to generate a text response from a given prompt.

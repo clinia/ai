@@ -16,8 +16,8 @@ type LanguageModel struct {
 
 var _ api.LanguageModel = &LanguageModel{}
 
-// NewLanguageModel creates a new OpenAI language model.
-func (p *Provider) NewLanguageModel(modelID string) *LanguageModel {
+// LanguageModel creates a new OpenAI language model.
+func (p *Provider) LanguageModel(modelID string) (api.LanguageModel, error) {
 	// Create model with provider's client
 	model := &LanguageModel{
 		modelID: modelID,
@@ -27,7 +27,7 @@ func (p *Provider) NewLanguageModel(modelID string) *LanguageModel {
 		},
 	}
 
-	return model
+	return model, nil
 }
 
 func (m *LanguageModel) ProviderName() string {

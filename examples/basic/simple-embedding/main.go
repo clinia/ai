@@ -15,7 +15,7 @@ func example() error {
 	provider := openai.NewProvider()
 
 	// Create a model
-	model := provider.NewEmbeddingModel("text-embedding-3-small")
+	model, _ := provider.TextEmbeddingModel("text-embedding-3-small")
 
 	// Generate text
 	response, err := ai.EmbedMany(

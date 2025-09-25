@@ -16,8 +16,8 @@ type EmbeddingModel struct {
 
 var _ api.EmbeddingModel[string] = &EmbeddingModel{}
 
-// NewEmbeddingModel creates a new OpenAI embedding model.
-func (p *Provider) NewEmbeddingModel(modelID string) *EmbeddingModel {
+// TextEmbeddingModel creates a new OpenAI embedding model.
+func (p *Provider) TextEmbeddingModel(modelID string) (api.EmbeddingModel[string], error) {
 	// Create model with provider's client
 	model := &EmbeddingModel{
 		modelID: modelID,
@@ -27,7 +27,7 @@ func (p *Provider) NewEmbeddingModel(modelID string) *EmbeddingModel {
 		},
 	}
 
-	return model
+	return model, nil
 }
 
 func (m *EmbeddingModel) ProviderName() string {

@@ -15,7 +15,7 @@ func example() error {
 	provider := openai.NewProvider()
 
 	// Create a model
-	model := provider.NewLanguageModel("gpt-4o-mini")
+	model, _ := provider.LanguageModel("gpt-4o-mini")
 
 	// Generate text
 	response, err := ai.GenerateTextStr(

@@ -1,34 +1,34 @@
 package codec
 
 import (
-    "net/http"
+	"net/http"
 
-    "go.jetify.com/ai/api"
-    jina "go.jetify.com/ai/provider/jina/client"
-    "go.jetify.com/ai/provider/jina/client/option"
+	"go.jetify.com/ai/api"
+	jina "go.jetify.com/ai/provider/jina/client"
+	"go.jetify.com/ai/provider/jina/client/option"
 )
 
 // EncodeEmbedding builds Jina params + request options from the unified API options.
 func EncodeMultimodalEmbedding(
-    modelID string,
-    values []api.MultimodalEmbeddingInput,
-    opts api.EmbeddingOptions,
+	modelID string,
+	values []api.MultimodalEmbeddingInput,
+	opts api.EmbeddingOptions,
 ) (jina.MultimodalEmbeddingNewParams, []option.RequestOption, []api.CallWarning, error) {
 	var reqOpts []option.RequestOption
 	if opts.Headers != nil {
 		reqOpts = append(reqOpts, applyHeaders(opts.Headers)...)
 	}
 
-    // Map API-level inputs to Jina client inputs
-    mapped := make([]jina.MultimodalEmbeddingInput, len(values))
-    for i, v := range values {
-        mapped[i] = jina.MultimodalEmbeddingInput{Text: v.Text, Image: v.Image}
-    }
+	// Map API-level inputs to Jina client inputs
+	mapped := make([]jina.MultimodalEmbeddingInput, len(values))
+	for i, v := range values {
+		mapped[i] = jina.MultimodalEmbeddingInput{Text: v.Text, Image: v.Image}
+	}
 
-    params := jina.MultimodalEmbeddingNewParams{
-        Model: jina.EmbeddingModel(modelID),
-        Input: mapped,
-    }
+	params := jina.MultimodalEmbeddingNewParams{
+		Model: jina.EmbeddingModel(modelID),
+		Input: mapped,
+	}
 
 	applyProviderMultimodalMetadata(&params, opts)
 

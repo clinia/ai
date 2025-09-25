@@ -110,11 +110,11 @@ func TestEmbeddingModelDoEmbed(t *testing.T) {
 			require.NoError(t, err)
 			provider.embedder = tt.embedder
 
-            modelID := tt.modelName
-            if tt.modelVersion != "" {
-                modelID = tt.modelName + ":" + tt.modelVersion
-            }
-            model, err := provider.TextEmbeddingModel(modelID)
+			modelID := tt.modelName
+			if tt.modelVersion != "" {
+				modelID = tt.modelName + ":" + tt.modelVersion
+			}
+			model, err := provider.TextEmbeddingModel(modelID)
 			if tt.wantModelErr {
 				require.Error(t, err)
 				return

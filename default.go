@@ -16,7 +16,7 @@ var defaultLanguageModel atomic.Value
 
 func init() {
 	provider := openai.NewProvider()
-	model := provider.NewLanguageModel(openai.ChatModelGPT5)
+	model, _ := provider.LanguageModel(openai.ChatModelGPT5)
 	defaultLanguageModel.Store(&modelWrapper{model: model})
 }
 

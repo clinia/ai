@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"go.jetify.com/ai/api"
-	jina "go.jetify.com/ai/provider/jina/client"
 	"go.jetify.com/ai/provider/jina/internal/codec"
 )
 
@@ -15,10 +14,10 @@ type MultimodalEmbeddingModel struct {
 	pc      ProviderConfig
 }
 
-var _ api.EmbeddingModel[jina.MultimodalEmbeddingInput] = &MultimodalEmbeddingModel{}
+var _ api.EmbeddingModel[api.MultimodalEmbeddingInput] = &MultimodalEmbeddingModel{}
 
 // NewEmbeddingModel creates a new Jina embedding model.
-func (p *Provider) NewMultimodalEmbeddingModel(modelID string) *MultimodalEmbeddingModel {
+func (p *Provider) MultimodalEmbeddingModel(modelID string) (api.EmbeddingModel[api.MultimodalEmbeddingInput], error) {
 	// Create model with provider's client
 	model := &MultimodalEmbeddingModel{
 		modelID: modelID,
@@ -29,7 +28,7 @@ func (p *Provider) NewMultimodalEmbeddingModel(modelID string) *MultimodalEmbedd
 		},
 	}
 
-	return model
+	return model, nil
 }
 
 func (m *MultimodalEmbeddingModel) ProviderName() string {
@@ -58,7 +57,7 @@ func (m *MultimodalEmbeddingModel) MaxEmbeddingsPerCall() *int {
 // DoEmbed implements api.EmbeddingModel.
 func (m *MultimodalEmbeddingModel) DoEmbed(
 	ctx context.Context,
-	values []jina.MultimodalEmbeddingInput,
+	values []api.MultimodalEmbeddingInput,
 	opts api.EmbeddingOptions,
 ) (api.EmbeddingResponse, error) {
 	embeddingParams, jinaOpts, _, err := codec.EncodeMultimodalEmbedding(

@@ -2,6 +2,7 @@ package openai
 
 import (
 	"github.com/openai/openai-go/v2"
+	"go.jetify.com/ai/api"
 )
 
 type Provider struct {
@@ -10,6 +11,8 @@ type Provider struct {
 	// name is the name of the provider, overrides the default "openai".
 	name string
 }
+
+var _ api.Provider = &Provider{}
 
 type ProviderOption func(*Provider)
 
@@ -31,4 +34,9 @@ func NewProvider(opts ...ProviderOption) *Provider {
 	}
 
 	return p
+}
+
+// MultimodalEmbeddingModel is not supported by OpenAI Provider at this time.
+func (p *Provider) MultimodalEmbeddingModel(modelID string) (api.EmbeddingModel[api.MultimodalEmbeddingInput], error) {
+	return nil, api.NewUnsupportedFunctionalityError(p.name, "MultiModalEmbeddingModel")
 }

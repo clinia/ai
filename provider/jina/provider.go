@@ -1,6 +1,7 @@
 package jina
 
 import (
+	"go.jetify.com/ai/api"
 	jina "go.jetify.com/ai/provider/jina/client"
 )
 
@@ -14,6 +15,8 @@ type Provider struct {
 	// apiKey is the API key used for authentication.
 	apiKey string
 }
+
+var _ api.Provider = &Provider{}
 
 type ProviderOption func(*Provider)
 
@@ -41,4 +44,9 @@ func NewProvider(opts ...ProviderOption) *Provider {
 	}
 
 	return p
+}
+
+// LanguageModel creates a new OpenAI language model.
+func (p *Provider) LanguageModel(modelID string) (api.LanguageModel, error) {
+	return nil, api.NewUnsupportedFunctionalityError(p.name, "LanguageModel")
 }

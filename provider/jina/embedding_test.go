@@ -165,7 +165,7 @@ func runDoEmbedTests(t *testing.T, tests []struct {
 			provider := NewProvider(WithClient(client))
 
 			// Create model with the provider
-			model := provider.NewEmbeddingModel(modelID)
+			model, _ := provider.TextEmbeddingModel(modelID)
 
 			// Build embedding options
 			resp, err := model.DoEmbed(t.Context(), testCase.input, testCase.options)

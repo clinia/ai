@@ -94,18 +94,6 @@ func (p *Provider) Name() string { return p.name }
 // ClientOptions exposes the shared client options for advanced integrations.
 func (p *Provider) ClientOptions() common.ClientOptions { return p.clientOptions }
 
-// Embedder exposes the underlying Clinia embedder implementation.
-func (p *Provider) Embedder() cliniaclient.Embedder { return p.embedder }
-
-// Ranker exposes the underlying Clinia ranker implementation.
-func (p *Provider) Ranker() cliniaclient.Ranker { return p.ranker }
-
-// Chunker exposes the underlying Clinia chunker implementation.
-func (p *Provider) Chunker() cliniaclient.Chunker { return p.chunker }
-
-// SparseEmbedder exposes the underlying Clinia sparse embedder implementation.
-func (p *Provider) SparseEmbedder() cliniaclient.SparseEmbedder { return p.sparse }
-
 func (p *Provider) providerNameFor(component string) string {
 	return fmt.Sprintf("%s.%s", p.name, component)
 }

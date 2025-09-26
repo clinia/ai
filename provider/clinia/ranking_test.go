@@ -6,8 +6,10 @@ import (
 	"testing"
 
 	cliniaclient "github.com/clinia/models-client-go/cliniamodel"
+	"github.com/clinia/models-client-go/cliniamodel/common"
 	"github.com/stretchr/testify/require"
 	"go.jetify.com/ai/api"
+	"go.jetify.com/ai/provider/clinia/internal/codec"
 )
 
 type fakeRanker struct {
@@ -17,6 +19,7 @@ type fakeRanker struct {
 	response         *cliniaclient.RankResponse
 	err              error
 	calls            int
+	boundRequester   common.Requester
 }
 
 func (f *fakeRanker) Rank(ctx context.Context, modelName, modelVersion string, req cliniaclient.RankRequest) (*cliniaclient.RankResponse, error) {
@@ -33,18 +36,19 @@ func TestRankingModel(t *testing.T) {
 	ctx := t.Context()
 
 	tests := []struct {
-		name         string
-		modelName    string
-		modelVersion string
-		query        string
-		texts        []string
-		opts         api.RankingOptions
-		ranker       *fakeRanker
-		wantModelErr bool
-		wantErr      bool
-		wantResp     *api.RankingResponse
-		wantModelID  string
-		after        func(t *testing.T, ranker *fakeRanker)
+		name              string
+		modelName         string
+		modelVersion      string
+		query             string
+		texts             []string
+		opts              api.RankingOptions
+		ranker            *fakeRanker
+		requesterCloseErr error
+		wantModelErr      bool
+		wantErr           bool
+		wantResp          *api.RankingResponse
+		wantModelID       string
+		after             func(t *testing.T, ranker *fakeRanker, requester *requesterStub)
 	}{
 		{
 			name:         "successful ranking",
@@ -55,17 +59,14 @@ func TestRankingModel(t *testing.T) {
 			ranker: &fakeRanker{
 				response: &cliniaclient.RankResponse{ID: "req", Scores: []float32{0.9, 0.2}},
 			},
-			wantModelErr: false,
-			wantResp:     &api.RankingResponse{RequestID: "req", Scores: []float64{0.9, 0.2}},
-			wantModelID:  "ranker:2",
-			after: func(t *testing.T, ranker *fakeRanker) {
+			wantResp:    &api.RankingResponse{RequestID: "req", Scores: []float64{0.9, 0.2}},
+			wantModelID: "ranker:2",
+			after: func(t *testing.T, ranker *fakeRanker, requester *requesterStub) {
 				require.Equal(t, 1, ranker.calls)
 				require.Equal(t, "ranker", ranker.lastModelName)
 				require.Equal(t, "2", ranker.lastModelVersion)
-				require.Equal(t, cliniaclient.RankRequest{
-					Query: "heart",
-					Texts: []string{"a", "b"},
-				}, ranker.lastRequest)
+				require.Equal(t, cliniaclient.RankRequest{Query: "heart", Texts: []string{"a", "b"}}, ranker.lastRequest)
+				require.Equal(t, requester, ranker.boundRequester)
 			},
 		},
 		{
@@ -75,11 +76,11 @@ func TestRankingModel(t *testing.T) {
 			query:        "q",
 			texts:        []string{"a"},
 			ranker:       &fakeRanker{err: errors.New("boom")},
-			wantModelErr: false,
 			wantErr:      true,
 			wantModelID:  "ranker:2",
-			after: func(t *testing.T, ranker *fakeRanker) {
+			after: func(t *testing.T, ranker *fakeRanker, requester *requesterStub) {
 				require.Equal(t, 1, ranker.calls)
+				require.Equal(t, requester, ranker.boundRequester)
 			},
 		},
 		{
@@ -98,10 +99,9 @@ func TestRankingModel(t *testing.T) {
 			query:        "",
 			texts:        []string{"a"},
 			ranker:       &fakeRanker{},
-			wantModelErr: false,
 			wantErr:      true,
 			wantModelID:  "ranker:2",
-			after: func(t *testing.T, ranker *fakeRanker) {
+			after: func(t *testing.T, ranker *fakeRanker, requester *requesterStub) {
 				require.Equal(t, 0, ranker.calls)
 			},
 		},
@@ -112,43 +112,81 @@ func TestRankingModel(t *testing.T) {
 			query:        "q",
 			texts:        []string{},
 			ranker:       &fakeRanker{},
-			wantModelErr: false,
 			wantErr:      true,
 			wantModelID:  "ranker:2",
-			after: func(t *testing.T, ranker *fakeRanker) {
+			after: func(t *testing.T, ranker *fakeRanker, requester *requesterStub) {
 				require.Equal(t, 0, ranker.calls)
+			},
+		},
+		{
+			name:              "close error surfaces",
+			modelName:         "ranker",
+			modelVersion:      "2",
+			query:             "heart",
+			texts:             []string{"a"},
+			ranker:            &fakeRanker{response: &cliniaclient.RankResponse{Scores: []float32{0.4}}},
+			requesterCloseErr: errors.New("close ranker"),
+			wantErr:           true,
+			wantModelID:       "ranker:2",
+			after: func(t *testing.T, ranker *fakeRanker, requester *requesterStub) {
+				require.Equal(t, 1, ranker.calls)
+				require.Equal(t, requester, ranker.boundRequester)
 			},
 		},
 	}
 
 	for _, tt := range tests {
-		tc := tt
-		t.Run(tc.name, func(t *testing.T) {
-			provider, err := NewProvider(ctx, WithRequester(requesterStub{}))
-			require.NoError(t, err)
-			provider.ranker = tc.ranker
+		t.Run(tt.name, func(t *testing.T) {
+			requester := &requesterStub{closeErr: tt.requesterCloseErr}
+			// Inject requester via ProviderMetadata
+			if tt.opts.ProviderMetadata == nil {
+				tt.opts.ProviderMetadata = api.NewProviderMetadata(nil)
+			}
+			tt.opts.ProviderMetadata.Set("clinia", codec.Metadata{Requester: requester})
 
-			modelID := tc.modelName
-			if tc.modelVersion != "" {
-				modelID = tc.modelName + ":" + tc.modelVersion
+			provider, err := NewProvider(ctx,
+				withRankerFactory(func(opts common.ClientOptions) cliniaclient.Ranker {
+					tt.ranker.boundRequester = opts.Requester
+					return tt.ranker
+				}),
+			)
+			require.NoError(t, err)
+
+			modelID := tt.modelName
+			if tt.modelVersion != "" {
+				modelID = tt.modelName + ":" + tt.modelVersion
 			}
 			model, err := provider.RankingModel(modelID)
-			if tc.wantModelErr {
+			if tt.wantModelErr {
 				require.Error(t, err)
+				require.Equal(t, 0, requester.closeCalls)
 				return
 			}
 			require.NoError(t, err)
-			require.Equal(t, tc.wantModelID, model.ModelID())
-			resp, err := model.Rank(ctx, tc.query, tc.texts, tc.opts)
-			if tc.wantErr {
+			require.Equal(t, tt.wantModelID, model.ModelID())
+
+			resp, err := model.Rank(ctx, tt.query, tt.texts, tt.opts)
+			if tt.wantErr {
 				require.Error(t, err)
 			} else {
 				require.NoError(t, err)
-				require.Equal(t, tc.wantResp.RequestID, resp.RequestID)
-				require.InDeltaSlice(t, tc.wantResp.Scores, resp.Scores, 1e-6)
+				require.NotNil(t, tt.wantResp)
+				require.Equal(t, tt.wantResp.RequestID, resp.RequestID)
+				require.InDeltaSlice(t, tt.wantResp.Scores, resp.Scores, 1e-6)
 			}
-			if tc.after != nil {
-				tc.after(t, tc.ranker)
+
+			if len(tt.texts) == 0 || tt.query == "" {
+				require.Equal(t, 0, requester.closeCalls)
+			} else {
+				require.Equal(t, 1, requester.closeCalls)
+			}
+
+			if tt.after != nil {
+				tt.after(t, tt.ranker, requester)
+			}
+
+			if tt.requesterCloseErr != nil && tt.query != "" && len(tt.texts) > 0 {
+				require.ErrorIs(t, err, tt.requesterCloseErr)
 			}
 		})
 	}

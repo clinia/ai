@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	cliniaclient "github.com/clinia/models-client-go/cliniamodel"
+	"github.com/clinia/models-client-go/cliniamodel/common"
 	"go.jetify.com/ai/api"
 )
 
@@ -11,17 +12,22 @@ type SparseParams struct {
 	ModelName    string
 	ModelVersion string
 	Request      cliniaclient.SparseEmbedRequest
+	Requester    common.Requester
 }
 
-func EncodeSparseEmbedding(modelName, modelVersion string, texts []string, _ api.SparseEmbeddingOptions) (SparseParams, error) {
+func EncodeSparseEmbedding(modelName, modelVersion string, texts []string, opts api.SparseEmbeddingOptions) (SparseParams, error) {
 	if len(texts) == 0 {
 		return SparseParams{}, fmt.Errorf("clinia/sparse: texts cannot be empty")
 	}
-	return SparseParams{
+	out := SparseParams{
 		ModelName:    modelName,
 		ModelVersion: modelVersion,
 		Request:      cliniaclient.SparseEmbedRequest{Texts: texts},
-	}, nil
+	}
+	if meta := GetMetadata(opts); meta != nil && meta.Requester != nil {
+		out.Requester = meta.Requester
+	}
+	return out, nil
 }
 
 func DecodeSparseEmbedding(resp *cliniaclient.SparseEmbedResponse) (api.SparseEmbeddingResponse, error) {

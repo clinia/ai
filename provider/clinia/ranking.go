@@ -18,22 +18,19 @@ type RankingModel struct {
 var _ api.RankingModel = (*RankingModel)(nil)
 
 func (p *Provider) RankingModel(modelID string) (*RankingModel, error) {
-	if p.ranker == nil {
-		return nil, fmt.Errorf("%s: provider ranker is nil", p.name)
-	}
-
 	name, version, err := splitModelID(p.name, modelID)
 	if err != nil {
 		return nil, err
 	}
 
 	return &RankingModel{
-		modelID:      joinModelID(name, version),
+		modelID:      modelID,
 		modelName:    name,
 		modelVersion: version,
 		config: ProviderConfig{
-			providerName: p.providerNameFor("ranker"),
-			ranker:       p.ranker,
+			providerName:  p.providerNameFor("ranker"),
+			clientOptions: p.clientOptions,
+			newRanker:     p.newRanker,
 		},
 	}, nil
 }
@@ -46,20 +43,45 @@ func (m *RankingModel) ModelID() string { return m.modelID }
 
 func (m *RankingModel) SupportsParallelCalls() bool { return true }
 
-func (m *RankingModel) Rank(ctx context.Context, query string, texts []string, opts api.RankingOptions) (api.RankingResponse, error) {
+func (m *RankingModel) Rank(ctx context.Context, query string, texts []string, opts api.RankingOptions) (resp api.RankingResponse, err error) {
 	params, err := codec.EncodeRank(query, texts, opts)
 	if err != nil {
 		return api.RankingResponse{}, err
 	}
-
-	if m.config.ranker == nil {
-		return api.RankingResponse{}, fmt.Errorf("%s: ranker is nil", m.config.providerName)
+	requester := params.Requester
+	if requester == nil {
+		requester, err = makeRequester(ctx, opts.BaseURL)
+		if err != nil {
+			return api.RankingResponse{}, err
+		}
+		if requester == nil {
+			return api.RankingResponse{}, fmt.Errorf("%s: requester is nil", m.config.providerName)
+		}
 	}
 
-	res, err := m.config.ranker.Rank(ctx, m.modelName, m.modelVersion, params.Request)
+	defer func() {
+		if cerr := requester.Close(); cerr != nil && err == nil {
+			err = cerr
+		}
+	}()
+
+	if m.config.newRanker == nil {
+		return api.RankingResponse{}, fmt.Errorf("%s: ranker factory is nil", m.config.providerName)
+	}
+
+	ranker := m.config.newRanker(m.config.clientOptionsWith(requester))
+	if ranker == nil {
+		return api.RankingResponse{}, fmt.Errorf("%s: ranker factory returned nil", m.config.providerName)
+	}
+
+	res, err := ranker.Rank(ctx, m.modelName, m.modelVersion, params.Request)
 	if err != nil {
 		return api.RankingResponse{}, err
 	}
 
-	return codec.DecodeRank(res)
+	resp, err = codec.DecodeRank(res)
+	if err != nil {
+		return api.RankingResponse{}, err
+	}
+	return resp, nil
 }

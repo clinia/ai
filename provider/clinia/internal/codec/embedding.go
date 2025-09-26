@@ -4,12 +4,14 @@ import (
 	"fmt"
 
 	cliniaclient "github.com/clinia/models-client-go/cliniamodel"
+	"github.com/clinia/models-client-go/cliniamodel/common"
 	"go.jetify.com/ai/api"
 )
 
 // EmbeddingParams represents a fully prepared request for the Clinia embedder.
 type EmbeddingParams struct {
-	Request cliniaclient.EmbedRequest
+	Request   cliniaclient.EmbedRequest
+	Requester common.Requester
 }
 
 // EncodeEmbedding converts the SDK request into the Clinia embedder request payload.
@@ -22,6 +24,10 @@ func EncodeEmbedding(values []string, opts api.EmbeddingOptions) (EmbeddingParam
 		Request: cliniaclient.EmbedRequest{
 			Texts: values,
 		},
+	}
+
+	if meta := GetMetadata(opts); meta != nil && meta.Requester != nil {
+		params.Requester = meta.Requester
 	}
 
 	return params, nil

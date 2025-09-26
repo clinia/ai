@@ -6,8 +6,10 @@ import (
 	"testing"
 
 	cliniaclient "github.com/clinia/models-client-go/cliniamodel"
+	"github.com/clinia/models-client-go/cliniamodel/common"
 	"github.com/stretchr/testify/require"
 	"go.jetify.com/ai/api"
+	"go.jetify.com/ai/provider/clinia/internal/codec"
 )
 
 type sparseStub struct {
@@ -17,6 +19,7 @@ type sparseStub struct {
 	lastRequest      cliniaclient.SparseEmbedRequest
 	response         *cliniaclient.SparseEmbedResponse
 	err              error
+	boundRequester   common.Requester
 }
 
 func (s *sparseStub) SparseEmbed(ctx context.Context, modelName, modelVersion string, req cliniaclient.SparseEmbedRequest) (*cliniaclient.SparseEmbedResponse, error) {
@@ -30,15 +33,16 @@ func TestSparseEmbeddingModel(t *testing.T) {
 	ctx := t.Context()
 
 	tests := []struct {
-		name         string
-		modelName    string
-		modelVersion string
-		texts        []string
-		sparse       *sparseStub
-		wantCtorErr  bool
-		wantErr      bool
-		want         api.SparseEmbeddingResponse
-		after        func(*testing.T, *sparseStub)
+		name              string
+		modelName         string
+		modelVersion      string
+		texts             []string
+		sparse            *sparseStub
+		requesterCloseErr error
+		wantCtorErr       bool
+		wantErr           bool
+		want              api.SparseEmbeddingResponse
+		after             func(*testing.T, *sparseStub, *requesterStub)
 	}{
 		{
 			name:         "successful",
@@ -47,11 +51,12 @@ func TestSparseEmbeddingModel(t *testing.T) {
 			texts:        []string{"a"},
 			sparse:       &sparseStub{response: &cliniaclient.SparseEmbedResponse{ID: "req", Embeddings: []map[string]float32{{"x": 0.5}}}},
 			want:         api.SparseEmbeddingResponse{RequestID: "req", Embeddings: []map[string]float64{{"x": 0.5}}},
-			after: func(t *testing.T, s *sparseStub) {
+			after: func(t *testing.T, s *sparseStub, r *requesterStub) {
 				require.Equal(t, 1, s.calls)
 				require.Equal(t, "sparse", s.lastModelName)
 				require.Equal(t, "1", s.lastModelVersion)
 				require.Equal(t, cliniaclient.SparseEmbedRequest{Texts: []string{"a"}}, s.lastRequest)
+				require.Equal(t, r, s.boundRequester)
 			},
 		},
 		{
@@ -61,7 +66,10 @@ func TestSparseEmbeddingModel(t *testing.T) {
 			texts:        []string{"a"},
 			sparse:       &sparseStub{err: errors.New("boom")},
 			wantErr:      true,
-			after:        func(t *testing.T, s *sparseStub) { require.Equal(t, 1, s.calls) },
+			after: func(t *testing.T, s *sparseStub, r *requesterStub) {
+				require.Equal(t, 1, s.calls)
+				require.Equal(t, r, s.boundRequester)
+			},
 		},
 		{
 			name:         "constructor needs name",
@@ -86,38 +94,73 @@ func TestSparseEmbeddingModel(t *testing.T) {
 			texts:        []string{},
 			sparse:       &sparseStub{},
 			wantErr:      true,
-			after:        func(t *testing.T, s *sparseStub) { require.Equal(t, 0, s.calls) },
+			after: func(t *testing.T, s *sparseStub, r *requesterStub) {
+				require.Equal(t, 0, s.calls)
+			},
+		},
+		{
+			name:              "close error surfaces",
+			modelName:         "sparse",
+			modelVersion:      "1",
+			texts:             []string{"a"},
+			sparse:            &sparseStub{response: &cliniaclient.SparseEmbedResponse{}},
+			requesterCloseErr: errors.New("close sparse"),
+			wantErr:           true,
+			after: func(t *testing.T, s *sparseStub, r *requesterStub) {
+				require.Equal(t, 1, s.calls)
+				require.Equal(t, r, s.boundRequester)
+			},
 		},
 	}
 
 	for _, tt := range tests {
-		tc := tt
-		t.Run(tc.name, func(t *testing.T) {
-			p, err := NewProvider(ctx, WithRequester(requesterStub{}))
-			require.NoError(t, err)
-			p.sparse = tc.sparse
+		t.Run(tt.name, func(t *testing.T) {
+			requester := &requesterStub{closeErr: tt.requesterCloseErr}
+			// Inject requester via metadata
+			opts := api.SparseEmbeddingOptions{}
+			opts.ProviderMetadata = api.NewProviderMetadata(nil)
+			opts.ProviderMetadata.Set("clinia", codec.Metadata{Requester: requester})
 
-			modelID := tc.modelName
-			if tc.modelVersion != "" {
-				modelID = tc.modelName + ":" + tc.modelVersion
+			p, err := NewProvider(ctx,
+				withSparseFactory(func(ctx context.Context, opts common.ClientOptions) cliniaclient.SparseEmbedder {
+					tt.sparse.boundRequester = opts.Requester
+					return tt.sparse
+				}),
+			)
+			require.NoError(t, err)
+
+			modelID := tt.modelName
+			if tt.modelVersion != "" {
+				modelID = tt.modelName + ":" + tt.modelVersion
 			}
 			m, err := p.SparseEmbeddingModel(modelID)
-			if tc.wantCtorErr {
+			if tt.wantCtorErr {
 				require.Error(t, err)
+				require.Equal(t, 0, requester.closeCalls)
 				return
 			}
 			require.NoError(t, err)
 
-			resp, err := m.SparseEmbed(ctx, tc.texts, api.SparseEmbeddingOptions{})
-			if tc.wantErr {
+			resp, err := m.SparseEmbed(ctx, tt.texts, opts)
+			if tt.wantErr {
 				require.Error(t, err)
 			} else {
 				require.NoError(t, err)
-				require.Equal(t, tc.want, resp)
+				require.Equal(t, tt.want, resp)
 			}
 
-			if tc.after != nil {
-				tc.after(t, tc.sparse)
+			if len(tt.texts) == 0 {
+				require.Equal(t, 0, requester.closeCalls)
+			} else {
+				require.Equal(t, 1, requester.closeCalls)
+			}
+
+			if tt.after != nil {
+				tt.after(t, tt.sparse, requester)
+			}
+
+			if tt.requesterCloseErr != nil && len(tt.texts) > 0 {
+				require.ErrorIs(t, err, tt.requesterCloseErr)
 			}
 		})
 	}

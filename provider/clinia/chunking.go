@@ -20,22 +20,19 @@ var _ api.ChunkingModel = (*ChunkingModel)(nil)
 
 // ChunkingModel constructs a chunking model wrapper from a model ID ("name:version").
 func (p *Provider) ChunkingModel(modelID string) (*ChunkingModel, error) {
-	if p.chunker == nil {
-		return nil, fmt.Errorf("%s: provider chunker is nil", p.name)
-	}
-
 	name, version, err := splitModelID(p.name, modelID)
 	if err != nil {
 		return nil, err
 	}
 
 	return &ChunkingModel{
-		modelID:      joinModelID(name, version),
+		modelID:      modelID,
 		modelName:    name,
 		modelVersion: version,
 		config: ProviderConfig{
-			providerName: p.providerNameFor("chunker"),
-			chunker:      p.chunker,
+			providerName:  p.providerNameFor("chunker"),
+			clientOptions: p.clientOptions,
+			newChunker:    p.newChunker,
 		},
 	}, nil
 }
@@ -48,20 +45,45 @@ func (m *ChunkingModel) ModelID() string { return m.modelID }
 
 func (m *ChunkingModel) SupportsParallelCalls() bool { return true }
 
-func (m *ChunkingModel) Chunk(ctx context.Context, texts []string, opts api.ChunkingOptions) (api.ChunkingResponse, error) {
-	params, err := codec.EncodeChunk(texts)
+func (m *ChunkingModel) Chunk(ctx context.Context, texts []string, opts api.ChunkingOptions) (resp api.ChunkingResponse, err error) {
+	params, err := codec.EncodeChunk(texts, opts)
+	if err != nil {
+		return api.ChunkingResponse{}, err
+	}
+	requester := params.Requester
+	if requester == nil {
+		requester, err = makeRequester(ctx, opts.BaseURL)
+		if err != nil {
+			return api.ChunkingResponse{}, err
+		}
+		if requester == nil {
+			return api.ChunkingResponse{}, fmt.Errorf("%s: requester is nil", m.config.providerName)
+		}
+	}
+
+	defer func() {
+		if cerr := requester.Close(); cerr != nil && err == nil {
+			err = cerr
+		}
+	}()
+
+	if m.config.newChunker == nil {
+		return api.ChunkingResponse{}, fmt.Errorf("%s: chunker factory is nil", m.config.providerName)
+	}
+
+	chunker := m.config.newChunker(ctx, m.config.clientOptionsWith(requester))
+	if chunker == nil {
+		return api.ChunkingResponse{}, fmt.Errorf("%s: chunker factory returned nil", m.config.providerName)
+	}
+
+	respProto, err := chunker.Chunk(ctx, m.modelName, m.modelVersion, params.Request)
 	if err != nil {
 		return api.ChunkingResponse{}, err
 	}
 
-	if m.config.chunker == nil {
-		return api.ChunkingResponse{}, fmt.Errorf("%s: chunker is nil", m.config.providerName)
-	}
-
-	resp, err := m.config.chunker.Chunk(ctx, m.modelName, m.modelVersion, params.Request)
+	resp, err = codec.DecodeChunk(respProto)
 	if err != nil {
 		return api.ChunkingResponse{}, err
 	}
-
-	return codec.DecodeChunk(resp)
+	return resp, nil
 }

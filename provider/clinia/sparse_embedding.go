@@ -19,22 +19,19 @@ type SparseEmbeddingModel struct {
 var _ api.SparseEmbeddingModel = (*SparseEmbeddingModel)(nil)
 
 func (p *Provider) SparseEmbeddingModel(modelID string) (*SparseEmbeddingModel, error) {
-	if p.sparse == nil {
-		return nil, fmt.Errorf("%s: provider sparse embedder is nil", p.name)
-	}
-
 	name, version, err := splitModelID(p.name, modelID)
 	if err != nil {
 		return nil, err
 	}
 
 	return &SparseEmbeddingModel{
-		modelID:      joinModelID(name, version),
+		modelID:      modelID,
 		modelName:    name,
 		modelVersion: version,
 		config: ProviderConfig{
-			providerName: p.providerNameFor("sparse_embedding"),
-			sparse:       p.sparse,
+			providerName:  p.providerNameFor("sparse_embedding"),
+			clientOptions: p.clientOptions,
+			newSparse:     p.newSparse,
 		},
 	}, nil
 }
@@ -44,17 +41,45 @@ func (m *SparseEmbeddingModel) ProviderName() string         { return m.config.p
 func (m *SparseEmbeddingModel) ModelID() string              { return m.modelID }
 func (m *SparseEmbeddingModel) SupportsParallelCalls() bool  { return true }
 
-func (m *SparseEmbeddingModel) SparseEmbed(ctx context.Context, texts []string, opts api.SparseEmbeddingOptions) (api.SparseEmbeddingResponse, error) {
+func (m *SparseEmbeddingModel) SparseEmbed(ctx context.Context, texts []string, opts api.SparseEmbeddingOptions) (resp api.SparseEmbeddingResponse, err error) {
 	params, err := codec.EncodeSparseEmbedding(m.modelName, m.modelVersion, texts, opts)
 	if err != nil {
 		return api.SparseEmbeddingResponse{}, err
 	}
-	if m.config.sparse == nil {
-		return api.SparseEmbeddingResponse{}, fmt.Errorf("%s: sparse embedder is nil", m.config.providerName)
+	requester := params.Requester
+	if requester == nil {
+		requester, err = makeRequester(ctx, opts.BaseURL)
+		if err != nil {
+			return api.SparseEmbeddingResponse{}, err
+		}
+		if requester == nil {
+			return api.SparseEmbeddingResponse{}, fmt.Errorf("%s: requester is nil", m.config.providerName)
+		}
 	}
-	res, err := m.config.sparse.SparseEmbed(ctx, params.ModelName, params.ModelVersion, params.Request)
+
+	defer func() {
+		if cerr := requester.Close(); cerr != nil && err == nil {
+			err = cerr
+		}
+	}()
+
+	if m.config.newSparse == nil {
+		return api.SparseEmbeddingResponse{}, fmt.Errorf("%s: sparse embedder factory is nil", m.config.providerName)
+	}
+
+	sparse := m.config.newSparse(ctx, m.config.clientOptionsWith(requester))
+	if sparse == nil {
+		return api.SparseEmbeddingResponse{}, fmt.Errorf("%s: sparse embedder factory returned nil", m.config.providerName)
+	}
+
+	res, err := sparse.SparseEmbed(ctx, params.ModelName, params.ModelVersion, params.Request)
 	if err != nil {
 		return api.SparseEmbeddingResponse{}, err
 	}
-	return codec.DecodeSparseEmbedding(res)
+
+	resp, err = codec.DecodeSparseEmbedding(res)
+	if err != nil {
+		return api.SparseEmbeddingResponse{}, err
+	}
+	return resp, nil
 }

@@ -4,8 +4,6 @@ import (
 	"context"
 	"log"
 
-	"github.com/clinia/models-client-go/cliniamodel/common"
-	"github.com/clinia/models-client-go/cliniamodel/requestergrpc"
 	"github.com/k0kubun/pp/v3"
 	"go.jetify.com/ai"
 	"go.jetify.com/ai/api"
@@ -21,19 +19,7 @@ func main() {
 func run() error {
 	ctx := context.Background()
 
-	host := common.Host{
-		Url:    "127.0.0.1",
-		Port:   4770,
-		Scheme: common.HTTP,
-	}
-
-	requester, err := requestergrpc.NewRequester(ctx, common.RequesterConfig{Host: host})
-	if err != nil {
-		return err
-	}
-	defer requester.Close()
-
-	provider, err := clinia.NewProvider(ctx, clinia.WithClientOptions(common.ClientOptions{Requester: requester}))
+	provider, err := clinia.NewProvider(ctx)
 	if err != nil {
 		return err
 	}
@@ -57,7 +43,7 @@ func run() error {
 		"The event will take place at the convention center",
 	}
 
-	resp, err := ai.RankMany(ctx, ranker, query, texts)
+	resp, err := ai.RankMany(ctx, ranker, query, texts, ai.WithRankingBaseURL("http://127.0.0.1:4770"))
 	if err != nil {
 		return err
 	}

@@ -5,11 +5,6 @@ import (
 	"strings"
 )
 
-// joinModelID formats a model identifier as "name:version".
-func joinModelID(name, version string) string {
-	return name + ":" + version
-}
-
 // splitModelID parses a model identifier of the form "name:version" and validates
 // that both parts are present and non-empty. The component string is used only
 // to contextualize error messages (e.g., "clinia/embed").

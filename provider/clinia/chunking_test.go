@@ -6,8 +6,10 @@ import (
 	"testing"
 
 	cliniaclient "github.com/clinia/models-client-go/cliniamodel"
+	"github.com/clinia/models-client-go/cliniamodel/common"
 	"github.com/stretchr/testify/require"
 	"go.jetify.com/ai/api"
+	"go.jetify.com/ai/provider/clinia/internal/codec"
 )
 
 type chunkerStub struct {
@@ -17,6 +19,7 @@ type chunkerStub struct {
 	lastRequest      cliniaclient.ChunkRequest
 	response         *cliniaclient.ChunkResponse
 	err              error
+	boundRequester   common.Requester
 }
 
 func (f *chunkerStub) Chunk(ctx context.Context, modelName, modelVersion string, req cliniaclient.ChunkRequest) (*cliniaclient.ChunkResponse, error) {
@@ -33,17 +36,18 @@ func TestChunkingModel(t *testing.T) {
 	ctx := t.Context()
 
 	tests := []struct {
-		name         string
-		modelName    string
-		modelVersion string
-		texts        []string
-		opts         api.ChunkingOptions
-		chunker      *chunkerStub
-		wantModelErr bool
-		wantErr      bool
-		wantResp     api.ChunkingResponse
-		wantModelID  string
-		after        func(t *testing.T, chunker *chunkerStub)
+		name              string
+		modelName         string
+		modelVersion      string
+		texts             []string
+		opts              api.ChunkingOptions
+		chunker           *chunkerStub
+		requesterCloseErr error
+		wantModelErr      bool
+		wantErr           bool
+		wantResp          api.ChunkingResponse
+		wantModelID       string
+		after             func(t *testing.T, chunker *chunkerStub, requester *requesterStub)
 	}{
 		{
 			name:         "successful chunk",
@@ -58,7 +62,6 @@ func TestChunkingModel(t *testing.T) {
 					}},
 				},
 			},
-			wantModelErr: false,
 			wantResp: api.ChunkingResponse{
 				RequestID: "req",
 				Chunks: [][]api.Chunk{{
@@ -72,11 +75,12 @@ func TestChunkingModel(t *testing.T) {
 				}},
 			},
 			wantModelID: "chunker:2",
-			after: func(t *testing.T, chunker *chunkerStub) {
+			after: func(t *testing.T, chunker *chunkerStub, requester *requesterStub) {
 				require.Equal(t, 1, chunker.calls)
 				require.Equal(t, "chunker", chunker.lastModelName)
 				require.Equal(t, "2", chunker.lastModelVersion)
 				require.Equal(t, cliniaclient.ChunkRequest{Texts: []string{"hello"}}, chunker.lastRequest)
+				require.Equal(t, requester, chunker.boundRequester)
 			},
 		},
 		{
@@ -85,11 +89,11 @@ func TestChunkingModel(t *testing.T) {
 			modelVersion: "2",
 			texts:        []string{"hello"},
 			chunker:      &chunkerStub{err: errors.New("boom")},
-			wantModelErr: false,
 			wantErr:      true,
 			wantModelID:  "chunker:2",
-			after: func(t *testing.T, chunker *chunkerStub) {
+			after: func(t *testing.T, chunker *chunkerStub, requester *requesterStub) {
 				require.Equal(t, 1, chunker.calls)
+				require.Equal(t, requester, chunker.boundRequester)
 			},
 		},
 		{
@@ -106,44 +110,78 @@ func TestChunkingModel(t *testing.T) {
 			modelVersion: "2",
 			texts:        []string{},
 			chunker:      &chunkerStub{},
-			wantModelErr: false,
 			wantErr:      true,
 			wantModelID:  "chunker:2",
-			after: func(t *testing.T, chunker *chunkerStub) {
+			after: func(t *testing.T, chunker *chunkerStub, requester *requesterStub) {
 				require.Equal(t, 0, chunker.calls)
+			},
+		},
+		{
+			name:              "close error surfaces",
+			modelName:         "chunker",
+			modelVersion:      "2",
+			texts:             []string{"hello"},
+			chunker:           &chunkerStub{response: &cliniaclient.ChunkResponse{}},
+			requesterCloseErr: errors.New("close chunk"),
+			wantErr:           true,
+			wantModelID:       "chunker:2",
+			after: func(t *testing.T, chunker *chunkerStub, requester *requesterStub) {
+				require.Equal(t, 1, chunker.calls)
+				require.Equal(t, requester, chunker.boundRequester)
 			},
 		},
 	}
 
 	for _, tt := range tests {
-		tc := tt
-		t.Run(tc.name, func(t *testing.T) {
-			provider, err := NewProvider(ctx, WithRequester(requesterStub{}))
-			require.NoError(t, err)
-			provider.chunker = tc.chunker
+		t.Run(tt.name, func(t *testing.T) {
+			requester := &requesterStub{closeErr: tt.requesterCloseErr}
+			// Inject requester via metadata
+			if tt.opts.ProviderMetadata == nil {
+				tt.opts.ProviderMetadata = api.NewProviderMetadata(nil)
+			}
+			tt.opts.ProviderMetadata.Set("clinia", codec.Metadata{Requester: requester})
 
-			modelID := tc.modelName
-			if tc.modelVersion != "" {
-				modelID = tc.modelName + ":" + tc.modelVersion
+			provider, err := NewProvider(ctx,
+				withChunkerFactory(func(ctx context.Context, opts common.ClientOptions) cliniaclient.Chunker {
+					tt.chunker.boundRequester = opts.Requester
+					return tt.chunker
+				}),
+			)
+			require.NoError(t, err)
+
+			modelID := tt.modelName
+			if tt.modelVersion != "" {
+				modelID = tt.modelName + ":" + tt.modelVersion
 			}
 			model, err := provider.ChunkingModel(modelID)
-			if tc.wantModelErr {
+			if tt.wantModelErr {
 				require.Error(t, err)
+				require.Equal(t, 0, requester.closeCalls)
 				return
 			}
 			require.NoError(t, err)
-			require.Equal(t, tc.wantModelID, model.ModelID())
+			require.Equal(t, tt.wantModelID, model.ModelID())
 
-			resp, err := model.Chunk(ctx, tc.texts, tc.opts)
-			if tc.wantErr {
+			resp, err := model.Chunk(ctx, tt.texts, tt.opts)
+			if tt.wantErr {
 				require.Error(t, err)
 			} else {
 				require.NoError(t, err)
-				require.Equal(t, tc.wantResp, resp)
+				require.Equal(t, tt.wantResp, resp)
 			}
 
-			if tc.after != nil {
-				tc.after(t, tc.chunker)
+			if len(tt.texts) == 0 {
+				require.Equal(t, 0, requester.closeCalls)
+			} else {
+				require.Equal(t, 1, requester.closeCalls)
+			}
+
+			if tt.after != nil {
+				tt.after(t, tt.chunker, requester)
+			}
+
+			if tt.requesterCloseErr != nil && len(tt.texts) > 0 {
+				require.ErrorIs(t, err, tt.requesterCloseErr)
 			}
 		})
 	}

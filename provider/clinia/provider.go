@@ -9,14 +9,15 @@ import (
 	"go.jetify.com/ai/api"
 )
 
-// Provider wires the Clinia requester with AI SDK model interfaces.
+// Provider wires the Clinia client options with AI SDK model interfaces.
 type Provider struct {
 	name          string
 	clientOptions common.ClientOptions
-	embedder      cliniaclient.Embedder
-	ranker        cliniaclient.Ranker
-	chunker       cliniaclient.Chunker
-	sparse        cliniaclient.SparseEmbedder
+
+	newEmbedder embeddingFactory
+	newRanker   rankerFactory
+	newChunker  chunkerFactory
+	newSparse   sparseFactory
 }
 
 // Assert Provider implements the api.Provider interface
@@ -27,9 +28,22 @@ type Option func(*providerOptions)
 
 type providerOptions struct {
 	name          string
-	requester     common.Requester
 	clientOptions *common.ClientOptions
+
+	newEmbedder embeddingFactory
+	newRanker   rankerFactory
+	newChunker  chunkerFactory
+	newSparse   sparseFactory
 }
+
+// embeddingFactory defines the constructor signature for Clinia embedders.
+type embeddingFactory func(context.Context, common.ClientOptions) cliniaclient.Embedder
+
+type rankerFactory func(common.ClientOptions) cliniaclient.Ranker
+
+type chunkerFactory func(context.Context, common.ClientOptions) cliniaclient.Chunker
+
+type sparseFactory func(context.Context, common.ClientOptions) cliniaclient.SparseEmbedder
 
 // WithName overrides the provider name (defaults to "clinia").
 func WithName(name string) Option {
@@ -38,24 +52,17 @@ func WithName(name string) Option {
 	}
 }
 
-// WithRequester supplies an explicit requester to be reused by all models.
-func WithRequester(r common.Requester) Option {
-	return func(o *providerOptions) {
-		o.requester = r
-	}
-}
-
-// WithClientOptions injects pre-built client options.
+// WithClientOptions injects pre-built client options without a bound requester.
 func WithClientOptions(opts common.ClientOptions) Option {
 	cp := opts
+	cp.Requester = nil
 	return func(o *providerOptions) {
 		o.clientOptions = &cp
 	}
 }
 
-// NewProvider constructs a new Clinia provider. A requester must be supplied through
-// WithRequester or WithClientOptions.
-func NewProvider(ctx context.Context, opts ...Option) (*Provider, error) {
+// NewProvider constructs a new Clinia provider.
+func NewProvider(_ context.Context, opts ...Option) (*Provider, error) {
 	options := providerOptions{name: "clinia"}
 	for _, opt := range opts {
 		opt(&options)
@@ -64,28 +71,32 @@ func NewProvider(ctx context.Context, opts ...Option) (*Provider, error) {
 	clientOpts := common.ClientOptions{}
 	if options.clientOptions != nil {
 		clientOpts = *options.clientOptions
+		clientOpts.Requester = nil
 	}
 
-	if clientOpts.Requester == nil {
-		clientOpts.Requester = options.requester
-	}
-
-	if clientOpts.Requester == nil {
-		return nil, fmt.Errorf("clinia/provider: requester is required")
-	}
-	embedder := cliniaclient.NewEmbedder(ctx, clientOpts)
-	ranker := cliniaclient.NewRanker(clientOpts)
-	chunker := cliniaclient.NewChunker(ctx, clientOpts)
-	sparse := cliniaclient.NewSparseEmbedder(ctx, clientOpts)
-
-	return &Provider{
+	provider := &Provider{
 		name:          options.name,
 		clientOptions: clientOpts,
-		embedder:      embedder,
-		ranker:        ranker,
-		chunker:       chunker,
-		sparse:        sparse,
-	}, nil
+		newEmbedder:   options.newEmbedder,
+		newRanker:     options.newRanker,
+		newChunker:    options.newChunker,
+		newSparse:     options.newSparse,
+	}
+
+	if provider.newEmbedder == nil {
+		provider.newEmbedder = cliniaclient.NewEmbedder
+	}
+	if provider.newRanker == nil {
+		provider.newRanker = cliniaclient.NewRanker
+	}
+	if provider.newChunker == nil {
+		provider.newChunker = cliniaclient.NewChunker
+	}
+	if provider.newSparse == nil {
+		provider.newSparse = cliniaclient.NewSparseEmbedder
+	}
+
+	return provider, nil
 }
 
 // Name returns the provider name used for logging and metadata.
@@ -106,4 +117,29 @@ func (p *Provider) LanguageModel(modelID string) (api.LanguageModel, error) {
 // MultimodalEmbeddingModel is not supported by the Clinia provider.
 func (p *Provider) MultimodalEmbeddingModel(modelID string) (api.EmbeddingModel[api.MultimodalEmbeddingInput], error) {
 	return nil, api.NewUnsupportedFunctionalityError("multimodal_embeddings", "Clinia provider does not support multimodal embeddings")
+}
+
+// withEmbeddingFactory overrides the embedder factory (used in tests).
+func withEmbeddingFactory(factory embeddingFactory) Option {
+	return func(o *providerOptions) {
+		o.newEmbedder = factory
+	}
+}
+
+func withRankerFactory(factory rankerFactory) Option {
+	return func(o *providerOptions) {
+		o.newRanker = factory
+	}
+}
+
+func withChunkerFactory(factory chunkerFactory) Option {
+	return func(o *providerOptions) {
+		o.newChunker = factory
+	}
+}
+
+func withSparseFactory(factory sparseFactory) Option {
+	return func(o *providerOptions) {
+		o.newSparse = factory
+	}
 }

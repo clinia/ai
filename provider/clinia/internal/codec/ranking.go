@@ -4,12 +4,14 @@ import (
 	"fmt"
 
 	cliniaclient "github.com/clinia/models-client-go/cliniamodel"
+	"github.com/clinia/models-client-go/cliniamodel/common"
 	"go.jetify.com/ai/api"
 )
 
 // RankParams holds the resolved Clinia request.
 type RankParams struct {
-	Request cliniaclient.RankRequest
+	Request   cliniaclient.RankRequest
+	Requester common.Requester
 }
 
 // EncodeRank converts the SDK call into a Clinia rank request.
@@ -26,9 +28,11 @@ func EncodeRank(query string, texts []string, opts api.RankingOptions) (RankPara
 		Texts: texts,
 	}
 
-	return RankParams{
-		Request: req,
-	}, nil
+	out := RankParams{Request: req}
+	if meta := GetMetadata(opts); meta != nil && meta.Requester != nil {
+		out.Requester = meta.Requester
+	}
+	return out, nil
 }
 
 // DecodeRank converts the Clinia response into the SDK ranking response.

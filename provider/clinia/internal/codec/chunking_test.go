@@ -32,7 +32,7 @@ func TestEncodeChunk(t *testing.T) {
 	for _, tt := range tests {
 		parameters := tt
 		t.Run(tt.name, func(t *testing.T) {
-			params, err := EncodeChunk(parameters.texts)
+			params, err := EncodeChunk(parameters.texts, api.ChunkingOptions{})
 			if parameters.wantErr {
 				require.Error(t, err)
 				return

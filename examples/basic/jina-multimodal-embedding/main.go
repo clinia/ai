@@ -11,7 +11,7 @@ import (
 )
 
 func example() error {
-	// Initialize the OpenAI provider
+	// Initialize the Jina provider
 	provider := jinaprovider.NewProvider()
 
 	// Create a model

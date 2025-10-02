@@ -16,8 +16,8 @@ type RankingModel interface {
 	// SupportsParallelCalls indicates if the model can handle multiple ranking calls in parallel.
 	SupportsParallelCalls() bool
 
-	// Rank produces a score for each text given a query.
-	Rank(ctx context.Context, query string, texts []string, opts RankingOptions) (RankingResponse, error)
+	// DoRank produces a score for each text given a query.
+	DoRank(ctx context.Context, query string, texts []string, opts RankingOptions) (RankingResponse, error)
 }
 
 // RankingResponse represents the response from a ranking request.

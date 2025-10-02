@@ -115,7 +115,7 @@ func (p *Provider) LanguageModel(modelID string) (api.LanguageModel, error) {
 }
 
 // MultimodalEmbeddingModel is not supported by the Clinia provider.
-func (p *Provider) MultimodalEmbeddingModel(modelID string) (api.EmbeddingModel[api.MultimodalEmbeddingInput], error) {
+func (p *Provider) MultimodalEmbeddingModel(modelID string) (api.EmbeddingModel[api.MultimodalEmbeddingInput, api.Embedding], error) {
 	return nil, api.NewUnsupportedFunctionalityError("multimodal_embeddings", "Clinia provider does not support multimodal embeddings")
 }
 

@@ -16,11 +16,11 @@ type EmbeddingModel struct {
 	config       ProviderConfig
 }
 
-var _ api.EmbeddingModel[string] = (*EmbeddingModel)(nil)
+var _ api.EmbeddingModel[string, api.Embedding] = (*EmbeddingModel)(nil)
 
 // TextEmbeddingModel constructs a new text embedding model from a model ID in the form "name:version".
 // Implements api.Provider.TextEmbeddingModel.
-func (p *Provider) TextEmbeddingModel(modelID string) (api.EmbeddingModel[string], error) {
+func (p *Provider) TextEmbeddingModel(modelID string) (api.EmbeddingModel[string, api.Embedding], error) {
 	name, version, err := splitModelID("embed", modelID)
 	if err != nil {
 		return nil, err
@@ -60,20 +60,17 @@ func (m *EmbeddingModel) MaxEmbeddingsPerCall() *int {
 }
 
 // DoEmbed executes an embedding call against the Clinia embedder.
-func (m *EmbeddingModel) DoEmbed(ctx context.Context, values []string, opts api.EmbeddingOptions) (resp api.EmbeddingResponse, err error) {
+func (m *EmbeddingModel) DoEmbed(ctx context.Context, values []string, opts api.EmbeddingOptions) (resp api.DenseEmbeddingResponse, err error) {
 	params, err := codec.EncodeEmbedding(values, opts)
 	if err != nil {
-		return api.EmbeddingResponse{}, err
+		return api.DenseEmbeddingResponse{}, err
 	}
-	requester := params.Requester
+	requester, err := makeRequester(ctx, opts.BaseURL)
+	if err != nil {
+		return api.DenseEmbeddingResponse{}, err
+	}
 	if requester == nil {
-		requester, err = makeRequester(ctx, opts.BaseURL)
-		if err != nil {
-			return api.EmbeddingResponse{}, err
-		}
-		if requester == nil {
-			return api.EmbeddingResponse{}, fmt.Errorf("clinia/embed: requester is nil")
-		}
+		return api.DenseEmbeddingResponse{}, fmt.Errorf("clinia/embed: requester is nil")
 	}
 
 	defer func() {
@@ -83,22 +80,22 @@ func (m *EmbeddingModel) DoEmbed(ctx context.Context, values []string, opts api.
 	}()
 
 	if m.config.newEmbedder == nil {
-		return api.EmbeddingResponse{}, fmt.Errorf("clinia/embed: embedder factory is nil")
+		return api.DenseEmbeddingResponse{}, fmt.Errorf("clinia/embed: embedder factory is nil")
 	}
 
 	embedder := m.config.newEmbedder(ctx, m.config.clientOptionsWith(requester))
 	if embedder == nil {
-		return api.EmbeddingResponse{}, fmt.Errorf("clinia/embed: embedder factory returned nil")
+		return api.DenseEmbeddingResponse{}, fmt.Errorf("clinia/embed: embedder factory returned nil")
 	}
 
 	embedResp, err := embedder.Embed(ctx, m.modelName, m.modelVersion, params.Request)
 	if err != nil {
-		return api.EmbeddingResponse{}, err
+		return api.DenseEmbeddingResponse{}, err
 	}
 
 	resp, err = codec.DecodeEmbedding(embedResp)
 	if err != nil {
-		return api.EmbeddingResponse{}, err
+		return api.DenseEmbeddingResponse{}, err
 	}
 	return resp, nil
 }

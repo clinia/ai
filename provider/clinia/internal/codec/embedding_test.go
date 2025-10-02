@@ -59,13 +59,13 @@ func TestDecodeEmbedding(t *testing.T) {
 	tests := []struct {
 		name    string
 		input   *cliniaclient.EmbedResponse
-		want    api.EmbeddingResponse
+		want    api.DenseEmbeddingResponse
 		wantErr bool
 	}{
 		{
 			name:  "basic",
 			input: &cliniaclient.EmbedResponse{Embeddings: [][]float32{{1.5, 2.5}}},
-			want: api.EmbeddingResponse{
+			want: api.DenseEmbeddingResponse{
 				Embeddings: []api.Embedding{
 					{1.5, 2.5},
 				},

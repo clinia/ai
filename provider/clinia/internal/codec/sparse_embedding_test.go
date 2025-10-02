@@ -9,13 +9,11 @@ import (
 )
 
 func TestEncodeSparseEmbedding(t *testing.T) {
-	params, err := EncodeSparseEmbedding("sparse", "1", []string{"a", "b"}, api.SparseEmbeddingOptions{})
+	params, err := EncodeSparseEmbedding([]string{"a", "b"}, api.EmbeddingOptions{})
 	require.NoError(t, err)
-	require.Equal(t, "sparse", params.ModelName)
-	require.Equal(t, "1", params.ModelVersion)
 	require.Equal(t, []string{"a", "b"}, params.Request.Texts)
 
-	_, err = EncodeSparseEmbedding("sparse", "1", nil, api.SparseEmbeddingOptions{})
+	_, err = EncodeSparseEmbedding(nil, api.EmbeddingOptions{})
 	require.Error(t, err)
 }
 
@@ -25,7 +23,6 @@ func TestDecodeSparseEmbedding(t *testing.T) {
 		Embeddings: []map[string]float32{{"token": 1.5}},
 	})
 	require.NoError(t, err)
-	require.Equal(t, "req", resp.RequestID)
 	require.Len(t, resp.Embeddings, 1)
 	require.Equal(t, 1.5, resp.Embeddings[0]["token"])
 

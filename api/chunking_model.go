@@ -25,5 +25,5 @@ type ChunkingModel interface {
 	ProviderName() string
 	ModelID() string
 	SupportsParallelCalls() bool
-	Chunk(ctx context.Context, texts []string, opts ChunkingOptions) (ChunkingResponse, error)
+	DoChunk(ctx context.Context, texts []string, opts ChunkingOptions) (ChunkingResponse, error)
 }

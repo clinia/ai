@@ -41,7 +41,7 @@ func example() error {
 	return nil
 }
 
-func printResponse(response api.EmbeddingResponse) {
+func printResponse(response api.DenseEmbeddingResponse) {
 	printer := pp.New()
 	printer.SetOmitEmpty(true)
 	printer.Print(response)

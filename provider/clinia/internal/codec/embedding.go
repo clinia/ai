@@ -26,17 +26,13 @@ func EncodeEmbedding(values []string, opts api.EmbeddingOptions) (EmbeddingParam
 		},
 	}
 
-	if meta := GetMetadata(opts); meta != nil && meta.Requester != nil {
-		params.Requester = meta.Requester
-	}
-
 	return params, nil
 }
 
 // DecodeEmbedding transforms the Clinia embedder response into the SDK shape.
-func DecodeEmbedding(resp *cliniaclient.EmbedResponse) (api.EmbeddingResponse, error) {
+func DecodeEmbedding(resp *cliniaclient.EmbedResponse) (api.DenseEmbeddingResponse, error) {
 	if resp == nil {
-		return api.EmbeddingResponse{}, fmt.Errorf("clinia/embed: response is nil")
+		return api.DenseEmbeddingResponse{}, fmt.Errorf("clinia/embed: response is nil")
 	}
 
 	embeddings := make([]api.Embedding, len(resp.Embeddings))
@@ -48,5 +44,5 @@ func DecodeEmbedding(resp *cliniaclient.EmbedResponse) (api.EmbeddingResponse, e
 		embeddings[i] = converted
 	}
 
-	return api.EmbeddingResponse{Embeddings: embeddings}, nil
+	return api.DenseEmbeddingResponse{Embeddings: embeddings}, nil
 }

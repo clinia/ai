@@ -43,20 +43,18 @@ func (m *RankingModel) ModelID() string { return m.modelID }
 
 func (m *RankingModel) SupportsParallelCalls() bool { return true }
 
-func (m *RankingModel) Rank(ctx context.Context, query string, texts []string, opts api.RankingOptions) (resp api.RankingResponse, err error) {
+func (m *RankingModel) DoRank(ctx context.Context, query string, texts []string, opts api.RankingOptions) (resp api.RankingResponse, err error) {
 	params, err := codec.EncodeRank(query, texts, opts)
 	if err != nil {
 		return api.RankingResponse{}, err
 	}
-	requester := params.Requester
+
+	requester, err := makeRequester(ctx, opts.BaseURL)
+	if err != nil {
+		return api.RankingResponse{}, err
+	}
 	if requester == nil {
-		requester, err = makeRequester(ctx, opts.BaseURL)
-		if err != nil {
-			return api.RankingResponse{}, err
-		}
-		if requester == nil {
-			return api.RankingResponse{}, fmt.Errorf("%s: requester is nil", m.config.providerName)
-		}
+		return api.RankingResponse{}, fmt.Errorf("%s: requester is nil", m.config.providerName)
 	}
 
 	defer func() {

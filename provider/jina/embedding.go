@@ -14,10 +14,10 @@ type EmbeddingModel struct {
 	pc      ProviderConfig
 }
 
-var _ api.EmbeddingModel[string] = &EmbeddingModel{}
+var _ api.EmbeddingModel[string, api.Embedding] = &EmbeddingModel{}
 
 // TextEmbeddingModel creates a new Jina embedding model.
-func (p *Provider) TextEmbeddingModel(modelID string) (api.EmbeddingModel[string], error) {
+func (p *Provider) TextEmbeddingModel(modelID string) (api.EmbeddingModel[string, api.Embedding], error) {
 	// Create model with provider's client
 	model := &EmbeddingModel{
 		modelID: modelID,
@@ -59,19 +59,19 @@ func (m *EmbeddingModel) DoEmbed(
 	ctx context.Context,
 	values []string,
 	opts api.EmbeddingOptions,
-) (api.EmbeddingResponse, error) {
+) (api.DenseEmbeddingResponse, error) {
 	embeddingParams, jinaOpts, _, err := codec.EncodeEmbedding(
 		m.modelID,
 		values,
 		opts,
 	)
 	if err != nil {
-		return api.EmbeddingResponse{}, err
+		return api.DenseEmbeddingResponse{}, err
 	}
 
 	resp, err := m.pc.client.Embeddings.New(ctx, embeddingParams, jinaOpts...)
 	if err != nil {
-		return api.EmbeddingResponse{}, err
+		return api.DenseEmbeddingResponse{}, err
 	}
 
 	return codec.DecodeEmbedding(resp)

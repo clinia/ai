@@ -45,20 +45,18 @@ func (m *ChunkingModel) ModelID() string { return m.modelID }
 
 func (m *ChunkingModel) SupportsParallelCalls() bool { return true }
 
-func (m *ChunkingModel) Chunk(ctx context.Context, texts []string, opts api.ChunkingOptions) (resp api.ChunkingResponse, err error) {
+func (m *ChunkingModel) DoChunk(ctx context.Context, texts []string, opts api.ChunkingOptions) (resp api.ChunkingResponse, err error) {
 	params, err := codec.EncodeChunk(texts, opts)
 	if err != nil {
 		return api.ChunkingResponse{}, err
 	}
-	requester := params.Requester
+
+	requester, err := makeRequester(ctx, opts.BaseURL)
+	if err != nil {
+		return api.ChunkingResponse{}, err
+	}
 	if requester == nil {
-		requester, err = makeRequester(ctx, opts.BaseURL)
-		if err != nil {
-			return api.ChunkingResponse{}, err
-		}
-		if requester == nil {
-			return api.ChunkingResponse{}, fmt.Errorf("%s: requester is nil", m.config.providerName)
-		}
+		return api.ChunkingResponse{}, fmt.Errorf("%s: requester is nil", m.config.providerName)
 	}
 
 	defer func() {

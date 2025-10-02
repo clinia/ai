@@ -14,10 +14,10 @@ type MultimodalEmbeddingModel struct {
 	pc      ProviderConfig
 }
 
-var _ api.EmbeddingModel[api.MultimodalEmbeddingInput] = &MultimodalEmbeddingModel{}
+var _ api.EmbeddingModel[api.MultimodalEmbeddingInput, api.Embedding] = &MultimodalEmbeddingModel{}
 
 // NewEmbeddingModel creates a new Jina embedding model.
-func (p *Provider) MultimodalEmbeddingModel(modelID string) (api.EmbeddingModel[api.MultimodalEmbeddingInput], error) {
+func (p *Provider) MultimodalEmbeddingModel(modelID string) (api.EmbeddingModel[api.MultimodalEmbeddingInput, api.Embedding], error) {
 	// Create model with provider's client
 	model := &MultimodalEmbeddingModel{
 		modelID: modelID,
@@ -59,19 +59,19 @@ func (m *MultimodalEmbeddingModel) DoEmbed(
 	ctx context.Context,
 	values []api.MultimodalEmbeddingInput,
 	opts api.EmbeddingOptions,
-) (api.EmbeddingResponse, error) {
+) (api.DenseEmbeddingResponse, error) {
 	embeddingParams, jinaOpts, _, err := codec.EncodeMultimodalEmbedding(
 		m.modelID,
 		values,
 		opts,
 	)
 	if err != nil {
-		return api.EmbeddingResponse{}, err
+		return api.DenseEmbeddingResponse{}, err
 	}
 
 	resp, err := m.pc.client.Embeddings.NewMultiModal(ctx, embeddingParams, jinaOpts...)
 	if err != nil {
-		return api.EmbeddingResponse{}, err
+		return api.DenseEmbeddingResponse{}, err
 	}
 
 	return codec.DecodeEmbedding(resp)

@@ -14,7 +14,7 @@ func TestDecodeEmbedding(t *testing.T) {
 	type tc struct {
 		name       string
 		in         *jina.CreateEmbeddingResponse
-		want       api.EmbeddingResponse
+		want       api.DenseEmbeddingResponse
 		wantErrSub string
 	}
 
@@ -36,7 +36,7 @@ func TestDecodeEmbedding(t *testing.T) {
 					TotalTokens:  27,
 				},
 			},
-			want: api.EmbeddingResponse{
+			want: api.DenseEmbeddingResponse{
 				Embeddings: []api.Embedding{
 					[]float64{0.1, 0.2, 0.3},
 					[]float64{0.4, 0.5},
@@ -59,7 +59,7 @@ func TestDecodeEmbedding(t *testing.T) {
 					TotalTokens:  0,
 				},
 			},
-			want: api.EmbeddingResponse{
+			want: api.DenseEmbeddingResponse{
 				Embeddings: []api.Embedding{},
 				Usage: &api.EmbeddingUsage{
 					PromptTokens: 0,
@@ -81,7 +81,7 @@ func TestDecodeEmbedding(t *testing.T) {
 					TotalTokens:  12,
 				},
 			},
-			want: api.EmbeddingResponse{
+			want: api.DenseEmbeddingResponse{
 				Embeddings: []api.Embedding{
 					[]float64{1, 2, 3, 4, 5, 6},
 				},

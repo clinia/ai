@@ -4,14 +4,12 @@ import (
 	"fmt"
 
 	cliniaclient "github.com/clinia/models-client-go/cliniamodel"
-	"github.com/clinia/models-client-go/cliniamodel/common"
 	"go.jetify.com/ai/api"
 )
 
 // ChunkParams holds the Clinia chunk request.
 type ChunkParams struct {
-	Request   cliniaclient.ChunkRequest
-	Requester common.Requester
+	Request cliniaclient.ChunkRequest
 }
 
 // EncodeChunk builds the Clinia chunk request from SDK inputs.
@@ -25,9 +23,6 @@ func EncodeChunk(texts []string, opts api.ChunkingOptions) (ChunkParams, error) 
 	}
 
 	out := ChunkParams{Request: req}
-	if meta := GetMetadata(opts); meta != nil && meta.Requester != nil {
-		out.Requester = meta.Requester
-	}
 	return out, nil
 }
 

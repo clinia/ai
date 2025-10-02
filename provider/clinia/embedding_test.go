@@ -9,7 +9,6 @@ import (
 	"github.com/clinia/models-client-go/cliniamodel/common"
 	"github.com/stretchr/testify/require"
 	"go.jetify.com/ai/api"
-	"go.jetify.com/ai/provider/clinia/internal/codec"
 )
 
 type fakeEmbedder struct {
@@ -36,18 +35,17 @@ func TestEmbeddingModelDoEmbed(t *testing.T) {
 	ctx := t.Context()
 
 	tests := []struct {
-		name              string
-		modelName         string
-		modelVersion      string
-		values            []string
-		embedder          *fakeEmbedder
-		requesterCloseErr error
-		baseURL           *string
-		wantModelErr      bool
-		wantErr           bool
-		wantResp          *api.EmbeddingResponse
-		wantModelID       string
-		after             func(t *testing.T, embedder *fakeEmbedder, requester *requesterStub)
+		name         string
+		modelName    string
+		modelVersion string
+		values       []string
+		embedder     *fakeEmbedder
+		baseURL      *string
+		wantModelErr bool
+		wantErr      bool
+		wantResp     *api.DenseEmbeddingResponse
+		wantModelID  string
+		after        func(t *testing.T, embedder *fakeEmbedder)
 	}{
 		{
 			name:         "successful embedding",
@@ -57,18 +55,18 @@ func TestEmbeddingModelDoEmbed(t *testing.T) {
 			embedder: &fakeEmbedder{
 				response: &cliniaclient.EmbedResponse{Embeddings: [][]float32{{1, 2}}},
 			},
-			wantResp: &api.EmbeddingResponse{
+			wantResp: &api.DenseEmbeddingResponse{
 				Embeddings: []api.Embedding{
 					{1, 2},
 				},
 			},
 			wantModelID: "dense:2",
-			after: func(t *testing.T, embedder *fakeEmbedder, requester *requesterStub) {
+			after: func(t *testing.T, embedder *fakeEmbedder) {
 				require.Equal(t, 1, embedder.calls)
 				require.Equal(t, "dense", embedder.lastModelName)
 				require.Equal(t, "2", embedder.lastModelVersion)
 				require.Equal(t, []string{"hello"}, embedder.lastRequest.Texts)
-				require.Equal(t, requester, embedder.boundRequester)
+				require.NotNil(t, embedder.boundRequester)
 			},
 		},
 		{
@@ -79,9 +77,9 @@ func TestEmbeddingModelDoEmbed(t *testing.T) {
 			embedder:     &fakeEmbedder{err: errors.New("boom")},
 			wantErr:      true,
 			wantModelID:  "dense:2",
-			after: func(t *testing.T, embedder *fakeEmbedder, requester *requesterStub) {
+			after: func(t *testing.T, embedder *fakeEmbedder) {
 				require.Equal(t, 1, embedder.calls)
-				require.Equal(t, requester, embedder.boundRequester)
+				require.NotNil(t, embedder.boundRequester)
 			},
 		},
 		{
@@ -102,22 +100,8 @@ func TestEmbeddingModelDoEmbed(t *testing.T) {
 			},
 			wantErr:     true,
 			wantModelID: "dense:2",
-			after: func(t *testing.T, embedder *fakeEmbedder, requester *requesterStub) {
+			after: func(t *testing.T, embedder *fakeEmbedder) {
 				require.Equal(t, 0, embedder.calls)
-			},
-		},
-		{
-			name:              "close error surfaces",
-			modelName:         "dense",
-			modelVersion:      "2",
-			values:            []string{"hello"},
-			embedder:          &fakeEmbedder{response: &cliniaclient.EmbedResponse{Embeddings: [][]float32{{3}}}},
-			requesterCloseErr: errors.New("close boom"),
-			wantErr:           true,
-			wantModelID:       "dense:2",
-			after: func(t *testing.T, embedder *fakeEmbedder, requester *requesterStub) {
-				require.Equal(t, 1, embedder.calls)
-				require.Equal(t, requester, embedder.boundRequester)
 			},
 		},
 		{
@@ -131,24 +115,19 @@ func TestEmbeddingModelDoEmbed(t *testing.T) {
 			baseURL:     ptr("127.0.0.1"),
 			wantErr:     true,
 			wantModelID: "dense:2",
-			after: func(t *testing.T, embedder *fakeEmbedder, requester *requesterStub) {
-				require.Equal(t, 0, embedder.calls)
-			},
+			after:       func(t *testing.T, embedder *fakeEmbedder) { require.Equal(t, 0, embedder.calls) },
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			requester := &requesterStub{closeErr: tt.requesterCloseErr}
-			// Build options: either inject requester or force BaseURL path for error
 			opts := api.EmbeddingOptions{}
+			// Ensure makeRequester is called when inputs are valid
 			if tt.baseURL != nil {
 				opts.BaseURL = tt.baseURL
-			} else {
-				if opts.ProviderMetadata == nil {
-					opts.ProviderMetadata = api.NewProviderMetadata(nil)
-				}
-				opts.ProviderMetadata.Set("clinia", codec.Metadata{Requester: requester})
+			} else if len(tt.values) > 0 {
+				host := "127.0.0.1:9000"
+				opts.BaseURL = &host
 			}
 
 			provider, err := NewProvider(ctx,
@@ -167,7 +146,6 @@ func TestEmbeddingModelDoEmbed(t *testing.T) {
 			model, err := provider.TextEmbeddingModel(modelID)
 			if tt.wantModelErr {
 				require.Error(t, err)
-				require.Equal(t, 0, requester.closeCalls)
 				return
 			}
 			require.NoError(t, err)
@@ -184,20 +162,8 @@ func TestEmbeddingModelDoEmbed(t *testing.T) {
 				require.Equal(t, *tt.wantResp, resp)
 			}
 
-			if tt.baseURL != nil {
-				// invalid baseURL path should not close
-				require.Equal(t, 0, requester.closeCalls)
-			} else if len(tt.values) == 0 {
-				require.Equal(t, 0, requester.closeCalls)
-			} else {
-				require.Equal(t, 1, requester.closeCalls)
-			}
-
 			if tt.after != nil {
-				tt.after(t, tt.embedder, requester)
-			}
-			if tt.requesterCloseErr != nil && tt.baseURL == nil && len(tt.values) > 0 {
-				require.ErrorIs(t, err, tt.requesterCloseErr)
+				tt.after(t, tt.embedder)
 			}
 			if tt.baseURL != nil {
 				require.Error(t, err)

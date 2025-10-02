@@ -11,7 +11,7 @@ import (
 )
 
 func example() error {
-	// Initialize the Jina provider
+	// Initialize the OpenAI provider
 	provider := jinaprovider.NewProvider()
 
 	// Create a model
@@ -41,7 +41,7 @@ func example() error {
 	return nil
 }
 
-func printResponse(response api.EmbeddingResponse) {
+func printResponse(response api.DenseEmbeddingResponse) {
 	printer := pp.New()
 	printer.SetOmitEmpty(true)
 	printer.Print(response)

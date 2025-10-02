@@ -46,7 +46,7 @@ func NewProvider(opts ...ProviderOption) *Provider {
 	return p
 }
 
-// LanguageModel is not supported by the Jina provider.
+// LanguageModel creates a new OpenAI language model.
 func (p *Provider) LanguageModel(modelID string) (api.LanguageModel, error) {
 	return nil, api.NewUnsupportedFunctionalityError(p.name, "LanguageModel")
 }

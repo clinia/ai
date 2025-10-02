@@ -6,11 +6,25 @@ import (
 	"go.jetify.com/ai/api"
 )
 
-func EmbedMany[T any](
-	ctx context.Context, model api.EmbeddingModel[T], values []T, opts ...EmbeddingOption,
-) (api.EmbeddingResponse, error) {
+func EmbedMany[T api.EmbeddingInput, E api.EmbeddingVector](
+	ctx context.Context, model api.EmbeddingModel[T, E], values []T, opts ...EmbeddingOption,
+) (api.EmbeddingResponse[E], error) {
 	config := buildEmbeddingConfig(opts)
 	return model.DoEmbed(ctx, values, config)
+}
+
+func RankMany(
+	ctx context.Context, model api.RankingModel, query string, texts []string, opts ...RankingOption,
+) (api.RankingResponse, error) {
+	config := buildRankingConfig(opts)
+	return model.DoRank(ctx, query, texts, config)
+}
+
+func ChunkMany(
+	ctx context.Context, model api.ChunkingModel, texts []string, opts ...ChunkingOption,
+) (api.ChunkingResponse, error) {
+	config := buildChunkingConfig(opts)
+	return model.DoChunk(ctx, texts, config)
 }
 
 // TODO: do we want to rename from GenerateText to Generate and from StreamText to Stream?

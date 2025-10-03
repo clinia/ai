@@ -20,11 +20,12 @@ func RankMany(
 	return model.DoRank(ctx, query, texts, config)
 }
 
-func ChunkMany(
-	ctx context.Context, model api.ChunkingModel, texts []string, opts ...ChunkingOption,
-) (api.ChunkingResponse, error) {
-	config := buildChunkingConfig(opts)
-	return model.DoChunk(ctx, texts, config)
+// SegmentMany provides a Segmenter-style API that mirrors chunking for now.
+func SegmentMany(
+	ctx context.Context, model api.SegmentingModel, texts []string, opts ...SegmentingOption,
+) (api.SegmentingResponse, error) {
+	config := buildSegmentingConfig(opts)
+	return model.DoSegment(ctx, texts, config)
 }
 
 // TODO: do we want to rename from GenerateText to Generate and from StreamText to Stream?

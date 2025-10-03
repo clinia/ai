@@ -24,7 +24,7 @@ func run() error {
 		return err
 	}
 
-	chunker, err := provider.ChunkingModel("text-chunker:1")
+	segmenter, err := provider.Segmenter("text-chunker:1")
 	if err != nil {
 		return err
 	}
@@ -37,20 +37,20 @@ func run() error {
 		"Ethical considerations in AI development focus on transparency, fairness, and bias mitigation to ensure equitable outcomes.",
 	}
 
-	resp, err := ai.ChunkMany(ctx, chunker, documents, ai.WithChunkingBaseURL("http://127.0.0.1:4770"))
+	resp, err := ai.SegmentMany(ctx, segmenter, documents, ai.WithSegmentingBaseURL("http://127.0.0.1:4770"))
 	if err != nil {
 		return err
 	}
 
-	printChunkingResponse(documents, resp)
+	printSegmentingResponse(documents, resp)
 	return nil
 }
 
-func printChunkingResponse(texts []string, resp api.ChunkingResponse) {
+func printSegmentingResponse(texts []string, resp api.SegmentingResponse) {
 	printer := pp.New()
 	printer.SetOmitEmpty(true)
 	printer.Println(map[string]any{
-		"texts":  texts,
-		"chunks": resp.Chunks,
+		"texts":    texts,
+		"segments": resp.Segments,
 	})
 }

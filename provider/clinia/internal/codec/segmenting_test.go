@@ -8,7 +8,7 @@ import (
 	"go.jetify.com/ai/api"
 )
 
-func TestEncodeChunk(t *testing.T) {
+func TestEncodeSegment(t *testing.T) {
 	tests := []struct {
 		name    string
 		texts   []string
@@ -32,7 +32,7 @@ func TestEncodeChunk(t *testing.T) {
 	for _, tt := range tests {
 		parameters := tt
 		t.Run(tt.name, func(t *testing.T) {
-			params, err := EncodeChunk(parameters.texts, api.ChunkingOptions{})
+			params, err := EncodeSegment(parameters.texts, api.SegmentingOptions{})
 			if parameters.wantErr {
 				require.Error(t, err)
 				return
@@ -43,11 +43,11 @@ func TestEncodeChunk(t *testing.T) {
 	}
 }
 
-func TestDecodeChunk(t *testing.T) {
+func TestDecodeSegment(t *testing.T) {
 	tests := []struct {
 		name    string
 		input   *cliniaclient.ChunkResponse
-		want    api.ChunkingResponse
+		want    api.SegmentingResponse
 		wantErr bool
 	}{
 		{
@@ -58,9 +58,9 @@ func TestDecodeChunk(t *testing.T) {
 					{ID: "c1", Text: "foo", StartIndex: 0, EndIndex: 3, TokenCount: 3},
 				}},
 			},
-			want: api.ChunkingResponse{
+			want: api.SegmentingResponse{
 				RequestID: "req",
-				Chunks: [][]api.Chunk{{
+				Segments: [][]api.Segment{{
 					{
 						ID:         "c1",
 						Text:       "foo",
@@ -81,7 +81,7 @@ func TestDecodeChunk(t *testing.T) {
 	for _, tt := range tests {
 		parameters := tt
 		t.Run(tt.name, func(t *testing.T) {
-			resp, err := DecodeChunk(parameters.input)
+			resp, err := DecodeSegment(parameters.input)
 			if parameters.wantErr {
 				require.Error(t, err)
 				return

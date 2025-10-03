@@ -31,7 +31,7 @@ func (f *chunkerStub) Chunk(ctx context.Context, modelName, modelVersion string,
 
 func (f *chunkerStub) Ready(ctx context.Context, modelName, modelVersion string) error { return nil }
 
-func TestChunkingModel(t *testing.T) {
+func TestSegmentingModel(t *testing.T) {
 	ctx := t.Context()
 
 	tests := []struct {
@@ -39,17 +39,17 @@ func TestChunkingModel(t *testing.T) {
 		modelName    string
 		modelVersion string
 		texts        []string
-		opts         api.ChunkingOptions
+		opts         api.SegmentingOptions
 		chunker      *chunkerStub
 		wantModelErr bool
 		wantErr      bool
-		wantResp     api.ChunkingResponse
+		wantResp     api.SegmentingResponse
 		wantModelID  string
 		after        func(t *testing.T, chunker *chunkerStub)
 	}{
 		{
-			name:         "successful chunk",
-			modelName:    "chunker",
+			name:         "successful segment",
+			modelName:    "segmenter",
 			modelVersion: "2",
 			texts:        []string{"hello"},
 			chunker: &chunkerStub{
@@ -60,9 +60,9 @@ func TestChunkingModel(t *testing.T) {
 					}},
 				},
 			},
-			wantResp: api.ChunkingResponse{
+			wantResp: api.SegmentingResponse{
 				RequestID: "req",
-				Chunks: [][]api.Chunk{{
+				Segments: [][]api.Segment{{
 					{
 						ID:         "c1",
 						Text:       "hello",
@@ -72,10 +72,10 @@ func TestChunkingModel(t *testing.T) {
 					},
 				}},
 			},
-			wantModelID: "chunker:2",
+			wantModelID: "segmenter:2",
 			after: func(t *testing.T, chunker *chunkerStub) {
 				require.Equal(t, 1, chunker.calls)
-				require.Equal(t, "chunker", chunker.lastModelName)
+				require.Equal(t, "segmenter", chunker.lastModelName)
 				require.Equal(t, "2", chunker.lastModelVersion)
 				require.Equal(t, cliniaclient.ChunkRequest{Texts: []string{"hello"}}, chunker.lastRequest)
 				require.NotNil(t, chunker.boundRequester)
@@ -83,12 +83,12 @@ func TestChunkingModel(t *testing.T) {
 		},
 		{
 			name:         "propagates provider error",
-			modelName:    "chunker",
+			modelName:    "segmenter",
 			modelVersion: "2",
 			texts:        []string{"hello"},
 			chunker:      &chunkerStub{err: errors.New("boom")},
 			wantErr:      true,
-			wantModelID:  "chunker:2",
+			wantModelID:  "segmenter:2",
 			after: func(t *testing.T, chunker *chunkerStub) {
 				require.Equal(t, 1, chunker.calls)
 				require.NotNil(t, chunker.boundRequester)
@@ -96,7 +96,7 @@ func TestChunkingModel(t *testing.T) {
 		},
 		{
 			name:         "requires model version",
-			modelName:    "chunker",
+			modelName:    "segmenter",
 			modelVersion: "",
 			texts:        []string{"hello"},
 			chunker:      &chunkerStub{},
@@ -104,12 +104,12 @@ func TestChunkingModel(t *testing.T) {
 		},
 		{
 			name:         "validates texts",
-			modelName:    "chunker",
+			modelName:    "segmenter",
 			modelVersion: "2",
 			texts:        []string{},
 			chunker:      &chunkerStub{},
 			wantErr:      true,
-			wantModelID:  "chunker:2",
+			wantModelID:  "segmenter:2",
 			after: func(t *testing.T, chunker *chunkerStub) {
 				require.Equal(t, 0, chunker.calls)
 			},
@@ -137,7 +137,7 @@ func TestChunkingModel(t *testing.T) {
 			if tt.modelVersion != "" {
 				modelID = tt.modelName + ":" + tt.modelVersion
 			}
-			model, err := provider.ChunkingModel(modelID)
+			model, err := provider.Segmenter(modelID)
 			if tt.wantModelErr {
 				require.Error(t, err)
 				return
@@ -145,7 +145,7 @@ func TestChunkingModel(t *testing.T) {
 			require.NoError(t, err)
 			require.Equal(t, tt.wantModelID, model.ModelID())
 
-			resp, err := model.DoChunk(ctx, tt.texts, tt.opts)
+			resp, err := model.DoSegment(ctx, tt.texts, tt.opts)
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {

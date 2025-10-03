@@ -1,31 +1,31 @@
 package jina
 
 import (
-    "context"
+	"context"
 
-    "go.jetify.com/ai/api"
-    "go.jetify.com/ai/provider/jina/internal/codec"
+	"go.jetify.com/ai/api"
+	"go.jetify.com/ai/provider/jina/internal/codec"
 )
 
 // SegmenterModel implements api.SegmentingModel using Jina Segmenter API.
 type SegmenterModel struct {
-    modelID string
-    pc      ProviderConfig
+	modelID string
+	pc      ProviderConfig
 }
 
 var _ api.SegmentingModel = &SegmenterModel{}
 
 // Segmenter creates a new SegmenterModel.
 func (p *Provider) Segmenter(modelID string) (api.SegmentingModel, error) {
-    m := &SegmenterModel{
-        modelID: modelID,
-        pc: ProviderConfig{
-            providerName: p.name + ".segmenter",
-            client:       p.client,
-            apiKey:       p.apiKey,
-        },
-    }
-    return m, nil
+	m := &SegmenterModel{
+		modelID: modelID,
+		pc: ProviderConfig{
+			providerName: p.name + ".segmenter",
+			client:       p.client,
+			apiKey:       p.apiKey,
+		},
+	}
+	return m, nil
 }
 
 func (m *SegmenterModel) SpecificationVersion() string { return "v1" }
@@ -34,23 +34,22 @@ func (m *SegmenterModel) ModelID() string              { return m.modelID }
 func (m *SegmenterModel) SupportsParallelCalls() bool  { return true }
 
 func (m *SegmenterModel) DoSegment(ctx context.Context, texts []string, opts api.SegmentingOptions) (api.SegmentingResponse, error) {
-    // Jina Segmenter handles one content per request; iterate inputs
-    groups := make([][]api.Segment, 0, len(texts))
-    for _, text := range texts {
-        body, ropts, err := codec.EncodeSegment(text, opts)
-        if err != nil {
-            return api.SegmentingResponse{}, err
-        }
-        resp, err := m.pc.client.Segmenter.New(ctx, body, ropts...)
-        if err != nil {
-            return api.SegmentingResponse{}, err
-        }
-        segs, err := codec.DecodeSegment(resp)
-        if err != nil {
-            return api.SegmentingResponse{}, err
-        }
-        groups = append(groups, segs)
-    }
-    return api.SegmentingResponse{Segments: groups}, nil
+	// Jina Segmenter handles one content per request; iterate inputs
+	groups := make([][]api.Segment, 0, len(texts))
+	for _, text := range texts {
+		body, ropts, err := codec.EncodeSegment(text, opts)
+		if err != nil {
+			return api.SegmentingResponse{}, err
+		}
+		resp, err := m.pc.client.Segmenter.New(ctx, body, ropts...)
+		if err != nil {
+			return api.SegmentingResponse{}, err
+		}
+		segs, err := codec.DecodeSegment(resp)
+		if err != nil {
+			return api.SegmentingResponse{}, err
+		}
+		groups = append(groups, segs)
+	}
+	return api.SegmentingResponse{Segments: groups}, nil
 }
-

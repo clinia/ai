@@ -61,7 +61,7 @@ func TestDoEmbed(t *testing.T) {
 		options      api.EmbeddingOptions
 		exchanges    []httpmock.Exchange
 		wantErr      bool
-		expectedResp api.EmbeddingResponse
+		expectedResp api.DenseEmbeddingResponse
 		skip         bool
 	}{
 		{
@@ -69,7 +69,7 @@ func TestDoEmbed(t *testing.T) {
 			modelID:   "text-embedding-ada-002",
 			input:     standardInput,
 			exchanges: standardExchange,
-			expectedResp: api.EmbeddingResponse{
+			expectedResp: api.DenseEmbeddingResponse{
 				Embeddings: []api.Embedding{
 					{0.0023064255, -0.009327292, 0.015797527},
 					{0.0072664247, -0.008545238, 0.017125098},
@@ -112,7 +112,7 @@ func TestDoEmbed(t *testing.T) {
 					},
 				},
 			},
-			expectedResp: api.EmbeddingResponse{
+			expectedResp: api.DenseEmbeddingResponse{
 				Embeddings: []api.Embedding{
 					{0.0023064255, -0.009327292, 0.015797527},
 					{0.0072664247, -0.008545238, 0.017125098},
@@ -138,7 +138,7 @@ func runDoEmbedTests(t *testing.T, tests []struct {
 	options      api.EmbeddingOptions
 	exchanges    []httpmock.Exchange
 	wantErr      bool
-	expectedResp api.EmbeddingResponse
+	expectedResp api.DenseEmbeddingResponse
 	skip         bool
 },
 ) {

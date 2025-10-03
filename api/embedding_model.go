@@ -9,13 +9,26 @@ import (
 // It is e.g. used to represent a text as a vector of word embeddings.
 type Embedding []float64
 
+// SparseEmbedding is a sparse vector, represented as a map from token to weight.
+type SparseEmbedding map[string]float64
+
+// EmbeddingVector is a constraint that allows either dense or sparse embeddings.
+type EmbeddingVector interface {
+	Embedding | SparseEmbedding
+}
+
+// EmbeddingInput is a constraint that allows either string or multimodal input.
+type EmbeddingInput interface {
+	string | MultimodalEmbeddingInput
+}
+
 // EmbeddingModel is a specification for an embedding model that implements the embedding model
 // interface version 1.
 //
 // T is the type of the values that the model can embed.
 // This will allow us to go beyond text embeddings in the future,
 // e.g. to support image embeddings
-type EmbeddingModel[T any] interface {
+type EmbeddingModel[T EmbeddingInput, E EmbeddingVector] interface {
 	// SpecificationVersion returns which embedding model interface version is implemented.
 	// This will allow us to evolve the embedding model interface and retain backwards
 	// compatibility. The different implementation versions can be handled as a discriminated
@@ -38,13 +51,13 @@ type EmbeddingModel[T any] interface {
 	//
 	// Naming: "do" prefix to prevent accidental direct usage of the method
 	// by the user.
-	DoEmbed(ctx context.Context, values []T, opts EmbeddingOptions) (EmbeddingResponse, error)
+	DoEmbed(ctx context.Context, values []T, opts EmbeddingOptions) (EmbeddingResponse[E], error)
 }
 
 // EmbeddingResponse represents the response from generating embeddings.
-type EmbeddingResponse struct {
+type EmbeddingResponse[E EmbeddingVector] struct {
 	// Embeddings are the generated embeddings. They are in the same order as the input values.
-	Embeddings []Embedding
+	Embeddings []E
 
 	// Usage contains token usage information. We only have input tokens for embeddings.
 	Usage *EmbeddingUsage
@@ -52,6 +65,12 @@ type EmbeddingResponse struct {
 	// RawResponse contains optional raw response information for debugging purposes.
 	RawResponse *EmbeddingRawResponse
 }
+
+// DenseEmbeddingResponse is a convenience type for dense embeddings.
+type DenseEmbeddingResponse = EmbeddingResponse[Embedding]
+
+// SparseEmbeddingResponse is a convenience type for sparse embeddings.
+type SparseEmbeddingResponse = EmbeddingResponse[SparseEmbedding]
 
 // EmbeddingUsage represents token usage information.
 type EmbeddingUsage struct {

@@ -37,6 +37,6 @@ func NewProvider(opts ...ProviderOption) *Provider {
 }
 
 // MultimodalEmbeddingModel is not supported by OpenAI Provider at this time.
-func (p *Provider) MultimodalEmbeddingModel(modelID string) (api.EmbeddingModel[api.MultimodalEmbeddingInput], error) {
+func (p *Provider) MultimodalEmbeddingModel(modelID string) (api.EmbeddingModel[api.MultimodalEmbeddingInput, api.Embedding], error) {
 	return nil, api.NewUnsupportedFunctionalityError(p.name, "MultiModalEmbeddingModel")
 }

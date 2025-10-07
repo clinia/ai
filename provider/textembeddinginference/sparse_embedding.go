@@ -69,7 +69,7 @@ func (m *SparseEmbeddingModel) DoSparseEmbed(
 		return SparseEmbeddingResponse{}, err
 	}
 
-	resp, err := m.pc.client.Embeddings.NewSparse(ctx, sparseEmbeddingParams, teiOpts...)
+	resp, err := m.pc.client.Embedding.NewSparse(ctx, sparseEmbeddingParams, teiOpts...)
 	if err != nil {
 		return SparseEmbeddingResponse{}, err
 	}

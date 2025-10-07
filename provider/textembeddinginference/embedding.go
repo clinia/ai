@@ -69,7 +69,7 @@ func (m *EmbeddingModel) DoEmbed(
 		return api.EmbeddingResponse{}, err
 	}
 
-	resp, err := m.pc.client.Embeddings.New(ctx, embeddingParams, teiOpts...)
+	resp, err := m.pc.client.Embedding.New(ctx, embeddingParams, teiOpts...)
 	if err != nil {
 		return api.EmbeddingResponse{}, err
 	}

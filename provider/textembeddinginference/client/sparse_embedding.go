@@ -9,10 +9,10 @@ import (
 	"go.jetify.com/ai/provider/textembeddinginference/client/option"
 )
 
-// TextEmbeddingNewParams is an alias for EmbedRequest for backward compatibility
-type TextEmbeddingNewParams = EmbedRequest
+// SparseTextEmbeddingNewParams is an alias for EmbedSparseRequest for backward compatibility
+type SparseTextEmbeddingNewParams = EmbedSparseRequest
 
-func validateEmbedRequest(req EmbedRequest) error {
+func validateEmbedSparseRequest(req EmbedSparseRequest) error {
 	if req.Inputs == nil {
 		return fmt.Errorf("inputs is required")
 	}
@@ -39,14 +39,14 @@ func validateEmbedRequest(req EmbedRequest) error {
 	return nil
 }
 
-// New creates an embedding vector representing the input text.
-// TEI uses the /embed endpoint which returns a direct array of embedding vectors.
-func (r *EmbeddingService) New(ctx context.Context, body TextEmbeddingNewParams, opts ...option.RequestOption) (res *CreateEmbeddingResponse, err error) {
-	if err := validateEmbedRequest(body); err != nil {
+// NewSparse creates sparse embedding vectors representing the input text.
+// TEI uses the /embed_sparse endpoint which returns arrays of SparseValue objects.
+func (r *EmbeddingService) NewSparse(ctx context.Context, body SparseTextEmbeddingNewParams, opts ...option.RequestOption) (res *CreateSparseEmbeddingResponse, err error) {
+	if err := validateEmbedSparseRequest(body); err != nil {
 		return nil, err
 	}
 	opts = append(r.Options[:], opts...)
-	path := "embed"
+	path := "embed_sparse"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return
 }

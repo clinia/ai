@@ -69,10 +69,3 @@ func WithAPIKey(value string) RequestOption {
 		return r.Apply(WithHeader("authorization", fmt.Sprintf("Bearer %s", r.APIKey)))
 	})
 }
-
-// WithEnvironmentProduction returns a RequestOption that sets the current
-// environment to be the "production" environment. An environment specifies which base URL
-// to use by default. For TEI, this is typically a localhost URL.
-func WithEnvironmentProduction() RequestOption {
-	return requestconfig.WithDefaultBaseURL("http://localhost:8080")
-}

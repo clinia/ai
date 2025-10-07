@@ -8,25 +8,25 @@ import (
 )
 
 // DecodeEmbedding maps the TEI embedding API response to the unified api.EmbeddingResponse.
+// TEI returns embeddings as a direct array of arrays: [[0.1, 0.2], [0.3, 0.4]]
 func DecodeEmbedding(resp *tei.CreateEmbeddingResponse) (api.EmbeddingResponse, error) {
 	if resp == nil {
 		return api.EmbeddingResponse{}, api.NewEmptyResponseBodyError("response from TEI embeddings API is nil")
 	}
 
-	embs := make([]api.Embedding, len(resp.Data))
-	for i, d := range resp.Data {
-		vec := make([]float64, len(d.Embedding))
-		copy(vec, d.Embedding)
+	// TEI returns [][]float64 directly
+	embeddingArrays := *resp
+	embs := make([]api.Embedding, len(embeddingArrays))
+	for i, embedding := range embeddingArrays {
+		// Each embedding is already []float64, just copy it
+		vec := make([]float64, len(embedding))
+		copy(vec, embedding)
 		embs[i] = vec
 	}
 
+	// TEI doesn't return usage information in the basic response
+	// Usage would need to be tracked separately if needed
 	var usage *api.EmbeddingUsage
-	if resp.Usage != nil {
-		usage = &api.EmbeddingUsage{
-			PromptTokens: resp.Usage.PromptTokens,
-			TotalTokens:  resp.Usage.TotalTokens,
-		}
-	}
 
 	return api.EmbeddingResponse{
 		Embeddings: embs,

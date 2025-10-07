@@ -45,7 +45,7 @@ func (r *RerankingService) Rerank(ctx context.Context, body RerankRequest, opts 
 		return nil, err
 	}
 	opts = append(r.Options[:], opts...)
-	path := "rerank"
+	path := ""
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return
 }

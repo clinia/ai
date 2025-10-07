@@ -106,7 +106,7 @@ func (cfg *RequestConfig) Execute() error {
 
 	if resp.StatusCode >= 400 {
 		body, _ := io.ReadAll(resp.Body)
-		return fmt.Errorf("TEI API error: status=%d body=%s", resp.StatusCode, string(body))
+		return fmt.Errorf("TEI API error: status=%d body=%s request=%s", resp.StatusCode, string(body), cfg.Request.URL.String())
 	}
 
 	if cfg.ResponseBodyInto == nil {

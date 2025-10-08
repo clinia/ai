@@ -13,8 +13,7 @@ type SparseEmbeddingModel struct {
 	pc      ProviderConfig
 }
 
-type SparseEmbeddingResponse = codec.SparseEmbeddingResponse
-type SparseEmbedding = codec.SparseEmbedding
+var _ api.EmbeddingModel[string, api.SparseEmbedding] = &SparseEmbeddingModel{}
 
 // SparseTextEmbeddingModel creates a new TEI sparse embedding model.
 func (p *Provider) SparseTextEmbeddingModel(modelID string) (*SparseEmbeddingModel, error) {
@@ -54,24 +53,24 @@ func (m *SparseEmbeddingModel) MaxEmbeddingsPerCall() *int {
 	return &max
 }
 
-// DoSparseEmbed generates a list of sparse embeddings for the given input values.
-func (m *SparseEmbeddingModel) DoSparseEmbed(
+// DoEmbed generates a list of sparse embeddings for the given input values.
+func (m *SparseEmbeddingModel) DoEmbed(
 	ctx context.Context,
 	values []string,
-	opts api.EmbeddingOptions,
-) (SparseEmbeddingResponse, error) {
+	opts api.TransportOptions,
+) (api.SparseEmbeddingResponse, error) {
 	sparseEmbeddingParams, teiOpts, _, err := codec.EncodeSparseEmbedding(
 		m.modelID,
 		values,
 		opts,
 	)
 	if err != nil {
-		return SparseEmbeddingResponse{}, err
+		return api.SparseEmbeddingResponse{}, err
 	}
 
 	resp, err := m.pc.client.Embedding.NewSparse(ctx, sparseEmbeddingParams, teiOpts...)
 	if err != nil {
-		return SparseEmbeddingResponse{}, err
+		return api.SparseEmbeddingResponse{}, err
 	}
 
 	return codec.DecodeSparseEmbedding(resp)

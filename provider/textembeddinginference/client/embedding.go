@@ -34,37 +34,13 @@ type SparseValue struct {
 // EmbeddingModel represents a TEI model identifier
 type EmbeddingModel = string
 
-// TEI typically uses the actual model name loaded in the service
-// These are common model names that might be used with TEI
-const (
-	// Common text embedding models that can be used with TEI
-	EmbeddingModelAllMiniLML6V2      EmbeddingModel = "sentence-transformers/all-MiniLM-L6-v2"
-	EmbeddingModelAllMiniLML12V2     EmbeddingModel = "sentence-transformers/all-MiniLM-L12-v2"
-	EmbeddingModelAllMpnetBaseV2     EmbeddingModel = "sentence-transformers/all-mpnet-base-v2"
-	EmbeddingModelMultiQAMiniLML6COS EmbeddingModel = "sentence-transformers/multi-qa-MiniLM-L6-cos-v1"
-
-	// BGE models
-	EmbeddingModelBGESmallEN EmbeddingModel = "BAAI/bge-small-en"
-	EmbeddingModelBGEBaseEN  EmbeddingModel = "BAAI/bge-base-en"
-	EmbeddingModelBGELargeEN EmbeddingModel = "BAAI/bge-large-en"
-
-	// E5 models
-	EmbeddingModelE5SmallV2 EmbeddingModel = "intfloat/e5-small-v2"
-	EmbeddingModelE5BaseV2  EmbeddingModel = "intfloat/e5-base-v2"
-	EmbeddingModelE5LargeV2 EmbeddingModel = "intfloat/e5-large-v2"
-
-	// Sparse embedding models (SPLADE-based)
-	EmbeddingModelSpladeCoCondenser EmbeddingModel = "naver/splade-cocondenser-ensembledistil"
-	EmbeddingModelSpladeV2Max       EmbeddingModel = "naver/splade-v2-max"
-	EmbeddingModelSpladeV2Distil    EmbeddingModel = "naver/splade-v2-distil"
-	EmbeddingModelSpladeV3          EmbeddingModel = "naver/splade-v3"
-)
-
 // EmbedRequest represents the request parameters for the TEI /embed endpoint
 // This matches the TEI OpenAPI EmbedRequest schema
 type EmbedRequest struct {
 	// Inputs can be a single string or array of strings to embed
 	Inputs interface{} `json:"inputs"`
+	// Dimensions is the number of dimensions that the output embeddings should have (optional)
+	Dimensions *int `json:"dimensions,omitempty"`
 	// Normalize indicates whether to normalize the embeddings (default: true)
 	Normalize *bool `json:"normalize,omitempty"`
 	// Truncate indicates whether to truncate inputs that exceed model limits (default: false)

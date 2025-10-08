@@ -14,10 +14,10 @@ type EmbeddingModel struct {
 	pc      ProviderConfig
 }
 
-var _ api.EmbeddingModel[string] = &EmbeddingModel{}
+var _ api.EmbeddingModel[string, api.Embedding] = &EmbeddingModel{}
 
 // TextEmbeddingModel creates a new TEI embedding model.
-func (p *Provider) TextEmbeddingModel(modelID string) (api.EmbeddingModel[string], error) {
+func (p *Provider) TextEmbeddingModel(modelID string) (api.EmbeddingModel[string, api.Embedding], error) {
 	// Create model with provider's client
 	model := &EmbeddingModel{
 		modelID: modelID,
@@ -36,7 +36,7 @@ func (m *EmbeddingModel) ProviderName() string {
 }
 
 func (m *EmbeddingModel) SpecificationVersion() string {
-	return "v2"
+	return "v1"
 }
 
 func (m *EmbeddingModel) ModelID() string {
@@ -58,20 +58,20 @@ func (m *EmbeddingModel) MaxEmbeddingsPerCall() *int {
 func (m *EmbeddingModel) DoEmbed(
 	ctx context.Context,
 	values []string,
-	opts api.EmbeddingOptions,
-) (api.EmbeddingResponse, error) {
+	opts api.TransportOptions,
+) (api.DenseEmbeddingResponse, error) {
 	embeddingParams, teiOpts, _, err := codec.EncodeEmbedding(
 		m.modelID,
 		values,
 		opts,
 	)
 	if err != nil {
-		return api.EmbeddingResponse{}, err
+		return api.DenseEmbeddingResponse{}, err
 	}
 
 	resp, err := m.pc.client.Embedding.New(ctx, embeddingParams, teiOpts...)
 	if err != nil {
-		return api.EmbeddingResponse{}, err
+		return api.DenseEmbeddingResponse{}, err
 	}
 
 	return codec.DecodeEmbedding(resp)

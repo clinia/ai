@@ -46,7 +46,7 @@ func (r *EmbeddingService) NewSparse(ctx context.Context, body SparseTextEmbeddi
 		return nil, err
 	}
 	opts = append(r.Options[:], opts...)
-	path := "embed_sparse"
+	path := ""
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return
 }

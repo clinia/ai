@@ -61,6 +61,6 @@ func (p *Provider) LanguageModel(modelID string) (api.LanguageModel, error) {
 }
 
 // MultimodalEmbeddingModel is not supported by TEI provider.
-func (p *Provider) MultimodalEmbeddingModel(modelID string) (api.EmbeddingModel[api.MultimodalEmbeddingInput], error) {
+func (p *Provider) MultimodalEmbeddingModel(modelID string) (api.EmbeddingModel[api.MultimodalEmbeddingInput, api.Embedding], error) {
 	return nil, api.NewUnsupportedFunctionalityError(p.name, "MultimodalEmbeddingModel")
 }

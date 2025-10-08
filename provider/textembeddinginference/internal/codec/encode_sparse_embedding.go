@@ -10,7 +10,7 @@ import (
 func EncodeSparseEmbedding(
 	modelID string,
 	values []string,
-	opts api.EmbeddingOptions,
+	opts api.TransportOptions,
 ) (tei.SparseTextEmbeddingNewParams, []option.RequestOption, []api.CallWarning, error) {
 	var reqOpts []option.RequestOption
 	if opts.Headers != nil {
@@ -29,12 +29,18 @@ func EncodeSparseEmbedding(
 }
 
 // applySparseProviderMetadata applies metadata-specific options to the sparse parameters
-func applySparseProviderMetadata(params *tei.SparseTextEmbeddingNewParams, opts api.EmbeddingOptions) {
+func applySparseProviderMetadata(params *tei.SparseTextEmbeddingNewParams, opts api.TransportOptions) {
 	if opts.ProviderMetadata != nil {
 		metadata := GetSparseTextEmbeddingMetadata(opts)
 		if metadata != nil {
 			if metadata.Truncate != nil {
 				params.Truncate = metadata.Truncate
+			}
+			if metadata.TruncationDirection != nil {
+				params.TruncationDirection = metadata.TruncationDirection
+			}
+			if metadata.PromptName != nil {
+				params.PromptName = metadata.PromptName
 			}
 		}
 	}

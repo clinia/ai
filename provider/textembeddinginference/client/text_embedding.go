@@ -46,7 +46,7 @@ func (r *EmbeddingService) New(ctx context.Context, body TextEmbeddingNewParams,
 		return nil, err
 	}
 	opts = append(r.Options[:], opts...)
-	path := ""
+	path := "embed" // TEI /embed endpoint as per OpenAPI spec
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return
 }

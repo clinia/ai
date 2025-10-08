@@ -9,7 +9,7 @@ import (
 type Client struct {
 	Options   []option.RequestOption
 	Embedding EmbeddingService
-	Reranking RerankingService
+	Ranking   RankingService
 }
 
 // DefaultClientOptions read from the environment (TEI_BASE_URL, TEI_API_KEY).
@@ -31,6 +31,6 @@ func NewClient(opts ...option.RequestOption) (r Client) {
 	r = Client{Options: opts}
 
 	r.Embedding = NewEmbeddingService(opts...)
-	r.Reranking = NewRerankingService(opts...)
+	r.Ranking = NewRankingService(opts...)
 	return
 }

@@ -9,11 +9,11 @@ import (
 	"go.jetify.com/ai/provider/textembeddinginference/client/option"
 )
 
-type rerankRequestConcrete struct {
-	RerankRequest
+type rankRequestConcrete struct {
+	RankRequest
 }
 
-func (p rerankRequestConcrete) validate() error {
+func (p rankRequestConcrete) validate() error {
 	if p.Query == "" {
 		return fmt.Errorf("query is required")
 	}
@@ -35,17 +35,17 @@ func (p rerankRequestConcrete) validate() error {
 	return nil
 }
 
-// Rerank reorders the given documents based on their relevance to the query.
+// Rank reorders the given documents based on their relevance to the query.
 // Returns documents sorted by relevance score in descending order.
-func (r *RerankingService) Rerank(ctx context.Context, body RerankRequest, opts ...option.RequestOption) (res *RerankResponse, err error) {
-	req := rerankRequestConcrete{
-		RerankRequest: body,
+func (r *RankingService) Rank(ctx context.Context, body RankRequest, opts ...option.RequestOption) (res *RankResponse, err error) {
+	req := rankRequestConcrete{
+		RankRequest: body,
 	}
 	if err := req.validate(); err != nil {
 		return nil, err
 	}
 	opts = append(r.Options[:], opts...)
-	path := ""
+	path := "" // TODO: update with actual path if needed
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return
 }

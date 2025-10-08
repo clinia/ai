@@ -12,7 +12,7 @@ import (
 func EncodeEmbedding(
 	modelID string,
 	values []string,
-	opts api.EmbeddingOptions,
+	opts api.TransportOptions,
 ) (tei.TextEmbeddingNewParams, []option.RequestOption, []api.CallWarning, error) {
 	var reqOpts []option.RequestOption
 	if opts.Headers != nil {
@@ -42,15 +42,24 @@ func applyHeaders(headers http.Header) []option.RequestOption {
 }
 
 // applyProviderMetadata applies metadata-specific options to the parameters
-func applyProviderMetadata(params *tei.TextEmbeddingNewParams, opts api.EmbeddingOptions) {
+func applyProviderMetadata(params *tei.TextEmbeddingNewParams, opts api.TransportOptions) {
 	if opts.ProviderMetadata != nil {
 		metadata := GetTextEmbeddingMetadata(opts)
 		if metadata != nil {
+			if metadata.Dimensions != nil {
+				params.Dimensions = metadata.Dimensions
+			}
 			if metadata.Normalize != nil {
 				params.Normalize = metadata.Normalize
 			}
 			if metadata.Truncate != nil {
 				params.Truncate = metadata.Truncate
+			}
+			if metadata.TruncationDirection != nil {
+				params.TruncationDirection = metadata.TruncationDirection
+			}
+			if metadata.PromptName != nil {
+				params.PromptName = metadata.PromptName
 			}
 		}
 	}

@@ -67,6 +67,7 @@ func (s SegmenterService) New(ctx context.Context, body SegmentRequest, opts ...
 // content is an array of strings. The response is expected to be an array
 // of SegmentResponse objects, one per input string.
 // NOTE: Jina API does not support batched, this is made for Jina like providers.
+// TODO: response should not be a pointer to a slice.
 func (s SegmenterService) NewBatch(ctx context.Context, body BatchSegmentRequest, opts ...option.RequestOption) (res *[]SegmentResponse, err error) {
 	all := append([]option.RequestOption{}, s.opts...)
 	all = append(all, opts...)

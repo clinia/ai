@@ -34,7 +34,25 @@ func (m *SegmenterModel) ModelID() string              { return m.modelID }
 func (m *SegmenterModel) SupportsParallelCalls() bool  { return true }
 
 func (m *SegmenterModel) DoSegment(ctx context.Context, texts []string, opts api.SegmentingOptions) (api.SegmentingResponse, error) {
-	// Jina Segmenter handles one content per request; iterate inputs
+	// Inspect provider metadata for batching preference.
+	if meta := codec.GetSegmenterMetadata(opts); meta != nil && meta.UseContentArray {
+		// True batching: send all texts in one request using content as []string
+		body, ropts, err := codec.EncodeSegmentBatch(texts, opts)
+		if err != nil {
+			return api.SegmentingResponse{}, err
+		}
+		resp, err := m.pc.client.Segmenter.NewBatch(ctx, body, ropts...)
+		if err != nil {
+			return api.SegmentingResponse{}, err
+		}
+		groups, err := codec.DecodeSegmentBatch(resp)
+		if err != nil {
+			return api.SegmentingResponse{}, err
+		}
+		return api.SegmentingResponse{Segments: groups}, nil
+	}
+
+	// Default (and Jina-official) behavior: one content per request; iterate.
 	groups := make([][]api.Segment, 0, len(texts))
 	for _, text := range texts {
 		body, ropts, err := codec.EncodeSegment(text, opts)

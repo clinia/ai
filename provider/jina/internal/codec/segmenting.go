@@ -14,10 +14,30 @@ func EncodeSegment(text string, opts api.SegmentingOptions) (jina.SegmentRequest
 	if text == "" {
 		return jina.SegmentRequest{}, nil, fmt.Errorf("jina/segment: content is empty")
 	}
-	body := jina.SegmentRequest{
-		Content:      text,
-		ReturnChunks: true,
+	body := jina.SegmentRequest{Content: text}
+	body.ReturnChunks = true
+	var o []option.RequestOption
+	if opts.Headers != nil {
+		for k, vals := range opts.Headers {
+			for _, v := range vals {
+				o = append(o, option.WithHeaderAdd(k, v))
+			}
+		}
 	}
+	if opts.BaseURL != nil {
+		o = append(o, option.WithBaseURL(*opts.BaseURL))
+	}
+	return body, o, nil
+}
+
+// EncodeSegmentBatch prepares a Jina Segmenter request for multiple texts
+// in a single HTTP call by using an array in the "content" field.
+func EncodeSegmentBatch(texts []string, opts api.SegmentingOptions) (jina.BatchSegmentRequest, []option.RequestOption, error) {
+	if len(texts) == 0 {
+		return jina.BatchSegmentRequest{}, nil, fmt.Errorf("jina/segment: texts cannot be empty")
+	}
+	body := jina.BatchSegmentRequest{Content: texts}
+	body.ReturnChunks = true
 	var o []option.RequestOption
 	if opts.Headers != nil {
 		for k, vals := range opts.Headers {
@@ -47,4 +67,21 @@ func DecodeSegment(resp *jina.SegmentResponse) ([]api.Segment, error) {
 		segs = append(segs, seg)
 	}
 	return segs, nil
+}
+
+// DecodeSegmentBatch maps a batched Jina Segmenter response (slice) to the
+// [][]api.Segment shape expected by the SDK.
+func DecodeSegmentBatch(resps *[]jina.SegmentResponse) ([][]api.Segment, error) {
+	if resps == nil || *resps == nil {
+		return nil, fmt.Errorf("jina/segment: batch response is nil")
+	}
+	out := make([][]api.Segment, 0, len(*resps))
+	for i := range *resps {
+		segs, err := DecodeSegment(&(*resps)[i])
+		if err != nil {
+			return nil, err
+		}
+		out = append(out, segs)
+	}
+	return out, nil
 }

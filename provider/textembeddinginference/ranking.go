@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"go.jetify.com/ai/api"
-	tei "go.jetify.com/ai/provider/textembeddinginference/client"
+	"go.jetify.com/ai/provider/textembeddinginference/internal/codec"
 )
 
 // RankingModel represents a TEI ranking model.
@@ -17,11 +17,6 @@ type RankingModel struct {
 
 // Ensure rankingModel implements api.RankingModel
 var _ api.RankingModel = &RankingModel{}
-
-// Re-export client types for convenience
-type RankRequest = tei.RankRequest
-type RankResponse = tei.RankResponse
-type RankResult = tei.RankResult
 
 // rankingModel creates a new TEI ranking model.
 func (p *Provider) RankingModel(modelID string) (*RankingModel, error) {
@@ -68,52 +63,17 @@ func (m *RankingModel) DoRank(
 	texts []string,
 	opts api.TransportOptions,
 ) (api.RankingResponse, error) {
-	// Build the TEI rank request
-	request := RankRequest{
-		Query: query,
-		Texts: texts,
-	}
 
-	// Extract TEI-specific options from provider metadata if available
-	if opts.ProviderMetadata != nil {
-		if teiOpts, ok := opts.ProviderMetadata.Get("tei"); ok {
-			if rankOpts, ok := teiOpts.(RankOptions); ok {
-				request.RawScores = rankOpts.RawScores
-				request.ReturnText = rankOpts.ReturnText
-				request.Truncate = rankOpts.Truncate
-				request.TruncationDirection = rankOpts.TruncationDirection
-			}
-		}
-	}
-
-	// Call the client
-	resp, err := m.pc.client.Ranking.Rank(ctx, request)
+	request, reqOpts, _, err := codec.EncodeRank(query, texts, opts)
 	if err != nil {
 		return api.RankingResponse{}, err
 	}
 
-	// Convert TEI detailed response to simple scores
-	scores := make([]float64, len(texts))
-	for _, result := range *resp {
-		if result.Index >= 0 && result.Index < len(scores) {
-			scores[result.Index] = result.Score
-		}
+	// Call the client
+	resp, err := m.pc.client.Ranking.Rank(ctx, request, reqOpts...)
+	if err != nil {
+		return api.RankingResponse{}, err
 	}
 
-	return api.RankingResponse{
-		Scores: scores,
-		// RequestID could be extracted from response headers if available in the future
-	}, nil
-}
-
-// RankOptions contains options for ranking requests.
-type RankOptions struct {
-	// RawScores indicates whether to return raw scores instead of normalized scores
-	RawScores *bool
-	// ReturnText indicates whether to return the text content in the response
-	ReturnText *bool
-	// Truncate indicates whether to truncate inputs that are too long
-	Truncate *bool
-	// TruncationDirection specifies which direction to truncate from ("Left" or "Right")
-	TruncationDirection *string
+	return codec.DecodeRank(resp)
 }

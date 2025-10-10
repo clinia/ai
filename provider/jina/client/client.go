@@ -31,5 +31,5 @@ func NewClient(opts ...option.RequestOption) (r Client) {
 	r = Client{Options: opts}
 
 	r.Embeddings = NewEmbeddingService(opts...)
-	return
+	return r
 }

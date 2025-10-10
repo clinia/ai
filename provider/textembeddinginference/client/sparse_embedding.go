@@ -9,7 +9,6 @@ import (
 	"go.jetify.com/ai/provider/textembeddinginference/client/option"
 )
 
-// SparseTextEmbeddingNewParams is an alias for EmbedSparseRequest for backward compatibility
 type SparseTextEmbeddingNewParams = EmbedSparseRequest
 
 func validateEmbedSparseRequest(req EmbedSparseRequest) error {
@@ -46,7 +45,7 @@ func (r *EmbeddingService) NewSparse(ctx context.Context, body SparseTextEmbeddi
 		return nil, err
 	}
 	opts = append(r.Options[:], opts...)
-	path := ""
+	path := "embed_sparse"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
-	return
+	return res, err
 }

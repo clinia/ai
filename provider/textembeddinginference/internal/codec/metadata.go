@@ -12,3 +12,7 @@ func GetTextEmbeddingMetadata(source api.MetadataSource) *tei.TextEmbeddingNewPa
 func GetSparseTextEmbeddingMetadata(source api.MetadataSource) *tei.SparseTextEmbeddingNewParams {
 	return api.GetMetadata[tei.SparseTextEmbeddingNewParams]("text-embedding-inference", source)
 }
+
+func GetRankingMetadata(source api.MetadataSource) *tei.RankRequest {
+	return api.GetMetadata[tei.RankRequest]("text-embedding-inference", source)
+}

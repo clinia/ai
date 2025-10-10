@@ -32,5 +32,5 @@ func NewClient(opts ...option.RequestOption) (r Client) {
 
 	r.Embedding = NewEmbeddingService(opts...)
 	r.Ranking = NewRankingService(opts...)
-	return
+	return r
 }

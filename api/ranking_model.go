@@ -18,7 +18,7 @@ type RankingModel interface {
 
 	// DoRank produces a score for each text given a query.
 	// Uses EmbeddingOptions to unify per-call HTTP/auth/baseURL options.
-	DoRank(ctx context.Context, query string, texts []string, opts EmbeddingOptions) (RankingResponse, error)
+	DoRank(ctx context.Context, query string, texts []string, opts TransportOptions) (RankingResponse, error)
 }
 
 // RankingResponse represents the response from a ranking request.

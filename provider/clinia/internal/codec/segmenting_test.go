@@ -32,7 +32,7 @@ func TestEncodeSegment(t *testing.T) {
 	for _, tt := range tests {
 		parameters := tt
 		t.Run(tt.name, func(t *testing.T) {
-			params, err := EncodeSegment(parameters.texts, api.EmbeddingOptions{})
+			params, err := EncodeSegment(parameters.texts, api.TransportOptions{})
 			if parameters.wantErr {
 				require.Error(t, err)
 				return

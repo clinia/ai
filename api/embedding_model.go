@@ -51,7 +51,7 @@ type EmbeddingModel[T EmbeddingInput, E EmbeddingVector] interface {
 	//
 	// Naming: "do" prefix to prevent accidental direct usage of the method
 	// by the user.
-	DoEmbed(ctx context.Context, values []T, opts EmbeddingOptions) (EmbeddingResponse[E], error)
+	DoEmbed(ctx context.Context, values []T, opts TransportOptions) (EmbeddingResponse[E], error)
 }
 
 // EmbeddingResponse represents the response from generating embeddings.

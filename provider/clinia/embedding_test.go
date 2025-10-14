@@ -121,7 +121,7 @@ func TestEmbeddingModelDoEmbed(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			opts := api.EmbeddingOptions{}
+			opts := api.TransportOptions{}
 			// Ensure makeRequester is called when inputs are valid
 			if tt.baseURL != nil {
 				opts.BaseURL = tt.baseURL

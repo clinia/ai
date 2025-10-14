@@ -37,7 +37,7 @@ func run() error {
 		"Ethical considerations in AI development focus on transparency, fairness, and bias mitigation to ensure equitable outcomes.",
 	}
 
-	resp, err := ai.SegmentMany(ctx, segmenter, documents, ai.WithEmbeddingBaseURL("http://127.0.0.1:4770"))
+	resp, err := ai.SegmentMany(ctx, segmenter, documents, ai.WithTransportBaseURL("http://127.0.0.1:4770"))
 	if err != nil {
 		return err
 	}

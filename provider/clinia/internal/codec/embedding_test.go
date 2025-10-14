@@ -44,7 +44,7 @@ func TestEncodeEmbedding(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			params, err := EncodeEmbedding(tt.values, api.EmbeddingOptions{})
+			params, err := EncodeEmbedding(tt.values, api.TransportOptions{})
 			if tt.wantErr {
 				require.Error(t, err)
 				return

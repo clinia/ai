@@ -84,7 +84,7 @@ func TestEncodeEmbedding(t *testing.T) {
 
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
-				opts := api.EmbeddingOptions{Headers: tt.headers}
+				opts := api.TransportOptions{Headers: tt.headers}
 
 				params, reqOpts, warnings, err := EncodeEmbedding(tt.modelID, tt.values, opts)
 				require.NoError(t, err)
@@ -186,7 +186,7 @@ func TestEncodeEmbedding(t *testing.T) {
 
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
-				opts := api.EmbeddingOptions{Headers: tt.headers}
+				opts := api.TransportOptions{Headers: tt.headers}
 
 				params, reqOpts, warnings, err := EncodeMultimodalEmbedding(tt.modelID, tt.values, opts)
 				require.NoError(t, err)

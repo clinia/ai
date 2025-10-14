@@ -12,7 +12,7 @@ import (
 func EncodeEmbedding(
 	modelID string,
 	values []string,
-	opts api.EmbeddingOptions,
+	opts api.TransportOptions,
 ) (openai.EmbeddingNewParams, []option.RequestOption, []api.CallWarning, error) {
 	var reqOpts []option.RequestOption
 	if opts.Headers != nil {

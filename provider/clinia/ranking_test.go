@@ -40,7 +40,7 @@ func TestRankingModel(t *testing.T) {
 		modelVersion string
 		query        string
 		texts        []string
-		opts         api.EmbeddingOptions
+		opts         api.TransportOptions
 		ranker       *fakeRanker
 		wantModelErr bool
 		wantErr      bool

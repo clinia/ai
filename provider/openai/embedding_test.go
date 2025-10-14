@@ -58,7 +58,7 @@ func TestDoEmbed(t *testing.T) {
 		name         string
 		modelID      string
 		input        []string
-		options      api.EmbeddingOptions
+		options      api.TransportOptions
 		exchanges    []httpmock.Exchange
 		wantErr      bool
 		expectedResp api.DenseEmbeddingResponse
@@ -87,7 +87,7 @@ func TestDoEmbed(t *testing.T) {
 			name:    "with custom headers",
 			modelID: "text-embedding-ada-002",
 			input:   standardInput,
-			options: api.EmbeddingOptions{
+			options: api.TransportOptions{
 				Headers: http.Header{
 					"Custom-Header": []string{"test-value"},
 				},
@@ -135,7 +135,7 @@ func runDoEmbedTests(t *testing.T, tests []struct {
 	name         string
 	modelID      string
 	input        []string
-	options      api.EmbeddingOptions
+	options      api.TransportOptions
 	exchanges    []httpmock.Exchange
 	wantErr      bool
 	expectedResp api.DenseEmbeddingResponse

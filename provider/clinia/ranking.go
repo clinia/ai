@@ -43,7 +43,7 @@ func (m *RankingModel) ModelID() string { return m.modelID }
 
 func (m *RankingModel) SupportsParallelCalls() bool { return true }
 
-func (m *RankingModel) DoRank(ctx context.Context, query string, texts []string, opts api.EmbeddingOptions) (resp api.RankingResponse, err error) {
+func (m *RankingModel) DoRank(ctx context.Context, query string, texts []string, opts api.TransportOptions) (resp api.RankingResponse, err error) {
 	params, err := codec.EncodeRank(query, texts, opts)
 	if err != nil {
 		return api.RankingResponse{}, err

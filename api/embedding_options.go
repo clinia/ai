@@ -2,11 +2,11 @@ package api
 
 import "net/http"
 
-// EmbeddingOption represent the options for generating embeddings.
-type EmbeddingOption func(*EmbeddingOptions)
+// TransportOption represent the options for generating embeddings.
+type TransportOption func(*TransportOptions)
 
-// EmbeddingOptions represents the options for generating embeddings.
-type EmbeddingOptions struct {
+// TransportOptions represents the options for generating embeddings.
+type TransportOptions struct {
 	// Headers are additional HTTP headers to be sent with the request.
 	// Only applicable for HTTP-based providers.
 	Headers http.Header
@@ -31,4 +31,4 @@ type EmbeddingOptions struct {
 	ProviderMetadata *ProviderMetadata
 }
 
-func (o EmbeddingOptions) GetProviderMetadata() *ProviderMetadata { return o.ProviderMetadata }
+func (o TransportOptions) GetProviderMetadata() *ProviderMetadata { return o.ProviderMetadata }

@@ -11,7 +11,7 @@ type SparseParams struct {
 	Request cliniaclient.SparseEmbedRequest
 }
 
-func EncodeSparseEmbedding(texts []string, opts api.EmbeddingOptions) (SparseParams, error) {
+func EncodeSparseEmbedding(texts []string, opts api.TransportOptions) (SparseParams, error) {
 	if len(texts) == 0 {
 		return SparseParams{}, fmt.Errorf("clinia/sparse: texts cannot be empty")
 	}

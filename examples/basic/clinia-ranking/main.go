@@ -43,7 +43,7 @@ func run() error {
 		"The event will take place at the convention center",
 	}
 
-	resp, err := ai.RankMany(ctx, ranker, query, texts, ai.WithEmbeddingBaseURL("http://127.0.0.1:4770"))
+	resp, err := ai.RankMany(ctx, ranker, query, texts, ai.WithTransportBaseURL("http://127.0.0.1:4770"))
 	if err != nil {
 		return err
 	}

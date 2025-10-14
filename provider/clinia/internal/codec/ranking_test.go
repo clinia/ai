@@ -15,7 +15,7 @@ func TestEncodeRank(t *testing.T) {
 		modelVersion string
 		query        string
 		texts        []string
-		opts         api.RankingOptions
+		opts         api.EmbeddingOptions
 		want         RankParams
 		wantErr      bool
 	}{

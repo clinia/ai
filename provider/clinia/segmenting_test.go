@@ -39,7 +39,7 @@ func TestSegmentingModel(t *testing.T) {
 		modelName    string
 		modelVersion string
 		texts        []string
-		opts         api.SegmentingOptions
+		opts         api.EmbeddingOptions
 		chunker      *chunkerStub
 		wantModelErr bool
 		wantErr      bool

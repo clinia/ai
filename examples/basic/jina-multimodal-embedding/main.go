@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log"
+	"os"
 
 	"github.com/k0kubun/pp/v3"
 	"go.jetify.com/ai"
@@ -30,6 +31,9 @@ func example() error {
 			{Text: &Text2},
 		},
 		ai.WithEmbeddingProviderMetadata("jina", map[string]any{"task": task}),
+		ai.WithEmbeddingBaseURL("https://model-owpn08zq.api.baseten.co/development/predict"),
+		ai.WithEmbeddingAPIKey(os.Getenv("BASETEN_API_KEY")),
+		ai.WithEmbeddingUseRawBaseURL(),
 	)
 	if err != nil {
 		return err

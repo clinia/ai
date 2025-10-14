@@ -17,6 +17,14 @@ func WithEmbeddingHeaders(headers http.Header) EmbeddingOption {
 	}
 }
 
+// WithEmbeddingAPIKey sets the API key for this embedding call.
+// Only applies to HTTP-backed providers.
+func WithEmbeddingAPIKey(apiKey string) EmbeddingOption {
+	return func(o *api.EmbeddingOptions) {
+		o.APIKey = apiKey
+	}
+}
+
 // WithEmbeddingProviderMetadata sets provider-specific metadata for the embedding call.
 func WithEmbeddingProviderMetadata(provider string, metadata any) EmbeddingOption {
 	return func(o *api.EmbeddingOptions) {
@@ -32,6 +40,14 @@ func WithEmbeddingBaseURL(baseURL string) EmbeddingOption {
 	url := baseURL
 	return func(o *api.EmbeddingOptions) {
 		o.BaseURL = &url
+	}
+}
+
+// WithEmbeddingUseRawBaseURL instructs HTTP-backed providers to use the provided
+// BaseURL as the full request URL without appending a path.
+func WithEmbeddingUseRawBaseURL() EmbeddingOption {
+	return func(o *api.EmbeddingOptions) {
+		o.UseRawBaseURL = true
 	}
 }
 

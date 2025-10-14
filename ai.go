@@ -14,17 +14,17 @@ func EmbedMany[T api.EmbeddingInput, E api.EmbeddingVector](
 }
 
 func RankMany(
-	ctx context.Context, model api.RankingModel, query string, texts []string, opts ...RankingOption,
+	ctx context.Context, model api.RankingModel, query string, texts []string, opts ...EmbeddingOption,
 ) (api.RankingResponse, error) {
-	config := buildRankingConfig(opts)
+	config := buildEmbeddingConfig(opts)
 	return model.DoRank(ctx, query, texts, config)
 }
 
 // SegmentMany provides a Segmenter-style API that mirrors chunking for now.
 func SegmentMany(
-	ctx context.Context, model api.SegmentingModel, texts []string, opts ...SegmentingOption,
+	ctx context.Context, model api.SegmentingModel, texts []string, opts ...EmbeddingOption,
 ) (api.SegmentingResponse, error) {
-	config := buildSegmentingConfig(opts)
+	config := buildEmbeddingConfig(opts)
 	return model.DoSegment(ctx, texts, config)
 }
 

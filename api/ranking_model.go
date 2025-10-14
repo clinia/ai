@@ -17,7 +17,8 @@ type RankingModel interface {
 	SupportsParallelCalls() bool
 
 	// DoRank produces a score for each text given a query.
-	DoRank(ctx context.Context, query string, texts []string, opts RankingOptions) (RankingResponse, error)
+	// Uses EmbeddingOptions to unify per-call HTTP/auth/baseURL options.
+	DoRank(ctx context.Context, query string, texts []string, opts EmbeddingOptions) (RankingResponse, error)
 }
 
 // RankingResponse represents the response from a ranking request.

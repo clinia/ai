@@ -10,46 +10,60 @@ import (
 
 // EncodeSegment prepares a Jina Segmenter request for a single text.
 // Note: Jina Segmenter segments one content per request; batching is handled by the model.
-func EncodeSegment(text string, opts api.SegmentingOptions) (jina.SegmentRequest, []option.RequestOption, error) {
+func EncodeSegment(text string, opts api.TransportOptions) (jina.SegmentRequest, []option.RequestOption, error) {
 	if text == "" {
 		return jina.SegmentRequest{}, nil, fmt.Errorf("jina/segment: content is empty")
 	}
+
+	var reqOpts []option.RequestOption
+	if opts.Headers != nil {
+		reqOpts = append(reqOpts, applyHeaders(opts.Headers)...)
+	}
+
+	if opts.APIKey != "" {
+		reqOpts = append(reqOpts, option.WithAPIKey(opts.APIKey))
+	}
+
+	if opts.BaseURL != nil {
+		reqOpts = append(reqOpts, option.WithBaseURL(*opts.BaseURL))
+	}
+
+	if opts.UseRawBaseURL {
+		reqOpts = append(reqOpts, option.WithUseRawBaseURL())
+	}
+
 	body := jina.SegmentRequest{Content: text}
 	body.ReturnChunks = true
-	var o []option.RequestOption
-	if opts.Headers != nil {
-		for k, vals := range opts.Headers {
-			for _, v := range vals {
-				o = append(o, option.WithHeaderAdd(k, v))
-			}
-		}
-	}
-	if opts.BaseURL != nil {
-		o = append(o, option.WithBaseURL(*opts.BaseURL))
-	}
-	return body, o, nil
+
+	return body, reqOpts, nil
 }
 
 // EncodeSegmentBatch prepares a Jina Segmenter request for multiple texts
 // in a single HTTP call by using an array in the "content" field.
-func EncodeSegmentBatch(texts []string, opts api.SegmentingOptions) (jina.BatchSegmentRequest, []option.RequestOption, error) {
+func EncodeSegmentBatch(texts []string, opts api.TransportOptions) (jina.BatchSegmentRequest, []option.RequestOption, error) {
 	if len(texts) == 0 {
 		return jina.BatchSegmentRequest{}, nil, fmt.Errorf("jina/segment: texts cannot be empty")
 	}
+	var reqOpts []option.RequestOption
+	if opts.Headers != nil {
+		reqOpts = append(reqOpts, applyHeaders(opts.Headers)...)
+	}
+
+	if opts.APIKey != "" {
+		reqOpts = append(reqOpts, option.WithAPIKey(opts.APIKey))
+	}
+
+	if opts.BaseURL != nil {
+		reqOpts = append(reqOpts, option.WithBaseURL(*opts.BaseURL))
+	}
+
+	if opts.UseRawBaseURL {
+		reqOpts = append(reqOpts, option.WithUseRawBaseURL())
+	}
+
 	body := jina.BatchSegmentRequest{Content: texts}
 	body.ReturnChunks = true
-	var o []option.RequestOption
-	if opts.Headers != nil {
-		for k, vals := range opts.Headers {
-			for _, v := range vals {
-				o = append(o, option.WithHeaderAdd(k, v))
-			}
-		}
-	}
-	if opts.BaseURL != nil {
-		o = append(o, option.WithBaseURL(*opts.BaseURL))
-	}
-	return body, o, nil
+	return body, reqOpts, nil
 }
 
 // DecodeSegment maps a Jina Segmenter response to a list of SDK segments.

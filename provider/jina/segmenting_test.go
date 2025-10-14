@@ -15,7 +15,7 @@ func TestDoSegment(t *testing.T) {
 	tests := []struct {
 		name         string
 		texts        []string
-		options      api.SegmentingOptions
+		options      api.TransportOptions
 		exchanges    []httpmock.Exchange
 		wantErr      bool
 		expectedResp api.SegmentingResponse
@@ -39,10 +39,10 @@ func TestDoSegment(t *testing.T) {
 		{
 			name:  "batched request via provider metadata",
 			texts: []string{"Hello", "World"},
-			options: func() api.SegmentingOptions {
+			options: func() api.TransportOptions {
 				pm := api.NewProviderMetadata(nil)
 				pm.Set("jina", jinaClient.SegmenterNewParams{UseContentArray: true})
-				return api.SegmentingOptions{ProviderMetadata: pm}
+				return api.TransportOptions{ProviderMetadata: pm}
 			}(),
 			exchanges: []httpmock.Exchange{
 				{
@@ -60,7 +60,7 @@ func TestDoSegment(t *testing.T) {
 func runDoSegmentTests(t *testing.T, tests []struct {
 	name         string
 	texts        []string
-	options      api.SegmentingOptions
+	options      api.TransportOptions
 	exchanges    []httpmock.Exchange
 	wantErr      bool
 	expectedResp api.SegmentingResponse

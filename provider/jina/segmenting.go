@@ -33,7 +33,7 @@ func (m *SegmenterModel) ProviderName() string         { return m.pc.providerNam
 func (m *SegmenterModel) ModelID() string              { return m.modelID }
 func (m *SegmenterModel) SupportsParallelCalls() bool  { return true }
 
-func (m *SegmenterModel) DoSegment(ctx context.Context, texts []string, opts api.SegmentingOptions) (api.SegmentingResponse, error) {
+func (m *SegmenterModel) DoSegment(ctx context.Context, texts []string, opts api.TransportOptions) (api.SegmentingResponse, error) {
 	// Inspect provider metadata for batching preference.
 	if meta := codec.GetSegmenterMetadata(opts); meta != nil && meta.UseContentArray {
 		// True batching: send all texts in one request using content as []string

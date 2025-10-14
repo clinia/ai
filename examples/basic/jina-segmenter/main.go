@@ -33,7 +33,7 @@ func run() error {
 	}
 
 	// Call the segmenter. Optionally set a custom base URL or headers:
-	// resp, err := ai.SegmentMany(ctx, model, texts, ai.WithSegmentingBaseURL("https://api.jina.ai/v1/"))
+	// resp, err := ai.SegmentMany(ctx, model, texts, ai.WithTransportBaseURL("https://api.jina.ai/v1/"))
 	resp, err := ai.SegmentMany(ctx, model, texts)
 	if err != nil {
 		return err

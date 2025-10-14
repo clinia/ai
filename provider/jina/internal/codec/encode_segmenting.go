@@ -85,13 +85,13 @@ func DecodeSegment(resp *jina.SegmentResponse) ([]api.Segment, error) {
 
 // DecodeSegmentBatch maps a batched Jina Segmenter response (slice) to the
 // [][]api.Segment shape expected by the SDK.
-func DecodeSegmentBatch(resps *[]jina.SegmentResponse) ([][]api.Segment, error) {
-	if resps == nil || *resps == nil {
+func DecodeSegmentBatch(resps []jina.SegmentResponse) ([][]api.Segment, error) {
+	if len(resps) == 0 {
 		return nil, fmt.Errorf("jina/segment: batch response is nil")
 	}
-	out := make([][]api.Segment, 0, len(*resps))
-	for i := range *resps {
-		segs, err := DecodeSegment(&(*resps)[i])
+	out := make([][]api.Segment, 0, len(resps))
+	for i := range resps {
+		segs, err := DecodeSegment(&(resps)[i])
 		if err != nil {
 			return nil, err
 		}

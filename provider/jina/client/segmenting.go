@@ -59,7 +59,8 @@ func NewSegmenterService(opts ...option.RequestOption) SegmenterService {
 func (s SegmenterService) New(ctx context.Context, body SegmentRequest, opts ...option.RequestOption) (res *SegmentResponse, err error) {
 	all := append([]option.RequestOption{}, s.opts...)
 	all = append(all, opts...)
-	err = requestconfig.ExecuteNewRequest(ctx, "POST", "segment", body, &res, all...)
+	path := "segment"
+	err = requestconfig.ExecuteNewRequest(ctx, "POST", path, body, &res, all...)
 	return res, err
 }
 
@@ -71,6 +72,7 @@ func (s SegmenterService) New(ctx context.Context, body SegmentRequest, opts ...
 func (s SegmenterService) NewBatch(ctx context.Context, body BatchSegmentRequest, opts ...option.RequestOption) (res *[]SegmentResponse, err error) {
 	all := append([]option.RequestOption{}, s.opts...)
 	all = append(all, opts...)
-	err = requestconfig.ExecuteNewRequest(ctx, "POST", "segment", body, &res, all...)
+	path := "segment"
+	err = requestconfig.ExecuteNewRequest(ctx, "POST", path, body, &res, all...)
 	return res, err
 }

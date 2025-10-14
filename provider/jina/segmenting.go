@@ -41,7 +41,7 @@ func (m *SegmenterModel) DoSegment(ctx context.Context, texts []string, opts api
 		if err != nil {
 			return api.SegmentingResponse{}, err
 		}
-		resp, err := m.pc.client.Segmenter.NewBatch(ctx, body, ropts...)
+		resp, err := m.pc.client.Segments.NewBatch(ctx, body, ropts...)
 		if err != nil {
 			return api.SegmentingResponse{}, err
 		}
@@ -59,7 +59,7 @@ func (m *SegmenterModel) DoSegment(ctx context.Context, texts []string, opts api
 		if err != nil {
 			return api.SegmentingResponse{}, err
 		}
-		resp, err := m.pc.client.Segmenter.New(ctx, body, ropts...)
+		resp, err := m.pc.client.Segments.New(ctx, body, ropts...)
 		if err != nil {
 			return api.SegmentingResponse{}, err
 		}

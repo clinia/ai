@@ -68,6 +68,15 @@ func WithAPIKey(value string) RequestOption {
 	})
 }
 
+// WithUseRawBaseURL instructs the client to use the configured BaseURL as the
+// full request URL without appending a path from the request.
+func WithUseRawBaseURL() RequestOption {
+	return requestconfig.RequestOptionFunc(func(r *requestconfig.RequestConfig) error {
+		r.UseRawBaseURL = true
+		return nil
+	})
+}
+
 // WithEnvironmentProduction returns a RequestOption that sets the current
 // environment to be the "production" environment. An environment specifies which base URL
 // to use by default.

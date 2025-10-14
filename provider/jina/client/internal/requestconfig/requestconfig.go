@@ -27,6 +27,9 @@ type RequestConfig struct {
 	Request        *http.Request
 	HTTPClient     *http.Client
 	APIKey         string
+	// UseRawBaseURL instructs the executor to use the BaseURL as the full
+	// request URL without resolving the request path against it.
+	UseRawBaseURL bool
 	// If ResponseBodyInto not nil, then we will attempt to deserialize into
 	// ResponseBodyInto. If Destination is a []byte, then it will return the body as
 	// is.
@@ -94,9 +97,15 @@ func (cfg *RequestConfig) Execute() error {
 		}
 	}
 
-	// If the BaseURL is set, resolve the request URL relative to it
-	u := cfg.BaseURL.ResolveReference(cfg.Request.URL)
-	cfg.Request.URL = u
+	// Build final URL
+	if cfg.UseRawBaseURL {
+		// Ignore the request path and use BaseURL as-is
+		cfg.Request.URL = cfg.BaseURL
+	} else {
+		// Resolve the request path relative to BaseURL
+		u := cfg.BaseURL.ResolveReference(cfg.Request.URL)
+		cfg.Request.URL = u
+	}
 
 	resp, err := cfg.HTTPClient.Do(cfg.Request)
 	if err != nil {

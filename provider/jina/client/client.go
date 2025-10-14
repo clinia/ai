@@ -9,7 +9,7 @@ import (
 type Client struct {
 	Options    []option.RequestOption
 	Embeddings EmbeddingService
-	Segmenter  SegmenterService
+	Segments   SegmenterService
 }
 
 // DefaultClientOptions read from the environment (JINA_API_KEY, JINA_ORG_ID,
@@ -31,6 +31,6 @@ func NewClient(opts ...option.RequestOption) (r Client) {
 
 	r = Client{Options: opts}
 	r.Embeddings = NewEmbeddingService(opts...)
-	r.Segmenter = NewSegmenterService(opts...)
-	return
+	r.Segments = NewSegmenterService(opts...)
+	return r
 }

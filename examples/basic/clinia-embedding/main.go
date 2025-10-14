@@ -29,7 +29,7 @@ func example() error {
 		[]string{
 			"Hello, how are you?",
 		},
-		ai.WithEmbeddingBaseURL("http://127.0.0.1:4770"),
+		ai.WithTransportBaseURL("http://127.0.0.1:4770"),
 	)
 	if err != nil {
 		return err

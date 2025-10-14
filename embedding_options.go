@@ -6,20 +6,28 @@ import (
 	"go.jetify.com/ai/api"
 )
 
-// EmbeddingOption mutates per-call embedding configuration.
-type EmbeddingOption func(*api.EmbeddingOptions)
+// TransportOption mutates per-call embedding configuration.
+type TransportOption func(*api.TransportOptions)
 
-// WithEmbeddingHeaders sets extra HTTP headers for this embedding call.
+// WithTransportHeaders sets extra HTTP headers for this embedding call.
 // Only applies to HTTP-backed providers.
-func WithEmbeddingHeaders(headers http.Header) EmbeddingOption {
-	return func(o *api.EmbeddingOptions) {
+func WithTransportHeaders(headers http.Header) TransportOption {
+	return func(o *api.TransportOptions) {
 		o.Headers = headers
 	}
 }
 
-// WithEmbeddingProviderMetadata sets provider-specific metadata for the embedding call.
-func WithEmbeddingProviderMetadata(provider string, metadata any) EmbeddingOption {
-	return func(o *api.EmbeddingOptions) {
+// WithTransportAPIKey sets the API key for this embedding call.
+// Only applies to HTTP-backed providers.
+func WithTransportAPIKey(apiKey string) TransportOption {
+	return func(o *api.TransportOptions) {
+		o.APIKey = apiKey
+	}
+}
+
+// WithTransportProviderMetadata sets provider-specific metadata for the embedding call.
+func WithTransportProviderMetadata(provider string, metadata any) TransportOption {
+	return func(o *api.TransportOptions) {
 		if o.ProviderMetadata == nil {
 			o.ProviderMetadata = api.NewProviderMetadata(map[string]any{})
 		}
@@ -27,24 +35,25 @@ func WithEmbeddingProviderMetadata(provider string, metadata any) EmbeddingOptio
 	}
 }
 
-// WithEmbeddingBaseURL sets the base URL for the embedding API endpoint.
-func WithEmbeddingBaseURL(baseURL string) EmbeddingOption {
+// WithTransportBaseURL sets the base URL for the embedding API endpoint.
+func WithTransportBaseURL(baseURL string) TransportOption {
 	url := baseURL
-	return func(o *api.EmbeddingOptions) {
+	return func(o *api.TransportOptions) {
 		o.BaseURL = &url
 	}
 }
 
-// WithEmbeddingEmbeddingOptions sets the entire api.EmbeddingOptions struct.
-func WithEmbeddingEmbeddingOptions(embeddingOptions api.EmbeddingOptions) EmbeddingOption {
-	return func(o *api.EmbeddingOptions) {
-		*o = embeddingOptions
+// WithTransportUseRawBaseURL instructs HTTP-backed providers to use the provided
+// BaseURL as the full request URL without appending a path.
+func WithTransportUseRawBaseURL() TransportOption {
+	return func(o *api.TransportOptions) {
+		o.UseRawBaseURL = true
 	}
 }
 
-// buildEmbeddingConfig combines multiple options into a single api.EmbeddingOptions struct.
-func buildEmbeddingConfig(opts []EmbeddingOption) api.EmbeddingOptions {
-	config := api.EmbeddingOptions{}
+// buildTransportConfig combines multiple options into a single api.EmbeddingOptions struct.
+func buildTransportConfig(opts []TransportOption) api.TransportOptions {
+	config := api.TransportOptions{}
 	for _, opt := range opts {
 		opt(&config)
 	}

@@ -101,7 +101,7 @@ func TestSparseEmbeddingModel(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Ensure makeRequester is called when texts are provided
-			opts := api.EmbeddingOptions{}
+			opts := api.TransportOptions{}
 			if len(tt.texts) > 0 {
 				host := "127.0.0.1:9000"
 				opts.BaseURL = &host

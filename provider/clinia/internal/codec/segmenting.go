@@ -13,7 +13,7 @@ type SegmentParams struct {
 }
 
 // EncodeSegment builds the Clinia request from SDK inputs.
-func EncodeSegment(texts []string, opts api.SegmentingOptions) (SegmentParams, error) {
+func EncodeSegment(texts []string, opts api.TransportOptions) (SegmentParams, error) {
 	if len(texts) == 0 {
 		return SegmentParams{}, fmt.Errorf("clinia/segment: texts cannot be empty")
 	}

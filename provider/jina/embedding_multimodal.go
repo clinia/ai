@@ -58,7 +58,7 @@ func (m *MultimodalEmbeddingModel) MaxEmbeddingsPerCall() *int {
 func (m *MultimodalEmbeddingModel) DoEmbed(
 	ctx context.Context,
 	values []api.MultimodalEmbeddingInput,
-	opts api.EmbeddingOptions,
+	opts api.TransportOptions,
 ) (api.DenseEmbeddingResponse, error) {
 	embeddingParams, jinaOpts, _, err := codec.EncodeMultimodalEmbedding(
 		m.modelID,

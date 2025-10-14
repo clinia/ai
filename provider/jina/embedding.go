@@ -58,7 +58,7 @@ func (m *EmbeddingModel) MaxEmbeddingsPerCall() *int {
 func (m *EmbeddingModel) DoEmbed(
 	ctx context.Context,
 	values []string,
-	opts api.EmbeddingOptions,
+	opts api.TransportOptions,
 ) (api.DenseEmbeddingResponse, error) {
 	embeddingParams, jinaOpts, _, err := codec.EncodeEmbedding(
 		m.modelID,

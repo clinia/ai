@@ -31,7 +31,7 @@ func example() error {
 			{Text: &Text2},
 		},
 		ai.WithTransportProviderMetadata("jina", map[string]any{"task": task}),
-		ai.WithTransportBaseURL("https://model-owpn08zq.api.baseten.co/development/predict"),
+		ai.WithTransportBaseURL(os.Getenv("BASETEN_MULTIMODAL_URL")),
 		ai.WithTransportAPIKey(os.Getenv("BASETEN_API_KEY")),
 		ai.WithTransportUseRawBaseURL(),
 	)

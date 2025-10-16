@@ -12,3 +12,9 @@ func GetTextEmbeddingMetadata(source api.MetadataSource) *jina.TextEmbeddingNewP
 func GetMultimodalEmbeddingMetadata(source api.MetadataSource) *jina.MultimodalEmbeddingNewParams {
 	return api.GetMetadata[jina.MultimodalEmbeddingNewParams]("jina", source)
 }
+
+// GetSegmenterMetadata retrieves per-call knobs for the Jina Segmenter.
+// See jina.SegmenterNewParams for available fields.
+func GetSegmenterMetadata(source api.MetadataSource) *jina.SegmenterNewParams {
+	return api.GetMetadata[jina.SegmenterNewParams]("jina", source)
+}

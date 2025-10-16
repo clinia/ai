@@ -41,5 +41,8 @@ func (r *EmbeddingService) New(ctx context.Context, body TextEmbeddingNewParams,
 	opts = append(r.Options[:], opts...)
 	path := "embeddings"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
-	return res, err
+	if err != nil {
+		return nil, fmt.Errorf("jina embedding new: %w", err)
+	}
+	return res, nil
 }

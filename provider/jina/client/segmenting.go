@@ -74,5 +74,8 @@ func (s SegmenterService) NewBatch(ctx context.Context, body BatchSegmentRequest
 	all = append(all, opts...)
 	path := "segment"
 	err = requestconfig.ExecuteNewRequest(ctx, "POST", path, body, &res, all...)
-	return res, err
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
 }

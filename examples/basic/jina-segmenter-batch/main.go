@@ -37,10 +37,6 @@ func run() error {
 		ctx,
 		model,
 		texts,
-		ai.WithTransportProviderMetadata("jina", jinaclient.SegmenterNewParams{UseContentArray: true}),
-		ai.WithTransportBaseURL(os.Getenv("BASETEN_SEGMENTER_URL")),
-		ai.WithTransportAPIKey(os.Getenv("BASETEN_API_KEY")),
-		ai.WithTransportUseRawBaseURL(),
 	)
 	if err != nil {
 		return err

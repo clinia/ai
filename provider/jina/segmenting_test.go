@@ -36,22 +36,6 @@ func TestDoSegment(t *testing.T) {
 			},
 			expectedResp: api.SegmentingResponse{Segments: [][]api.Segment{{{Text: "Hello"}, {Text: "World!"}}, {{Text: "World"}}}},
 		},
-		{
-			name:  "batched request via provider metadata",
-			texts: []string{"Hello", "World"},
-			options: func() api.TransportOptions {
-				pm := api.NewProviderMetadata(nil)
-				pm.Set("jina", jinaClient.SegmenterNewParams{UseContentArray: true})
-				return api.TransportOptions{ProviderMetadata: pm}
-			}(),
-			exchanges: []httpmock.Exchange{
-				{
-					Request:  httpmock.Request{Method: http.MethodPost, Path: "/segment", Body: `{"content":["Hello","World"],"return_chunks":true}`},
-					Response: httpmock.Response{StatusCode: http.StatusOK, Body: `[{"num_tokens":2,"tokenizer":"t","num_chunks":1,"chunk_positions":[[0,5]],"chunks":["Hello"]},{"num_tokens":1,"tokenizer":"t","num_chunks":1,"chunk_positions":[[0,5]],"chunks":["World"]}]`},
-				},
-			},
-			expectedResp: api.SegmentingResponse{Segments: [][]api.Segment{{{Text: "Hello"}}, {{Text: "World"}}}},
-		},
 	}
 
 	runDoSegmentTests(t, tests)

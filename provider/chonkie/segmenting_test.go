@@ -22,35 +22,32 @@ func TestDoSegment(t *testing.T) {
 		skip         bool
 	}{
 		{
-			name:  "default per-text requests",
+			name:  "batched request body",
 			texts: []string{"Hello", "World"},
 			exchanges: []httpmock.Exchange{
 				{
-					Request:  httpmock.Request{Method: http.MethodPost, Path: "/segment", Body: `{"content":"Hello","return_chunks":true}`},
-					Response: httpmock.Response{StatusCode: http.StatusOK, Body: `{"num_tokens":3,"tokenizer":"t","num_chunks":2,"chunk_positions":[[0,5],[6,11]],"chunks":["Hello","World!"]}`},
-				},
-				{
-					Request:  httpmock.Request{Method: http.MethodPost, Path: "/segment", Body: `{"content":"World","return_chunks":true}`},
-					Response: httpmock.Response{StatusCode: http.StatusOK, Body: `{"num_tokens":1,"tokenizer":"t","num_chunks":1,"chunk_positions":[[0,5]],"chunks":["World"]}`},
-				},
-			},
-			expectedResp: api.SegmentingResponse{Segments: [][]api.Segment{{{Text: "Hello"}, {Text: "World!"}}, {{Text: "World"}}}},
-		},
-		{
-			name:  "batched request via provider metadata",
-			texts: []string{"Hello", "World"},
-			options: func() api.TransportOptions {
-				pm := api.NewProviderMetadata(nil)
-				pm.Set("chonkie", chonkieClient.SegmenterNewParams{UseContentArray: true})
-				return api.TransportOptions{ProviderMetadata: pm}
-			}(),
-			exchanges: []httpmock.Exchange{
-				{
-					Request:  httpmock.Request{Method: http.MethodPost, Path: "/segment", Body: `{"content":["Hello","World"],"return_chunks":true}`},
+					Request:  httpmock.Request{Method: http.MethodPost, Path: "/", Body: `{"content":["Hello","World"],"return_chunks":true}`},
 					Response: httpmock.Response{StatusCode: http.StatusOK, Body: `[{"num_tokens":2,"tokenizer":"t","num_chunks":1,"chunk_positions":[[0,5]],"chunks":["Hello"]},{"num_tokens":1,"tokenizer":"t","num_chunks":1,"chunk_positions":[[0,5]],"chunks":["World"]}]`},
 				},
 			},
 			expectedResp: api.SegmentingResponse{Segments: [][]api.Segment{{{Text: "Hello"}}, {{Text: "World"}}}},
+		},
+		{
+			name:      "empty input returns error",
+			texts:     []string{},
+			exchanges: []httpmock.Exchange{},
+			wantErr:   true,
+		},
+		{
+			name:  "provider returns HTTP error",
+			texts: []string{"Oops"},
+			exchanges: []httpmock.Exchange{
+				{
+					Request:  httpmock.Request{Method: http.MethodPost, Path: "/", Body: `{"content":["Oops"],"return_chunks":true}`},
+					Response: httpmock.Response{StatusCode: http.StatusInternalServerError, Body: `{"error":"boom"}`},
+				},
+			},
+			wantErr: true,
 		},
 	}
 

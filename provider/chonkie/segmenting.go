@@ -34,7 +34,6 @@ func (m *SegmentingModel) ModelID() string              { return m.modelID }
 func (m *SegmentingModel) SupportsParallelCalls() bool  { return true }
 
 func (m *SegmentingModel) DoSegment(ctx context.Context, texts []string, opts api.TransportOptions) (api.SegmentingResponse, error) {
-	// True batching: send all texts in one request using content as []string
 	body, ropts, err := codec.EncodeSegmentBatch(texts, opts)
 	if err != nil {
 		return api.SegmentingResponse{}, err

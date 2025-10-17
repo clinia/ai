@@ -24,7 +24,7 @@ func run() error {
 		return err
 	}
 
-	segmenter, err := provider.Segmenter("text-chunker:1")
+	segmenter, err := provider.SegmentingModel("text-chunker:1")
 	if err != nil {
 		return err
 	}

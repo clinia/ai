@@ -8,8 +8,8 @@ import (
 	"go.jetify.com/ai/provider/jina/client/option"
 )
 
-// EncodeSegment prepares a Jina Segmenter request for a single text.
-// Note: Jina Segmenter segments one content per request; batching is handled by the model.
+// EncodeSegment prepares a Jina Segmenting request for a single text.
+// Note: Jina Segmenting segments one content per request; batching is handled by the model.
 func EncodeSegment(text string, opts api.TransportOptions) (jina.SegmentRequest, []option.RequestOption, error) {
 	if text == "" {
 		return jina.SegmentRequest{}, nil, fmt.Errorf("jina/segment: content is empty")
@@ -38,7 +38,7 @@ func EncodeSegment(text string, opts api.TransportOptions) (jina.SegmentRequest,
 	return body, reqOpts, nil
 }
 
-// EncodeSegmentBatch prepares a Jina Segmenter request for multiple texts
+// EncodeSegmentBatch prepares a Jina Segmenting request for multiple texts
 // in a single HTTP call by using an array in the "content" field.
 func EncodeSegmentBatch(texts []string, opts api.TransportOptions) (jina.BatchSegmentRequest, []option.RequestOption, error) {
 	if len(texts) == 0 {
@@ -66,7 +66,7 @@ func EncodeSegmentBatch(texts []string, opts api.TransportOptions) (jina.BatchSe
 	return body, reqOpts, nil
 }
 
-// DecodeSegment maps a Jina Segmenter response to a list of SDK segments.
+// DecodeSegment maps a Jina Segmenting response to a list of SDK segments.
 func DecodeSegment(resp *jina.SegmentResponse) ([]api.Segment, error) {
 	if resp == nil {
 		return nil, fmt.Errorf("jina/segment: response is nil")
@@ -83,7 +83,7 @@ func DecodeSegment(resp *jina.SegmentResponse) ([]api.Segment, error) {
 	return segs, nil
 }
 
-// DecodeSegmentBatch maps a batched Jina Segmenter response (slice) to the
+// DecodeSegmentBatch maps a batched Jina Segmenting response (slice) to the
 // [][]api.Segment shape expected by the SDK.
 func DecodeSegmentBatch(resps []jina.SegmentResponse) ([][]api.Segment, error) {
 	if len(resps) == 0 {

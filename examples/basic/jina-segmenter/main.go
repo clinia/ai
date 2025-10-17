@@ -22,8 +22,8 @@ func run() error {
 	// Initialize the Jina provider (reads JINA_API_KEY/JINA_BASE_URL from env if set)
 	provider := jina.NewProvider()
 
-	// Create a Segmenter model (modelID used for metadata/logging only)
-	model, err := provider.SegmentingModel("segmenter:1")
+	// Create a Segmenting model (modelID used for metadata/logging only)
+	model, err := provider.SegmentingModel("segmenting:1")
 	if err != nil {
 		return err
 	}
@@ -32,7 +32,7 @@ func run() error {
 		"Jina AI: Your Search Foundation, Supercharged! 🚀\nIhrer Suchgrundlage, aufgeladen! 🚀\n您的搜索底座，从此不同！🚀\n検索ベース,もう二度と同じことはありません！🚀",
 	}
 
-	// Call the segmenter. Optionally set a custom base URL or headers:
+	// Call the segmenting. Optionally set a custom base URL or headers:
 	// resp, err := ai.SegmentMany(ctx, model, texts, ai.WithTransportBaseURL("https://api.jina.ai/v1/"))
 	resp, err := ai.SegmentMany(ctx, model, texts)
 	if err != nil {

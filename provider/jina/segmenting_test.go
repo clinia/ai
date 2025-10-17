@@ -66,7 +66,7 @@ func runDoSegmentTests(t *testing.T, tests []struct {
 			)
 
 			provider := NewProvider(WithClient(client))
-			model, err := provider.Segmenter("segmenter:1")
+			model, err := provider.SegmentingModel("segmenter:1")
 			require.NoError(t, err)
 
 			resp, err := model.DoSegment(t.Context(), tt.texts, tt.options)

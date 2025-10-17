@@ -137,7 +137,7 @@ func TestSegmentingModel(t *testing.T) {
 			if tt.modelVersion != "" {
 				modelID = tt.modelName + ":" + tt.modelVersion
 			}
-			model, err := provider.Segmenter(modelID)
+			model, err := provider.SegmentingModel(modelID)
 			if tt.wantModelErr {
 				require.Error(t, err)
 				return

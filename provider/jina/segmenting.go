@@ -15,8 +15,8 @@ type SegmenterModel struct {
 
 var _ api.SegmentingModel = &SegmenterModel{}
 
-// Segmenter creates a new SegmenterModel.
-func (p *Provider) Segmenter(modelID string) (api.SegmentingModel, error) {
+// SegmentingModel creates a new SegmenterModel.
+func (p *Provider) SegmentingModel(modelID string) (api.SegmentingModel, error) {
 	m := &SegmenterModel{
 		modelID: modelID,
 		pc: ProviderConfig{

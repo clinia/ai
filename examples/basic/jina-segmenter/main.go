@@ -23,7 +23,7 @@ func run() error {
 	provider := jina.NewProvider()
 
 	// Create a Segmenter model (modelID used for metadata/logging only)
-	model, err := provider.Segmenter("segmenter:1")
+	model, err := provider.SegmentingModel("segmenter:1")
 	if err != nil {
 		return err
 	}

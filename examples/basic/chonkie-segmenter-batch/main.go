@@ -23,8 +23,8 @@ func run() error {
 	// Initialize the Chonkie provider (reads CHONKIE_API_KEY/CHONKIE_BASE_URL from env if set)
 	provider := chonkie.NewProvider()
 
-	// Create a Segmenter model (modelID used for metadata/logging only)
-	model, err := provider.Segmenter("segmenter:1")
+	// Create a Segmenting model (modelID used for metadata/logging only)
+	model, err := provider.SegmentingModel("segmenting:1")
 	if err != nil {
 		return err
 	}
@@ -36,7 +36,7 @@ func run() error {
 		ctx,
 		model,
 		texts,
-		ai.WithTransportBaseURL(os.Getenv("BASETEN_SEGMENTER_URL")),
+		ai.WithTransportBaseURL(os.Getenv("BASETEN_SEGMENTING_URL")),
 		ai.WithTransportAPIKey(os.Getenv("BASETEN_API_KEY")),
 	)
 	if err != nil {

@@ -8,8 +8,8 @@ import (
 	"go.jetify.com/ai/provider/chonkie/client/option"
 )
 
-// EncodeSegment prepares a Chonkie Segmenter request for a single text.
-// Note: Chonkie Segmenter segments one content per request; batching is handled by the model.
+// EncodeSegment prepares a Chonkie Segmenting request for a single text.
+// Note: Chonkie Segmenting segments one content per request; batching is handled by the model.
 func EncodeSegment(text string, opts api.TransportOptions) (chonkie.SegmentRequest, []option.RequestOption, error) {
 	if text == "" {
 		return chonkie.SegmentRequest{}, nil, fmt.Errorf("chonkie/segment: content is empty")
@@ -38,7 +38,7 @@ func EncodeSegment(text string, opts api.TransportOptions) (chonkie.SegmentReque
 	return body, reqOpts, nil
 }
 
-// EncodeSegmentBatch prepares a Chonkie Segmenter request for multiple texts
+// EncodeSegmentBatch prepares a Chonkie Segmenting request for multiple texts
 // in a single HTTP call by using an array in the "content" field.
 func EncodeSegmentBatch(texts []string, opts api.TransportOptions) (chonkie.BatchSegmentRequest, []option.RequestOption, error) {
 	if len(texts) == 0 {
@@ -66,7 +66,7 @@ func EncodeSegmentBatch(texts []string, opts api.TransportOptions) (chonkie.Batc
 	return body, reqOpts, nil
 }
 
-// DecodeSegment maps a Chonkie Segmenter response to a list of SDK segments.
+// DecodeSegment maps a Chonkie Segmenting response to a list of SDK segments.
 func DecodeSegment(resp *chonkie.SegmentResponse) ([]api.Segment, error) {
 	if resp == nil {
 		return nil, fmt.Errorf("chonkie/segment: response is nil")
@@ -83,7 +83,7 @@ func DecodeSegment(resp *chonkie.SegmentResponse) ([]api.Segment, error) {
 	return segs, nil
 }
 
-// DecodeSegmentBatch maps a batched Chonkie Segmenter response (slice) to the
+// DecodeSegmentBatch maps a batched Chonkie Segmenting response (slice) to the
 // [][]api.Segment shape expected by the SDK.
 func DecodeSegmentBatch(resps []chonkie.SegmentResponse) ([][]api.Segment, error) {
 	if len(resps) == 0 {

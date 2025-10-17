@@ -13,8 +13,8 @@ func GetMultimodalEmbeddingMetadata(source api.MetadataSource) *chonkie.Multimod
 	return api.GetMetadata[chonkie.MultimodalEmbeddingNewParams]("chonkie", source)
 }
 
-// GetSegmenterMetadata retrieves per-call knobs for the Chonkie Segmenter.
-// See chonkie.SegmenterNewParams for available fields.
-func GetSegmenterMetadata(source api.MetadataSource) *chonkie.SegmenterNewParams {
-	return api.GetMetadata[chonkie.SegmenterNewParams]("chonkie", source)
+// GetSegmentingMetadata retrieves per-call knobs for the Chonkie Segmenting.
+// See chonkie.SegmentingNewParams for available fields.
+func GetSegmentingMetadata(source api.MetadataSource) *chonkie.SegmentingNewParams {
+	return api.GetMetadata[chonkie.SegmentingNewParams]("chonkie", source)
 }

@@ -7,7 +7,7 @@ import (
 	"go.jetify.com/ai/provider/chonkie/client/option"
 )
 
-// SegmentRequest models the POST body for Chonkie Segmenter API.
+// SegmentRequest models the POST body for Chonkie Segmenting API.
 type SegmentRequest struct {
 	Content string `json:"content"`
 	segmentCommon
@@ -31,16 +31,16 @@ type segmentCommon struct {
 	Tokenizer      *string `json:"tokenizer,omitempty"`
 }
 
-// SegmenterNewParams allows callers to pass provider metadata to tweak
+// SegmentingNewParams allows callers to pass provider metadata to tweak
 // segmenting behavior for Chonkie. Currently supports enabling true batching
 // by sending the content as an array in a single request.
-type SegmenterNewParams struct {
+type SegmentingNewParams struct {
 	// UseContentArray toggles sending a batched request with content as []string.
 	// If false, provider will send one request per input.
 	UseContentArray bool `json:"use_content_array,omitempty"`
 }
 
-// SegmentResponse is a subset of the Segmenter API response needed to build segments.
+// SegmentResponse is a subset of the Segmenting API response needed to build segments.
 type SegmentResponse struct {
 	NumTokens      int      `json:"num_tokens"`
 	Tokenizer      string   `json:"tokenizer"`
@@ -49,10 +49,10 @@ type SegmentResponse struct {
 	Chunks         []string `json:"chunks"`
 }
 
-type SegmenterService struct{ opts []option.RequestOption }
+type SegmentingService struct{ opts []option.RequestOption }
 
-func NewSegmenterService(opts ...option.RequestOption) SegmenterService {
-	return SegmenterService{opts: opts}
+func NewSegmentingService(opts ...option.RequestOption) SegmentingService {
+	return SegmentingService{opts: opts}
 }
 
 // New performs a POST /segment request with a batched body where
@@ -60,7 +60,7 @@ func NewSegmenterService(opts ...option.RequestOption) SegmenterService {
 // of SegmentResponse objects, one per input string.
 // NOTE: Chonkie API does not support batched, this is made for Chonkie like providers.
 // TODO: response should not be a pointer to a slice.
-func (s SegmenterService) New(ctx context.Context, body BatchSegmentRequest, opts ...option.RequestOption) (res []SegmentResponse, err error) {
+func (s SegmentingService) New(ctx context.Context, body BatchSegmentRequest, opts ...option.RequestOption) (res []SegmentResponse, err error) {
 	all := append([]option.RequestOption{}, s.opts...)
 	all = append(all, opts...)
 	err = requestconfig.ExecuteNewRequest(ctx, "POST", "", body, &res, all...)

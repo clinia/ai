@@ -30,7 +30,7 @@ func (p *Provider) SegmentingModel(modelID string) (*SegmentingModel, error) {
 		modelName:    name,
 		modelVersion: version,
 		config: ProviderConfig{
-			providerName:  p.providerNameFor("segmenter"),
+			providerName:  p.providerNameFor("segmenting"),
 			clientOptions: p.clientOptions,
 			newChunker:    p.newChunker, // reuse chunker implementation
 		},

@@ -49,7 +49,7 @@ func TestSegmentingModel(t *testing.T) {
 	}{
 		{
 			name:         "successful segment",
-			modelName:    "segmenter",
+			modelName:    "segmenting",
 			modelVersion: "2",
 			texts:        []string{"hello"},
 			chunker: &chunkerStub{
@@ -72,10 +72,10 @@ func TestSegmentingModel(t *testing.T) {
 					},
 				}},
 			},
-			wantModelID: "segmenter:2",
+			wantModelID: "segmenting:2",
 			after: func(t *testing.T, chunker *chunkerStub) {
 				require.Equal(t, 1, chunker.calls)
-				require.Equal(t, "segmenter", chunker.lastModelName)
+				require.Equal(t, "segmenting", chunker.lastModelName)
 				require.Equal(t, "2", chunker.lastModelVersion)
 				require.Equal(t, cliniaclient.ChunkRequest{Texts: []string{"hello"}}, chunker.lastRequest)
 				require.NotNil(t, chunker.boundRequester)
@@ -83,12 +83,12 @@ func TestSegmentingModel(t *testing.T) {
 		},
 		{
 			name:         "propagates provider error",
-			modelName:    "segmenter",
+			modelName:    "segmenting",
 			modelVersion: "2",
 			texts:        []string{"hello"},
 			chunker:      &chunkerStub{err: errors.New("boom")},
 			wantErr:      true,
-			wantModelID:  "segmenter:2",
+			wantModelID:  "segmenting:2",
 			after: func(t *testing.T, chunker *chunkerStub) {
 				require.Equal(t, 1, chunker.calls)
 				require.NotNil(t, chunker.boundRequester)
@@ -96,7 +96,7 @@ func TestSegmentingModel(t *testing.T) {
 		},
 		{
 			name:         "requires model version",
-			modelName:    "segmenter",
+			modelName:    "segmenting",
 			modelVersion: "",
 			texts:        []string{"hello"},
 			chunker:      &chunkerStub{},
@@ -104,12 +104,12 @@ func TestSegmentingModel(t *testing.T) {
 		},
 		{
 			name:         "validates texts",
-			modelName:    "segmenter",
+			modelName:    "segmenting",
 			modelVersion: "2",
 			texts:        []string{},
 			chunker:      &chunkerStub{},
 			wantErr:      true,
-			wantModelID:  "segmenter:2",
+			wantModelID:  "segmenting:2",
 			after: func(t *testing.T, chunker *chunkerStub) {
 				require.Equal(t, 0, chunker.calls)
 			},

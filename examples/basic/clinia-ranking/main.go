@@ -7,7 +7,7 @@ import (
 	"github.com/k0kubun/pp/v3"
 	"go.jetify.com/ai"
 	"go.jetify.com/ai/api"
-	clinia "go.jetify.com/ai/provider/clinia"
+	"go.jetify.com/ai/provider/triton"
 )
 
 func main() {
@@ -19,7 +19,7 @@ func main() {
 func run() error {
 	ctx := context.Background()
 
-	provider, err := clinia.NewProvider(ctx)
+	provider, err := triton.NewProvider(ctx)
 	if err != nil {
 		return err
 	}

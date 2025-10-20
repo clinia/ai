@@ -1,11 +1,11 @@
-package clinia
+package triton
 
 import (
 	"context"
 	"fmt"
 
 	"go.jetify.com/ai/api"
-	"go.jetify.com/ai/provider/clinia/internal/codec"
+	"go.jetify.com/ai/provider/triton/internal/codec"
 )
 
 // EmbeddingModel represents a Clinia embedding model backed by the models-client-go embedder.

@@ -63,7 +63,6 @@ func (m *RankingModel) DoRank(
 	texts []string,
 	opts api.TransportOptions,
 ) (api.RankingResponse, error) {
-
 	request, reqOpts, _, err := codec.EncodeRank(query, texts, opts)
 	if err != nil {
 		return api.RankingResponse{}, err

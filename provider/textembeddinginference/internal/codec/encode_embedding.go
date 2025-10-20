@@ -23,6 +23,14 @@ func EncodeEmbedding(
 		Inputs: values,
 	}
 
+	if opts.APIKey != "" {
+		reqOpts = append(reqOpts, option.WithAPIKey(opts.APIKey))
+	}
+
+	if opts.BaseURL != nil {
+		reqOpts = append(reqOpts, option.WithBaseURL(*opts.BaseURL))
+	}
+
 	applyProviderMetadata(&params, opts)
 
 	var warnings []api.CallWarning

@@ -21,6 +21,14 @@ func EncodeSparseEmbedding(
 		Inputs: values,
 	}
 
+	if opts.APIKey != "" {
+		reqOpts = append(reqOpts, option.WithAPIKey(opts.APIKey))
+	}
+
+	if opts.BaseURL != nil {
+		reqOpts = append(reqOpts, option.WithBaseURL(*opts.BaseURL))
+	}
+
 	applySparseProviderMetadata(&params, opts)
 
 	var warnings []api.CallWarning

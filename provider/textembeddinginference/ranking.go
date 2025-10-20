@@ -19,7 +19,7 @@ type RankingModel struct {
 var _ api.RankingModel = &RankingModel{}
 
 // rankingModel creates a new TEI ranking model.
-func (p *Provider) RankingModel(modelID string) (*RankingModel, error) {
+func (p *Provider) RankingModel(modelID string) (api.RankingModel, error) {
 	// Create model with provider's client
 	model := &RankingModel{
 		modelID: modelID,

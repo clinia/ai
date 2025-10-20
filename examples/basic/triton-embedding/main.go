@@ -13,7 +13,7 @@ import (
 func example() error {
 	ctx := context.Background()
 
-	provider, err := triton.NewProvider(ctx)
+	provider, err := triton.NewProvider()
 	if err != nil {
 		return err
 	}

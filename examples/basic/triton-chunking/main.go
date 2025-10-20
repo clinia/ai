@@ -19,7 +19,7 @@ func main() {
 func run() error {
 	ctx := context.Background()
 
-	provider, err := triton.NewProvider(ctx)
+	provider, err := triton.NewProvider()
 	if err != nil {
 		return err
 	}

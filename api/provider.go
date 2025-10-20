@@ -30,6 +30,21 @@ type Provider interface {
 	// an UnsupportedFunctionalityError.
 	MultimodalEmbeddingModel(modelID string) (EmbeddingModel[MultimodalEmbeddingInput, Embedding], error)
 
+	// SparseEmbeddingModel returns the sparse embedding model with the given id.
+	// Providers that don't support sparse embeddings should return
+	// an UnsupportedFunctionalityError.
+	SparseEmbeddingModel(modelID string) (EmbeddingModel[string, SparseEmbedding], error)
+
+	// SegmentingModel returns a text segmenting model for the given id.
+	// Providers that don't support segmenting should return an
+	// UnsupportedFunctionalityError.
+	SegmentingModel(modelID string) (SegmentingModel, error)
+
+	// RankingModel returns a ranking model for the given id.
+	// Providers that don't support ranking should return an
+	// UnsupportedFunctionalityError.
+	RankingModel(modelID string) (RankingModel, error)
+
 	// ImageModel returns the image model with the given id.
 	// The model id is then passed to the provider function to get the model.
 	// This method is optional and may return nil if image models are not supported.

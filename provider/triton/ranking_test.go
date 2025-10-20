@@ -126,7 +126,7 @@ func TestRankingModel(t *testing.T) {
 				tt.opts.BaseURL = &host
 			}
 
-			provider, err := NewProvider(ctx,
+			provider, err := NewProvider(
 				withRankerFactory(func(opts common.ClientOptions) cliniaclient.Ranker {
 					tt.ranker.boundRequester = opts.Requester
 					return tt.ranker

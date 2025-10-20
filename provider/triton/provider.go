@@ -62,7 +62,7 @@ func WithClientOptions(opts common.ClientOptions) Option {
 }
 
 // NewProvider constructs a new Clinia provider.
-func NewProvider(_ context.Context, opts ...Option) (*Provider, error) {
+func NewProvider(opts ...Option) (api.Provider, error) {
 	options := providerOptions{name: "clinia"}
 	for _, opt := range opts {
 		opt(&options)

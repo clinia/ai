@@ -107,7 +107,7 @@ func TestSparseEmbeddingModel(t *testing.T) {
 				opts.BaseURL = &host
 			}
 
-			p, err := NewProvider(ctx,
+			p, err := NewProvider(
 				withSparseFactory(func(ctx context.Context, opts common.ClientOptions) cliniaclient.SparseEmbedder {
 					tt.sparse.boundRequester = opts.Requester
 					return tt.sparse

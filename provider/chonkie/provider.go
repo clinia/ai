@@ -32,7 +32,7 @@ func WithAPIKey(apiKey string) ProviderOption {
 	return func(p *Provider) { p.apiKey = apiKey }
 }
 
-func NewProvider(opts ...ProviderOption) *Provider {
+func NewProvider(opts ...ProviderOption) api.Provider {
 	p := &Provider{client: chonkie.NewClient()}
 
 	for _, opt := range opts {
@@ -49,4 +49,24 @@ func NewProvider(opts ...ProviderOption) *Provider {
 // LanguageModel is not supported by the Chonkie provider.
 func (p *Provider) LanguageModel(modelID string) (api.LanguageModel, error) {
 	return nil, api.NewUnsupportedFunctionalityError(p.name, "LanguageModel")
+}
+
+// RankingModel is not supported by the Chonkie provider.
+func (p *Provider) RankingModel(modelID string) (api.RankingModel, error) {
+	return nil, api.NewUnsupportedFunctionalityError(p.name, "RankingModel")
+}
+
+// TextEmbeddingModel is not supported by the Chonkie provider.
+func (p *Provider) TextEmbeddingModel(modelID string) (api.EmbeddingModel[string, api.Embedding], error) {
+	return nil, api.NewUnsupportedFunctionalityError(p.name, "TextEmbeddingModel")
+}
+
+// MultimodalEmbeddingModel is not supported by the Chonkie provider.
+func (p *Provider) MultimodalEmbeddingModel(modelID string) (api.EmbeddingModel[api.MultimodalEmbeddingInput, api.Embedding], error) {
+	return nil, api.NewUnsupportedFunctionalityError(p.name, "MultimodalEmbeddingModel")
+}
+
+// SparseEmbeddingModel is not supported by the Chonkie provider.
+func (p *Provider) SparseEmbeddingModel(modelID string) (api.EmbeddingModel[string, api.SparseEmbedding], error) {
+	return nil, api.NewUnsupportedFunctionalityError(p.name, "SparseEmbeddingModel")
 }

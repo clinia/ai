@@ -130,7 +130,7 @@ func TestEmbeddingModelDoEmbed(t *testing.T) {
 				opts.BaseURL = &host
 			}
 
-			provider, err := NewProvider(ctx,
+			provider, err := NewProvider(
 				withEmbeddingFactory(func(ctx context.Context, opts common.ClientOptions) cliniaclient.Embedder {
 					tt.embedder.boundRequester = opts.Requester
 					return tt.embedder

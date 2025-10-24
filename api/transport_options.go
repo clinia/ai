@@ -2,7 +2,7 @@ package api
 
 import "net/http"
 
-// TransportOption represent the options for generating embeddings.
+// TransportOption represents an option function for transport configuration.
 type TransportOption func(*TransportOptions)
 
 // TransportOptions represents the options for generating embeddings.

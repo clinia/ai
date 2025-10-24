@@ -51,7 +51,7 @@ func WithTransportUseRawBaseURL() TransportOption {
 	}
 }
 
-// buildTransportConfig combines multiple options into a single api.EmbeddingOptions struct.
+// buildTransportConfig combines multiple options into a single api.TransportOptions struct.
 func buildTransportConfig(opts []TransportOption) api.TransportOptions {
 	config := api.TransportOptions{}
 	for _, opt := range opts {

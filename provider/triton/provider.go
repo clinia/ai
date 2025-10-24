@@ -63,7 +63,7 @@ func WithClientOptions(opts common.ClientOptions) Option {
 
 // NewProvider constructs a new Clinia provider.
 func NewProvider(opts ...Option) (api.Provider, error) {
-	options := providerOptions{name: "clinia"}
+	options := providerOptions{name: "triton"}
 	for _, opt := range opts {
 		opt(&options)
 	}

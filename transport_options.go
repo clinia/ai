@@ -6,7 +6,7 @@ import (
 	"go.jetify.com/ai/api"
 )
 
-// TransportOption mutates per-call embedding configuration.
+// TransportOption mutates per-call transport configuration.
 type TransportOption func(*api.TransportOptions)
 
 // WithTransportHeaders sets extra HTTP headers for this embedding call.

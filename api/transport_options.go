@@ -5,7 +5,7 @@ import "net/http"
 // TransportOption represents an option function for transport configuration.
 type TransportOption func(*TransportOptions)
 
-// TransportOptions represents the options for generating embeddings.
+// TransportOptions represents the transport-layer options for API calls.
 type TransportOptions struct {
 	// Headers are additional HTTP headers to be sent with the request.
 	// Only applicable for HTTP-based providers.

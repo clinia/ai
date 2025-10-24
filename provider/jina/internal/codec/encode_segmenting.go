@@ -91,7 +91,7 @@ func DecodeSegmentBatch(resps []jina.SegmentResponse) ([][]api.Segment, error) {
 	}
 	out := make([][]api.Segment, 0, len(resps))
 	for i := range resps {
-		segs, err := DecodeSegment(&(resps)[i])
+		segs, err := DecodeSegment(&resps[i])
 		if err != nil {
 			return nil, err
 		}

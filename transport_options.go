@@ -17,7 +17,7 @@ func WithTransportHeaders(headers http.Header) TransportOption {
 	}
 }
 
-// WithTransportAPIKey sets the API key for this embedding call.
+// WithTransportAPIKey sets the API key for this call.
 // Only applies to HTTP-backed providers.
 func WithTransportAPIKey(apiKey string) TransportOption {
 	return func(o *api.TransportOptions) {

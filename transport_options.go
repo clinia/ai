@@ -35,7 +35,7 @@ func WithTransportProviderMetadata(provider string, metadata any) TransportOptio
 	}
 }
 
-// WithTransportBaseURL sets the base URL for the embedding API endpoint.
+// WithTransportBaseURL sets the base URL for the API endpoint.
 func WithTransportBaseURL(baseURL string) TransportOption {
 	url := baseURL
 	return func(o *api.TransportOptions) {

@@ -9,7 +9,7 @@ import (
 // TransportOption mutates per-call transport configuration.
 type TransportOption func(*api.TransportOptions)
 
-// WithTransportHeaders sets extra HTTP headers for this embedding call.
+// WithTransportHeaders sets extra HTTP headers for this call.
 // Only applies to HTTP-backed providers.
 func WithTransportHeaders(headers http.Header) TransportOption {
 	return func(o *api.TransportOptions) {

@@ -25,7 +25,7 @@ func WithTransportAPIKey(apiKey string) TransportOption {
 	}
 }
 
-// WithTransportProviderMetadata sets provider-specific metadata for the embedding call.
+// WithTransportProviderMetadata sets provider-specific metadata for the call.
 func WithTransportProviderMetadata(provider string, metadata any) TransportOption {
 	return func(o *api.TransportOptions) {
 		if o.ProviderMetadata == nil {

@@ -52,7 +52,7 @@ func (m *RankingModel) SupportsParallelCalls() bool {
 
 // MaxDocumentsPerCall returns the maximum number of documents that can be ranked in a single call.
 func (m *RankingModel) MaxDocumentsPerCall() *int {
-	max := 1000 // TODO: verify
+	max := 1000 // TODO: [RET-3496] Determine actual limit
 	return &max
 }
 

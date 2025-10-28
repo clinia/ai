@@ -50,7 +50,7 @@ func (m *EmbeddingModel) SupportsParallelCalls() bool {
 
 // MaxEmbeddingsPerCall implements api.EmbeddingModel.
 func (m *EmbeddingModel) MaxEmbeddingsPerCall() *int {
-	max := 1000
+	max := 1000 // TODO: [RET-3496] Determine actual limit
 	return &max
 }
 

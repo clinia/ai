@@ -15,7 +15,6 @@ func DecodeSparseEmbedding(resp *tei.CreateSparseEmbeddingResponse) (api.SparseE
 	}
 
 	// TEI returns [][]SparseValue directly
-	// TODO: verify
 	sparseArrays := *resp
 	sparseEmbs := make([]api.SparseEmbedding, len(sparseArrays))
 

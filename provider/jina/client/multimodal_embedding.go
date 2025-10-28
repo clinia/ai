@@ -62,5 +62,5 @@ func (r *EmbeddingService) NewMultiModal(ctx context.Context, body MultimodalEmb
 	opts = append(r.Options[:], opts...)
 	path := "embeddings"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
-	return
+	return res, err
 }

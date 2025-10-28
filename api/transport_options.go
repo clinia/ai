@@ -16,7 +16,7 @@ type TransportOptions struct {
 	APIKey string
 
 	// BaseURL is the base URL for the API endpoint.
-	BaseURL *string
+	BaseURL string
 
 	// UseRawBaseURL, when true, instructs HTTP-backed providers to use the
 	// provided BaseURL as the full request URL without appending an API path.

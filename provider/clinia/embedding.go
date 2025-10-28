@@ -60,7 +60,7 @@ func (m *EmbeddingModel) MaxEmbeddingsPerCall() *int {
 }
 
 // DoEmbed executes an embedding call against the Clinia embedder.
-func (m *EmbeddingModel) DoEmbed(ctx context.Context, values []string, opts api.EmbeddingOptions) (resp api.DenseEmbeddingResponse, err error) {
+func (m *EmbeddingModel) DoEmbed(ctx context.Context, values []string, opts api.TransportOptions) (resp api.DenseEmbeddingResponse, err error) {
 	params, err := codec.EncodeEmbedding(values, opts)
 	if err != nil {
 		return api.DenseEmbeddingResponse{}, err

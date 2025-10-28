@@ -39,7 +39,7 @@ func TestSegmentingModel(t *testing.T) {
 		modelName    string
 		modelVersion string
 		texts        []string
-		opts         api.SegmentingOptions
+		opts         api.TransportOptions
 		chunker      *chunkerStub
 		wantModelErr bool
 		wantErr      bool
@@ -122,7 +122,7 @@ func TestSegmentingModel(t *testing.T) {
 			// Ensure makeRequester is called when inputs are valid
 			if len(tt.texts) > 0 {
 				host := "127.0.0.1:9000"
-				tt.opts.BaseURL = &host
+				tt.opts.BaseURL = host
 			}
 
 			provider, err := NewProvider(ctx,

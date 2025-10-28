@@ -13,7 +13,7 @@ type RankParams struct {
 }
 
 // EncodeRank converts the SDK call into a Clinia rank request.
-func EncodeRank(query string, texts []string, opts api.RankingOptions) (RankParams, error) {
+func EncodeRank(query string, texts []string, opts api.TransportOptions) (RankParams, error) {
 	if query == "" {
 		return RankParams{}, fmt.Errorf("clinia/rank: query cannot be empty")
 	}

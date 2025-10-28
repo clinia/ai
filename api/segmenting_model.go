@@ -26,5 +26,6 @@ type SegmentingModel interface {
 	ProviderName() string
 	ModelID() string
 	SupportsParallelCalls() bool
-	DoSegment(ctx context.Context, texts []string, opts SegmentingOptions) (SegmentingResponse, error)
+	// Uses TransportOptions to unify per-call HTTP/auth/baseURL options.
+	DoSegment(ctx context.Context, texts []string, opts TransportOptions) (SegmentingResponse, error)
 }

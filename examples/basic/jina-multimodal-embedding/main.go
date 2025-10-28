@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log"
+	"os"
 
 	"github.com/k0kubun/pp/v3"
 	"go.jetify.com/ai"
@@ -29,7 +30,10 @@ func example() error {
 			{Text: &Text1},
 			{Text: &Text2},
 		},
-		ai.WithEmbeddingProviderMetadata("jina", map[string]any{"task": task}),
+		ai.WithTransportProviderMetadata("jina", map[string]any{"task": task}),
+		ai.WithTransportBaseURL(os.Getenv("BASETEN_MULTIMODAL_URL")),
+		ai.WithTransportAPIKey(os.Getenv("BASETEN_API_KEY")),
+		ai.WithTransportUseRawBaseURL(),
 	)
 	if err != nil {
 		return err

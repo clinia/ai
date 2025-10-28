@@ -40,7 +40,7 @@ func TestRankingModel(t *testing.T) {
 		modelVersion string
 		query        string
 		texts        []string
-		opts         api.RankingOptions
+		opts         api.TransportOptions
 		ranker       *fakeRanker
 		wantModelErr bool
 		wantErr      bool
@@ -123,7 +123,7 @@ func TestRankingModel(t *testing.T) {
 			// Ensure makeRequester is called when inputs are valid
 			if tt.query != "" && len(tt.texts) > 0 {
 				host := "127.0.0.1:9000"
-				tt.opts.BaseURL = &host
+				tt.opts.BaseURL = host
 			}
 
 			provider, err := NewProvider(ctx,

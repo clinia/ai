@@ -7,24 +7,24 @@ import (
 )
 
 func EmbedMany[T api.EmbeddingInput, E api.EmbeddingVector](
-	ctx context.Context, model api.EmbeddingModel[T, E], values []T, opts ...EmbeddingOption,
+	ctx context.Context, model api.EmbeddingModel[T, E], values []T, opts ...TransportOption,
 ) (api.EmbeddingResponse[E], error) {
-	config := buildEmbeddingConfig(opts)
+	config := buildTransportConfig(opts)
 	return model.DoEmbed(ctx, values, config)
 }
 
 func RankMany(
-	ctx context.Context, model api.RankingModel, query string, texts []string, opts ...RankingOption,
+	ctx context.Context, model api.RankingModel, query string, texts []string, opts ...TransportOption,
 ) (api.RankingResponse, error) {
-	config := buildRankingConfig(opts)
+	config := buildTransportConfig(opts)
 	return model.DoRank(ctx, query, texts, config)
 }
 
 // SegmentMany provides a Segmenter-style API that mirrors chunking for now.
 func SegmentMany(
-	ctx context.Context, model api.SegmentingModel, texts []string, opts ...SegmentingOption,
+	ctx context.Context, model api.SegmentingModel, texts []string, opts ...TransportOption,
 ) (api.SegmentingResponse, error) {
-	config := buildSegmentingConfig(opts)
+	config := buildTransportConfig(opts)
 	return model.DoSegment(ctx, texts, config)
 }
 

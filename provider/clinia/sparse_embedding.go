@@ -42,7 +42,7 @@ func (m *SparseEmbeddingModel) ModelID() string              { return m.modelID 
 func (m *SparseEmbeddingModel) SupportsParallelCalls() bool  { return true }
 func (m *SparseEmbeddingModel) MaxEmbeddingsPerCall() *int   { return nil }
 
-func (m *SparseEmbeddingModel) DoEmbed(ctx context.Context, texts []string, opts api.EmbeddingOptions) (resp api.SparseEmbeddingResponse, err error) {
+func (m *SparseEmbeddingModel) DoEmbed(ctx context.Context, texts []string, opts api.TransportOptions) (resp api.SparseEmbeddingResponse, err error) {
 	params, err := codec.EncodeSparseEmbedding(texts, opts)
 	if err != nil {
 		return api.SparseEmbeddingResponse{}, err

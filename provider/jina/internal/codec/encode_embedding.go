@@ -12,7 +12,7 @@ import (
 func EncodeMultimodalEmbedding(
 	modelID string,
 	values []api.MultimodalEmbeddingInput,
-	opts api.EmbeddingOptions,
+	opts api.TransportOptions,
 ) (jina.MultimodalEmbeddingNewParams, []option.RequestOption, []api.CallWarning, error) {
 	var reqOpts []option.RequestOption
 	if opts.Headers != nil {
@@ -41,7 +41,7 @@ func EncodeMultimodalEmbedding(
 func EncodeEmbedding(
 	modelID string,
 	values []string,
-	opts api.EmbeddingOptions,
+	opts api.TransportOptions,
 ) (jina.TextEmbeddingNewParams, []option.RequestOption, []api.CallWarning, error) {
 	var reqOpts []option.RequestOption
 	if opts.Headers != nil {
@@ -72,7 +72,7 @@ func applyHeaders(headers http.Header) []option.RequestOption {
 }
 
 // applyProviderMetadata applies metadata-specific options to the parameters
-func applyProviderMetadata(params *jina.TextEmbeddingNewParams, opts api.EmbeddingOptions) {
+func applyProviderMetadata(params *jina.TextEmbeddingNewParams, opts api.TransportOptions) {
 	if opts.ProviderMetadata != nil {
 		metadata := GetTextEmbeddingMetadata(opts)
 		if metadata != nil {
@@ -84,7 +84,7 @@ func applyProviderMetadata(params *jina.TextEmbeddingNewParams, opts api.Embeddi
 }
 
 // applyProviderMultimodalMetadata applies metadata-specific options to the parameters
-func applyProviderMultimodalMetadata(params *jina.MultimodalEmbeddingNewParams, opts api.EmbeddingOptions) {
+func applyProviderMultimodalMetadata(params *jina.MultimodalEmbeddingNewParams, opts api.TransportOptions) {
 	if opts.ProviderMetadata != nil {
 		metadata := GetMultimodalEmbeddingMetadata(opts)
 		if metadata != nil {

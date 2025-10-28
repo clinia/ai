@@ -9,11 +9,11 @@ import (
 )
 
 func TestEncodeSparseEmbedding(t *testing.T) {
-	params, err := EncodeSparseEmbedding([]string{"a", "b"}, api.EmbeddingOptions{})
+	params, err := EncodeSparseEmbedding([]string{"a", "b"}, api.TransportOptions{})
 	require.NoError(t, err)
 	require.Equal(t, []string{"a", "b"}, params.Request.Texts)
 
-	_, err = EncodeSparseEmbedding(nil, api.EmbeddingOptions{})
+	_, err = EncodeSparseEmbedding(nil, api.TransportOptions{})
 	require.Error(t, err)
 }
 

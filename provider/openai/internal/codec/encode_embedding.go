@@ -12,15 +12,15 @@ import (
 func EncodeEmbedding(
 	modelID string,
 	values []string,
-	opts api.EmbeddingOptions,
+	opts api.TransportOptions,
 ) (openai.EmbeddingNewParams, []option.RequestOption, []api.CallWarning, error) {
 	var reqOpts []option.RequestOption
 	if opts.Headers != nil {
 		reqOpts = append(reqOpts, applyHeaders(opts.Headers)...)
 	}
 
-	if opts.BaseURL != nil {
-		reqOpts = append(reqOpts, option.WithBaseURL(*opts.BaseURL))
+	if len(opts.BaseURL) > 0 {
+		reqOpts = append(reqOpts, option.WithBaseURL(opts.BaseURL))
 	}
 
 	params := openai.EmbeddingNewParams{

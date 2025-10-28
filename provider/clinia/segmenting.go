@@ -42,7 +42,7 @@ func (m *SegmentingModel) ProviderName() string         { return m.config.provid
 func (m *SegmentingModel) ModelID() string              { return m.modelID }
 func (m *SegmentingModel) SupportsParallelCalls() bool  { return true }
 
-func (m *SegmentingModel) DoSegment(ctx context.Context, texts []string, opts api.SegmentingOptions) (resp api.SegmentingResponse, err error) {
+func (m *SegmentingModel) DoSegment(ctx context.Context, texts []string, opts api.TransportOptions) (resp api.SegmentingResponse, err error) {
 	params, err := codec.EncodeSegment(texts, opts)
 	if err != nil {
 		return api.SegmentingResponse{}, err

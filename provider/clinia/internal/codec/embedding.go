@@ -15,7 +15,7 @@ type EmbeddingParams struct {
 }
 
 // EncodeEmbedding converts the SDK request into the Clinia embedder request payload.
-func EncodeEmbedding(values []string, opts api.EmbeddingOptions) (EmbeddingParams, error) {
+func EncodeEmbedding(values []string, opts api.TransportOptions) (EmbeddingParams, error) {
 	if len(values) == 0 {
 		return EmbeddingParams{}, fmt.Errorf("clinia/embed: values cannot be empty")
 	}

@@ -18,8 +18,8 @@ type SegmentingModel struct {
 
 var _ api.SegmentingModel = (*SegmentingModel)(nil)
 
-// Segmenter constructs a segmenting model wrapper from a model ID ("name:version").
-func (p *Provider) Segmenter(modelID string) (*SegmentingModel, error) {
+// SegmentingModel constructs a segmenting model wrapper from a model ID ("name:version").
+func (p *Provider) SegmentingModel(modelID string) (*SegmentingModel, error) {
 	name, version, err := splitModelID(p.name, modelID)
 	if err != nil {
 		return nil, err
@@ -30,7 +30,7 @@ func (p *Provider) Segmenter(modelID string) (*SegmentingModel, error) {
 		modelName:    name,
 		modelVersion: version,
 		config: ProviderConfig{
-			providerName:  p.providerNameFor("segmenter"),
+			providerName:  p.providerNameFor("segmenting"),
 			clientOptions: p.clientOptions,
 			newChunker:    p.newChunker, // reuse chunker implementation
 		},

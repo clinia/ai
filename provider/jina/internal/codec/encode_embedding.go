@@ -19,6 +19,18 @@ func EncodeMultimodalEmbedding(
 		reqOpts = append(reqOpts, applyHeaders(opts.Headers)...)
 	}
 
+	if opts.APIKey != "" {
+		reqOpts = append(reqOpts, option.WithAPIKey(opts.APIKey))
+	}
+
+	if len(opts.BaseURL) > 0 {
+		reqOpts = append(reqOpts, option.WithBaseURL(opts.BaseURL))
+	}
+
+	if opts.UseRawBaseURL {
+		reqOpts = append(reqOpts, option.WithUseRawBaseURL())
+	}
+
 	// Map API-level inputs to Jina client inputs
 	mapped := make([]jina.MultimodalEmbeddingInput, len(values))
 	for i, v := range values {
@@ -46,6 +58,13 @@ func EncodeEmbedding(
 	var reqOpts []option.RequestOption
 	if opts.Headers != nil {
 		reqOpts = append(reqOpts, applyHeaders(opts.Headers)...)
+	}
+
+	if len(opts.BaseURL) > 0 {
+		reqOpts = append(reqOpts, option.WithBaseURL(opts.BaseURL))
+	}
+	if opts.UseRawBaseURL {
+		reqOpts = append(reqOpts, option.WithUseRawBaseURL())
 	}
 
 	params := jina.TextEmbeddingNewParams{

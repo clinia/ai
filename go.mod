@@ -6,6 +6,7 @@ require (
 	github.com/anthropics/anthropic-sdk-go v1.9.1
 	github.com/clinia/models-client-go v1.6.0
 	github.com/google/jsonschema-go v0.2.0
+	github.com/joho/godotenv v1.5.1
 	github.com/k0kubun/pp/v3 v3.5.0
 	github.com/openai/openai-go/v2 v2.1.0
 	github.com/stretchr/testify v1.10.0

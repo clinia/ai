@@ -26,8 +26,8 @@ func EncodeRank(
 		reqOpts = append(reqOpts, option.WithAPIKey(opts.APIKey))
 	}
 
-	if opts.BaseURL != nil {
-		reqOpts = append(reqOpts, option.WithBaseURL(*opts.BaseURL))
+	if len(opts.BaseURL) > 0 {
+		reqOpts = append(reqOpts, option.WithBaseURL(opts.BaseURL))
 	}
 
 	applyRankProviderMetadata(&params, opts)

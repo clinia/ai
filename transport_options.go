@@ -6,10 +6,10 @@ import (
 	"go.jetify.com/ai/api"
 )
 
-// TransportOption mutates per-call embedding configuration.
+// TransportOption mutates per-call transport configuration.
 type TransportOption func(*api.TransportOptions)
 
-// WithTransportHeaders sets extra HTTP headers for this embedding call.
+// WithTransportHeaders sets extra HTTP headers for this call.
 // Only applies to HTTP-backed providers.
 func WithTransportHeaders(headers http.Header) TransportOption {
 	return func(o *api.TransportOptions) {
@@ -17,7 +17,7 @@ func WithTransportHeaders(headers http.Header) TransportOption {
 	}
 }
 
-// WithTransportAPIKey sets the API key for this embedding call.
+// WithTransportAPIKey sets the API key for this call.
 // Only applies to HTTP-backed providers.
 func WithTransportAPIKey(apiKey string) TransportOption {
 	return func(o *api.TransportOptions) {
@@ -25,7 +25,7 @@ func WithTransportAPIKey(apiKey string) TransportOption {
 	}
 }
 
-// WithTransportProviderMetadata sets provider-specific metadata for the embedding call.
+// WithTransportProviderMetadata sets provider-specific metadata for the call.
 func WithTransportProviderMetadata(provider string, metadata any) TransportOption {
 	return func(o *api.TransportOptions) {
 		if o.ProviderMetadata == nil {
@@ -35,11 +35,10 @@ func WithTransportProviderMetadata(provider string, metadata any) TransportOptio
 	}
 }
 
-// WithTransportBaseURL sets the base URL for the embedding API endpoint.
+// WithTransportBaseURL sets the base URL for the API endpoint.
 func WithTransportBaseURL(baseURL string) TransportOption {
-	url := baseURL
 	return func(o *api.TransportOptions) {
-		o.BaseURL = &url
+		o.BaseURL = baseURL
 	}
 }
 
@@ -51,7 +50,7 @@ func WithTransportUseRawBaseURL() TransportOption {
 	}
 }
 
-// buildTransportConfig combines multiple options into a single api.EmbeddingOptions struct.
+// buildTransportConfig combines multiple options into a single api.TransportOptions struct.
 func buildTransportConfig(opts []TransportOption) api.TransportOptions {
 	config := api.TransportOptions{}
 	for _, opt := range opts {

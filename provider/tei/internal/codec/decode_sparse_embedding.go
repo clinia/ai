@@ -2,10 +2,9 @@ package codec
 
 import (
 	"fmt"
-	"net/http"
 
 	"go.jetify.com/ai/api"
-	tei "go.jetify.com/ai/provider/textembeddinginference/client"
+	tei "go.jetify.com/ai/provider/tei/client"
 )
 
 // DecodeSparseEmbedding maps the TEI sparse embedding API response to the unified SparseEmbeddingResponse.
@@ -36,10 +35,8 @@ func DecodeSparseEmbedding(resp *tei.CreateSparseEmbeddingResponse) (api.SparseE
 	var usage *api.EmbeddingUsage
 
 	return api.SparseEmbeddingResponse{
-		Embeddings: sparseEmbs,
-		Usage:      usage,
-		RawResponse: &api.EmbeddingRawResponse{
-			Headers: http.Header{},
-		},
+		Embeddings:  sparseEmbs,
+		Usage:       usage,
+		RawResponse: nil,
 	}, nil
 }

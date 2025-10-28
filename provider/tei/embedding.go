@@ -1,11 +1,11 @@
-package textembeddinginference
+package tei
 
 import (
 	"context"
 	"fmt"
 
 	"go.jetify.com/ai/api"
-	"go.jetify.com/ai/provider/textembeddinginference/internal/codec"
+	"go.jetify.com/ai/provider/tei/internal/codec"
 )
 
 // EmbeddingModel represents a TEI embedding model.

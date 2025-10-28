@@ -9,7 +9,7 @@ import (
 
 	"github.com/joho/godotenv"
 	"go.jetify.com/ai"
-	tei "go.jetify.com/ai/provider/textembeddinginference"
+	tei "go.jetify.com/ai/provider/tei"
 )
 
 func main() {

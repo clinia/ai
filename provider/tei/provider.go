@@ -1,8 +1,8 @@
-package textembeddinginference
+package tei
 
 import (
 	"go.jetify.com/ai/api"
-	tei "go.jetify.com/ai/provider/textembeddinginference/client"
+	tei "go.jetify.com/ai/provider/tei/client"
 )
 
 // Provider represents the Text Embedding Inference (TEI) provider.

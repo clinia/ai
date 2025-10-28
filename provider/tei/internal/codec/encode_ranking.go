@@ -2,8 +2,8 @@ package codec
 
 import (
 	"go.jetify.com/ai/api"
-	tei "go.jetify.com/ai/provider/textembeddinginference/client"
-	"go.jetify.com/ai/provider/textembeddinginference/client/option"
+	tei "go.jetify.com/ai/provider/tei/client"
+	"go.jetify.com/ai/provider/tei/client/option"
 )
 
 // EncodeRank builds TEI rank params + request options from the unified API options.

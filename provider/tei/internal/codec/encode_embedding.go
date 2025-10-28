@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"go.jetify.com/ai/api"
-	tei "go.jetify.com/ai/provider/textembeddinginference/client"
-	"go.jetify.com/ai/provider/textembeddinginference/client/option"
+	tei "go.jetify.com/ai/provider/tei/client"
+	"go.jetify.com/ai/provider/tei/client/option"
 )
 
 // EncodeEmbedding builds TEI params + request options from the unified API options.

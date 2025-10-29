@@ -19,8 +19,8 @@ func EncodeEmbedding(
 		reqOpts = append(reqOpts, applyHeaders(opts.Headers)...)
 	}
 
-	if opts.BaseURL != nil {
-		reqOpts = append(reqOpts, option.WithBaseURL(*opts.BaseURL))
+	if len(opts.BaseURL) > 0 {
+		reqOpts = append(reqOpts, option.WithBaseURL(opts.BaseURL))
 	}
 
 	params := openai.EmbeddingNewParams{

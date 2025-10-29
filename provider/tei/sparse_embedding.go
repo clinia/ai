@@ -1,11 +1,11 @@
-package textembeddinginference
+package tei
 
 import (
 	"context"
 	"fmt"
 
 	"go.jetify.com/ai/api"
-	"go.jetify.com/ai/provider/textembeddinginference/internal/codec"
+	"go.jetify.com/ai/provider/tei/internal/codec"
 )
 
 type SparseEmbeddingModel struct {
@@ -48,7 +48,7 @@ func (m *SparseEmbeddingModel) SupportsParallelCalls() bool {
 
 // MaxEmbeddingsPerCall returns the limit of how many embeddings can be generated in a single API call.
 func (m *SparseEmbeddingModel) MaxEmbeddingsPerCall() *int {
-	max := 1000 // TODO: verify
+	max := 1000 // TODO: [RET-3496] Determine actual limit
 	return &max
 }
 

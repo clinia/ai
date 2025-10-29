@@ -13,13 +13,6 @@ type SegmentRequest struct {
 	segmentCommon
 }
 
-// BatchSegmentRequest mirrors SegmentRequest but allows sending multiple
-// contents in a single request by using an array for the content field.
-type BatchSegmentRequest struct {
-	Content []string `json:"content"`
-	segmentCommon
-}
-
 // segmentCommon holds attributes shared by both single and batched requests.
 // Embedded into SegmentRequest and BatchSegmentRequest to avoid duplication.
 type segmentCommon struct {
@@ -62,20 +55,4 @@ func (s SegmentingService) New(ctx context.Context, body SegmentRequest, opts ..
 	path := "segment"
 	err = requestconfig.ExecuteNewRequest(ctx, "POST", path, body, &res, all...)
 	return res, err
-}
-
-// NewBatch performs a POST /segment request with a batched body where
-// content is an array of strings. The response is expected to be an array
-// of SegmentResponse objects, one per input string.
-// NOTE: Jina API does not support batched, this is made for Jina like providers.
-// TODO: response should not be a pointer to a slice.
-func (s SegmentingService) NewBatch(ctx context.Context, body BatchSegmentRequest, opts ...option.RequestOption) (res []SegmentResponse, err error) {
-	all := append([]option.RequestOption{}, s.opts...)
-	all = append(all, opts...)
-	path := "segment"
-	err = requestconfig.ExecuteNewRequest(ctx, "POST", path, body, &res, all...)
-	if err != nil {
-		return nil, err
-	}
-	return res, nil
 }

@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"go.jetify.com/ai/api"
-	tei "go.jetify.com/ai/provider/textembeddinginference/client"
-	"go.jetify.com/ai/provider/textembeddinginference/client/option"
+	tei "go.jetify.com/ai/provider/tei/client"
+	"go.jetify.com/ai/provider/tei/client/option"
 )
 
 // EncodeEmbedding builds TEI params + request options from the unified API options.
@@ -27,8 +27,8 @@ func EncodeEmbedding(
 		reqOpts = append(reqOpts, option.WithAPIKey(opts.APIKey))
 	}
 
-	if opts.BaseURL != nil {
-		reqOpts = append(reqOpts, option.WithBaseURL(*opts.BaseURL))
+	if len(opts.BaseURL) > 0 {
+		reqOpts = append(reqOpts, option.WithBaseURL(opts.BaseURL))
 	}
 
 	applyProviderMetadata(&params, opts)

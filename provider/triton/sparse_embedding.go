@@ -1,11 +1,11 @@
-package clinia
+package triton
 
 import (
 	"context"
 	"fmt"
 
 	"go.jetify.com/ai/api"
-	"go.jetify.com/ai/provider/clinia/internal/codec"
+	"go.jetify.com/ai/provider/triton/internal/codec"
 )
 
 // SparseEmbeddingModel wraps the Clinia sparse embedder.
@@ -18,7 +18,7 @@ type SparseEmbeddingModel struct {
 
 var _ api.EmbeddingModel[string, api.SparseEmbedding] = (*SparseEmbeddingModel)(nil)
 
-func (p *Provider) SparseEmbeddingModel(modelID string) (*SparseEmbeddingModel, error) {
+func (p *Provider) SparseEmbeddingModel(modelID string) (api.EmbeddingModel[string, api.SparseEmbedding], error) {
 	name, version, err := splitModelID(p.name, modelID)
 	if err != nil {
 		return nil, err

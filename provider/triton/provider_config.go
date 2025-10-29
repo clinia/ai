@@ -1,4 +1,4 @@
-package clinia
+package triton
 
 import (
 	"github.com/clinia/models-client-go/cliniamodel/common"

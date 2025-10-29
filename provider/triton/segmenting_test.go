@@ -1,4 +1,4 @@
-package clinia
+package triton
 
 import (
 	"context"
@@ -125,7 +125,7 @@ func TestSegmentingModel(t *testing.T) {
 				tt.opts.BaseURL = host
 			}
 
-			provider, err := NewProvider(ctx,
+			provider, err := NewProvider(
 				withChunkerFactory(func(ctx context.Context, opts common.ClientOptions) cliniaclient.Chunker {
 					tt.chunker.boundRequester = opts.Requester
 					return tt.chunker

@@ -64,3 +64,8 @@ func (p *Provider) LanguageModel(modelID string) (api.LanguageModel, error) {
 func (p *Provider) MultimodalEmbeddingModel(modelID string) (api.EmbeddingModel[api.MultimodalEmbeddingInput, api.Embedding], error) {
 	return nil, api.NewUnsupportedFunctionalityError(p.name, "MultimodalEmbeddingModel")
 }
+
+// SegmentingModel is not supported by TEI provider.
+func (p *Provider) SegmentingModel(modelID string) (api.SegmentingModel, error) {
+	return nil, api.NewUnsupportedFunctionalityError(p.name, "SegmentingModel")
+}

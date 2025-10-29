@@ -24,7 +24,7 @@ func WithName(name string) ProviderOption {
 	return func(p *Provider) { p.name = name }
 }
 
-func NewProvider(opts ...ProviderOption) *Provider {
+func NewProvider(opts ...ProviderOption) api.Provider {
 	p := &Provider{client: openai.NewClient()}
 	for _, opt := range opts {
 		opt(p)
@@ -39,4 +39,19 @@ func NewProvider(opts ...ProviderOption) *Provider {
 // MultimodalEmbeddingModel is not supported by OpenAI Provider at this time.
 func (p *Provider) MultimodalEmbeddingModel(modelID string) (api.EmbeddingModel[api.MultimodalEmbeddingInput, api.Embedding], error) {
 	return nil, api.NewUnsupportedFunctionalityError(p.name, "MultiModalEmbeddingModel")
+}
+
+// SegmentingModel is not supported by OpenAI Provider at this time.
+func (p *Provider) SegmentingModel(modelID string) (api.SegmentingModel, error) {
+	return nil, api.NewUnsupportedFunctionalityError(p.name, "SegmentingModel")
+}
+
+// RankingModel is not supported by OpenAI Provider at this time.
+func (p *Provider) RankingModel(modelID string) (api.RankingModel, error) {
+	return nil, api.NewUnsupportedFunctionalityError(p.name, "RankingModel")
+}
+
+// SparseEmbeddingModel is not supported by OpenAI Provider at this time.
+func (p *Provider) SparseEmbeddingModel(modelID string) (api.EmbeddingModel[string, api.SparseEmbedding], error) {
+	return nil, api.NewUnsupportedFunctionalityError(p.name, "SparseEmbeddingModel")
 }

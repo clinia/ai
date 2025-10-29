@@ -1,11 +1,11 @@
-package clinia
+package triton
 
 import (
 	"context"
 	"fmt"
 
 	"go.jetify.com/ai/api"
-	"go.jetify.com/ai/provider/clinia/internal/codec"
+	"go.jetify.com/ai/provider/triton/internal/codec"
 )
 
 type RankingModel struct {
@@ -17,7 +17,7 @@ type RankingModel struct {
 
 var _ api.RankingModel = (*RankingModel)(nil)
 
-func (p *Provider) RankingModel(modelID string) (*RankingModel, error) {
+func (p *Provider) RankingModel(modelID string) (api.RankingModel, error) {
 	name, version, err := splitModelID(p.name, modelID)
 	if err != nil {
 		return nil, err

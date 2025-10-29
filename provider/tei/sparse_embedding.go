@@ -15,8 +15,8 @@ type SparseEmbeddingModel struct {
 
 var _ api.EmbeddingModel[string, api.SparseEmbedding] = &SparseEmbeddingModel{}
 
-// SparseTextEmbeddingModel creates a new TEI sparse embedding model.
-func (p *Provider) SparseTextEmbeddingModel(modelID string) (*SparseEmbeddingModel, error) {
+// SparseEmbeddingModel creates a new TEI sparse embedding model.
+func (p *Provider) SparseEmbeddingModel(modelID string) (api.EmbeddingModel[string, api.SparseEmbedding], error) {
 	model := &SparseEmbeddingModel{
 		modelID: modelID,
 		pc: ProviderConfig{

@@ -1,4 +1,4 @@
-package clinia
+package triton
 
 import (
 	"fmt"

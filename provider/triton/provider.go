@@ -1,4 +1,4 @@
-package clinia
+package triton
 
 import (
 	"context"
@@ -62,8 +62,8 @@ func WithClientOptions(opts common.ClientOptions) Option {
 }
 
 // NewProvider constructs a new Clinia provider.
-func NewProvider(_ context.Context, opts ...Option) (*Provider, error) {
-	options := providerOptions{name: "clinia"}
+func NewProvider(opts ...Option) (api.Provider, error) {
+	options := providerOptions{name: "triton"}
 	for _, opt := range opts {
 		opt(&options)
 	}

@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-
 	"os"
 
 	"github.com/joho/godotenv"
@@ -92,5 +91,4 @@ func main() {
 	for i, score := range response2.Scores {
 		fmt.Printf("%-5d | %.4f\n", i, score)
 	}
-
 }

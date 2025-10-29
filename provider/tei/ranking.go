@@ -1,11 +1,11 @@
-package textembeddinginference
+package tei
 
 import (
 	"context"
 	"fmt"
 
 	"go.jetify.com/ai/api"
-	"go.jetify.com/ai/provider/textembeddinginference/internal/codec"
+	"go.jetify.com/ai/provider/tei/internal/codec"
 )
 
 // RankingModel represents a TEI ranking model.
@@ -52,7 +52,7 @@ func (m *RankingModel) SupportsParallelCalls() bool {
 
 // MaxDocumentsPerCall returns the maximum number of documents that can be ranked in a single call.
 func (m *RankingModel) MaxDocumentsPerCall() *int {
-	max := 1000 // TODO: verify
+	max := 1000 // TODO: [RET-3496] Determine actual limit
 	return &max
 }
 

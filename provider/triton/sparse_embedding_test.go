@@ -104,7 +104,7 @@ func TestSparseEmbeddingModel(t *testing.T) {
 			opts := api.TransportOptions{}
 			if len(tt.texts) > 0 {
 				host := "127.0.0.1:9000"
-				opts.BaseURL = &host
+				opts.BaseURL = host
 			}
 
 			p, err := NewProvider(

@@ -2,8 +2,8 @@ package codec
 
 import (
 	"go.jetify.com/ai/api"
-	tei "go.jetify.com/ai/provider/textembeddinginference/client"
-	"go.jetify.com/ai/provider/textembeddinginference/client/option"
+	tei "go.jetify.com/ai/provider/tei/client"
+	"go.jetify.com/ai/provider/tei/client/option"
 )
 
 // EncodeRank builds TEI rank params + request options from the unified API options.
@@ -26,8 +26,8 @@ func EncodeRank(
 		reqOpts = append(reqOpts, option.WithAPIKey(opts.APIKey))
 	}
 
-	if opts.BaseURL != nil {
-		reqOpts = append(reqOpts, option.WithBaseURL(*opts.BaseURL))
+	if len(opts.BaseURL) > 0 {
+		reqOpts = append(reqOpts, option.WithBaseURL(opts.BaseURL))
 	}
 
 	applyRankProviderMetadata(&params, opts)

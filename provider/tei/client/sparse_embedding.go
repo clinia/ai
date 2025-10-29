@@ -1,12 +1,12 @@
-package textembeddinginference
+package tei
 
 import (
 	"context"
 	"fmt"
 	"net/http"
 
-	"go.jetify.com/ai/provider/textembeddinginference/client/internal/requestconfig"
-	"go.jetify.com/ai/provider/textembeddinginference/client/option"
+	"go.jetify.com/ai/provider/tei/client/internal/requestconfig"
+	"go.jetify.com/ai/provider/tei/client/option"
 )
 
 type SparseTextEmbeddingNewParams = EmbedSparseRequest

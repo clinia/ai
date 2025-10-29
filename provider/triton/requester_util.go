@@ -12,11 +12,11 @@ import (
 	"github.com/clinia/models-client-go/cliniamodel/requestergrpc"
 )
 
-func makeRequester(ctx context.Context, baseURL *string) (common.Requester, error) {
-	if baseURL == nil || strings.TrimSpace(*baseURL) == "" {
+func makeRequester(ctx context.Context, baseURL string) (common.Requester, error) {
+	if strings.TrimSpace(baseURL) == "" {
 		return nil, fmt.Errorf("clinia: BaseURL is required")
 	}
-	raw := strings.TrimSpace(*baseURL)
+	raw := strings.TrimSpace(baseURL)
 	if !strings.Contains(raw, "://") {
 		raw = "http://" + raw
 	}

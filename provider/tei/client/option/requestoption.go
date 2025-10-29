@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"go.jetify.com/ai/provider/textembeddinginference/client/internal/requestconfig"
+	"go.jetify.com/ai/provider/tei/client/internal/requestconfig"
 )
 
 // RequestOption is an option for the requests made by the TEI API Client

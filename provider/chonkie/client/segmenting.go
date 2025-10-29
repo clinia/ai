@@ -58,8 +58,6 @@ func NewSegmentingService(opts ...option.RequestOption) SegmentingService {
 // New performs a POST /segment request with a batched body where
 // content is an array of strings. The response is expected to be an array
 // of SegmentResponse objects, one per input string.
-// NOTE: Chonkie API does not support batched, this is made for Chonkie like providers.
-// TODO: response should not be a pointer to a slice.
 func (s SegmentingService) New(ctx context.Context, body BatchSegmentRequest, opts ...option.RequestOption) (res []SegmentResponse, err error) {
 	all := append([]option.RequestOption{}, s.opts...)
 	all = append(all, opts...)

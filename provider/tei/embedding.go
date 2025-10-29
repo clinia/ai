@@ -1,11 +1,11 @@
-package textembeddinginference
+package tei
 
 import (
 	"context"
 	"fmt"
 
 	"go.jetify.com/ai/api"
-	"go.jetify.com/ai/provider/textembeddinginference/internal/codec"
+	"go.jetify.com/ai/provider/tei/internal/codec"
 )
 
 // EmbeddingModel represents a TEI embedding model.
@@ -50,7 +50,7 @@ func (m *EmbeddingModel) SupportsParallelCalls() bool {
 
 // MaxEmbeddingsPerCall implements api.EmbeddingModel.
 func (m *EmbeddingModel) MaxEmbeddingsPerCall() *int {
-	max := 1000
+	max := 1000 // TODO: [RET-3496] Determine actual limit
 	return &max
 }
 

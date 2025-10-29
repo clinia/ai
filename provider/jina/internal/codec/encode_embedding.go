@@ -23,8 +23,8 @@ func EncodeMultimodalEmbedding(
 		reqOpts = append(reqOpts, option.WithAPIKey(opts.APIKey))
 	}
 
-	if opts.BaseURL != nil {
-		reqOpts = append(reqOpts, option.WithBaseURL(*opts.BaseURL))
+	if len(opts.BaseURL) > 0 {
+		reqOpts = append(reqOpts, option.WithBaseURL(opts.BaseURL))
 	}
 
 	if opts.UseRawBaseURL {
@@ -60,8 +60,8 @@ func EncodeEmbedding(
 		reqOpts = append(reqOpts, applyHeaders(opts.Headers)...)
 	}
 
-	if opts.BaseURL != nil {
-		reqOpts = append(reqOpts, option.WithBaseURL(*opts.BaseURL))
+	if len(opts.BaseURL) > 0 {
+		reqOpts = append(reqOpts, option.WithBaseURL(opts.BaseURL))
 	}
 	if opts.UseRawBaseURL {
 		reqOpts = append(reqOpts, option.WithUseRawBaseURL())

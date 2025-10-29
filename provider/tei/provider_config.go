@@ -1,6 +1,6 @@
-package textembeddinginference
+package tei
 
-import tei "go.jetify.com/ai/provider/textembeddinginference/client"
+import tei "go.jetify.com/ai/provider/tei/client"
 
 type ProviderConfig struct {
 	providerName string

@@ -1,10 +1,8 @@
 package codec
 
 import (
-	"net/http"
-
 	"go.jetify.com/ai/api"
-	tei "go.jetify.com/ai/provider/textembeddinginference/client"
+	tei "go.jetify.com/ai/provider/tei/client"
 )
 
 // DecodeEmbedding maps the TEI embedding API response to the unified api.EmbeddingResponse.
@@ -29,10 +27,8 @@ func DecodeEmbedding(resp *tei.CreateEmbeddingResponse) (api.DenseEmbeddingRespo
 	var usage *api.EmbeddingUsage
 
 	return api.DenseEmbeddingResponse{
-		Embeddings: embs,
-		Usage:      usage,
-		RawResponse: &api.EmbeddingRawResponse{
-			Headers: http.Header{},
-		},
+		Embeddings:  embs,
+		Usage:       usage,
+		RawResponse: nil,
 	}, nil
 }

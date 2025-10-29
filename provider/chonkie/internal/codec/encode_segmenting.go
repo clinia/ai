@@ -24,8 +24,8 @@ func EncodeSegment(text string, opts api.TransportOptions) (chonkie.SegmentReque
 		reqOpts = append(reqOpts, option.WithAPIKey(opts.APIKey))
 	}
 
-	if opts.BaseURL != nil {
-		reqOpts = append(reqOpts, option.WithBaseURL(*opts.BaseURL))
+	if len(opts.BaseURL) > 0 {
+		reqOpts = append(reqOpts, option.WithBaseURL(opts.BaseURL))
 	}
 
 	if opts.UseRawBaseURL {
@@ -53,8 +53,8 @@ func EncodeSegmentBatch(texts []string, opts api.TransportOptions) (chonkie.Batc
 		reqOpts = append(reqOpts, option.WithAPIKey(opts.APIKey))
 	}
 
-	if opts.BaseURL != nil {
-		reqOpts = append(reqOpts, option.WithBaseURL(*opts.BaseURL))
+	if len(opts.BaseURL) > 0 {
+		reqOpts = append(reqOpts, option.WithBaseURL(opts.BaseURL))
 	}
 
 	if opts.UseRawBaseURL {

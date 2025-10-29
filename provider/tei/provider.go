@@ -1,8 +1,8 @@
-package textembeddinginference
+package tei
 
 import (
 	"go.jetify.com/ai/api"
-	tei "go.jetify.com/ai/provider/textembeddinginference/client"
+	tei "go.jetify.com/ai/provider/tei/client"
 )
 
 // Provider represents the Text Embedding Inference (TEI) provider.
@@ -39,7 +39,7 @@ func WithAPIKey(apiKey string) ProviderOption {
 }
 
 // NewProvider creates a new TEI provider with the given options.
-func NewProvider(opts ...ProviderOption) api.Provider {
+func NewProvider(opts ...ProviderOption) *Provider {
 	p := &Provider{
 		client: tei.NewClient(),
 	}
@@ -68,17 +68,4 @@ func (p *Provider) MultimodalEmbeddingModel(modelID string) (api.EmbeddingModel[
 // SegmentingModel is not supported by TEI provider.
 func (p *Provider) SegmentingModel(modelID string) (api.SegmentingModel, error) {
 	return nil, api.NewUnsupportedFunctionalityError(p.name, "SegmentingModel")
-}
-
-// SparseEmbeddingModel returns a TEI sparse embedding model implementation.
-func (p *Provider) SparseEmbeddingModel(modelID string) (api.EmbeddingModel[string, api.SparseEmbedding], error) {
-	model := &SparseEmbeddingModel{
-		modelID: modelID,
-		pc: ProviderConfig{
-			providerName: p.name + ".sparse-embedding",
-			client:       p.client,
-			apiKey:       p.apiKey,
-		},
-	}
-	return model, nil
 }

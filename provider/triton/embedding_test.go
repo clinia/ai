@@ -40,7 +40,7 @@ func TestEmbeddingModelDoEmbed(t *testing.T) {
 		modelVersion string
 		values       []string
 		embedder     *fakeEmbedder
-		baseURL      *string
+		baseURL      string
 		wantModelErr bool
 		wantErr      bool
 		wantResp     *api.DenseEmbeddingResponse
@@ -112,7 +112,7 @@ func TestEmbeddingModelDoEmbed(t *testing.T) {
 			embedder: &fakeEmbedder{
 				response: &cliniaclient.EmbedResponse{Embeddings: [][]float32{{1}}},
 			},
-			baseURL:     ptr("127.0.0.1"),
+			baseURL:     "127.0.0.1",
 			wantErr:     true,
 			wantModelID: "dense:2",
 			after:       func(t *testing.T, embedder *fakeEmbedder) { require.Equal(t, 0, embedder.calls) },
@@ -123,11 +123,11 @@ func TestEmbeddingModelDoEmbed(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			opts := api.TransportOptions{}
 			// Ensure makeRequester is called when inputs are valid
-			if tt.baseURL != nil {
+			if len(tt.baseURL) > 0 {
 				opts.BaseURL = tt.baseURL
 			} else if len(tt.values) > 0 {
 				host := "127.0.0.1:9000"
-				opts.BaseURL = &host
+				opts.BaseURL = host
 			}
 
 			provider, err := NewProvider(
@@ -165,7 +165,7 @@ func TestEmbeddingModelDoEmbed(t *testing.T) {
 			if tt.after != nil {
 				tt.after(t, tt.embedder)
 			}
-			if tt.baseURL != nil {
+			if len(tt.baseURL) > 0 {
 				require.Error(t, err)
 			}
 		})

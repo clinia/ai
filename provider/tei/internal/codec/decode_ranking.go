@@ -2,7 +2,7 @@ package codec
 
 import (
 	"go.jetify.com/ai/api"
-	tei "go.jetify.com/ai/provider/textembeddinginference/client"
+	tei "go.jetify.com/ai/provider/tei/client"
 )
 
 // DecodeRank maps the TEI ranking API response to the unified api.RankingResponse.

@@ -2,10 +2,10 @@ package api
 
 import "net/http"
 
-// TransportOption represent the options for generating embeddings.
+// TransportOption represents an option function for transport configuration.
 type TransportOption func(*TransportOptions)
 
-// TransportOptions represents the options for generating embeddings.
+// TransportOptions represents the transport-layer options for API calls.
 type TransportOptions struct {
 	// Headers are additional HTTP headers to be sent with the request.
 	// Only applicable for HTTP-based providers.
@@ -16,7 +16,7 @@ type TransportOptions struct {
 	APIKey string
 
 	// BaseURL is the base URL for the API endpoint.
-	BaseURL *string
+	BaseURL string
 
 	// UseRawBaseURL, when true, instructs HTTP-backed providers to use the
 	// provided BaseURL as the full request URL without appending an API path.

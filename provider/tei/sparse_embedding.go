@@ -1,11 +1,11 @@
-package textembeddinginference
+package tei
 
 import (
 	"context"
 	"fmt"
 
 	"go.jetify.com/ai/api"
-	"go.jetify.com/ai/provider/textembeddinginference/internal/codec"
+	"go.jetify.com/ai/provider/tei/internal/codec"
 )
 
 type SparseEmbeddingModel struct {
@@ -15,8 +15,8 @@ type SparseEmbeddingModel struct {
 
 var _ api.EmbeddingModel[string, api.SparseEmbedding] = &SparseEmbeddingModel{}
 
-// SparseTextEmbeddingModel creates a new TEI sparse embedding model.
-func (p *Provider) SparseTextEmbeddingModel(modelID string) (*SparseEmbeddingModel, error) {
+// SparseEmbeddingModel creates a new TEI sparse embedding model.
+func (p *Provider) SparseEmbeddingModel(modelID string) (api.EmbeddingModel[string, api.SparseEmbedding], error) {
 	model := &SparseEmbeddingModel{
 		modelID: modelID,
 		pc: ProviderConfig{
@@ -48,7 +48,7 @@ func (m *SparseEmbeddingModel) SupportsParallelCalls() bool {
 
 // MaxEmbeddingsPerCall returns the limit of how many embeddings can be generated in a single API call.
 func (m *SparseEmbeddingModel) MaxEmbeddingsPerCall() *int {
-	max := 1000 // TODO: verify
+	max := 1000 // TODO: [RET-3496] Determine actual limit
 	return &max
 }
 

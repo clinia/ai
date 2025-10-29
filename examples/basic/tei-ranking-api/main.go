@@ -4,12 +4,11 @@ import (
 	"context"
 	"fmt"
 	"log"
-
 	"os"
 
 	"github.com/joho/godotenv"
 	"go.jetify.com/ai"
-	tei "go.jetify.com/ai/provider/textembeddinginference"
+	"go.jetify.com/ai/provider/tei"
 )
 
 func main() {
@@ -92,5 +91,4 @@ func main() {
 	for i, score := range response2.Scores {
 		fmt.Printf("%-5d | %.4f\n", i, score)
 	}
-
 }

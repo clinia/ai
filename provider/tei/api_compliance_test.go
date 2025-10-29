@@ -1,10 +1,10 @@
-package textembeddinginference
+package tei
 
 import (
 	"encoding/json"
 	"testing"
 
-	tei "go.jetify.com/ai/provider/textembeddinginference/client"
+	tei "go.jetify.com/ai/provider/tei/client"
 )
 
 // TestEmbedRequestCompliance verifies our EmbedRequest structure matches TEI OpenAPI spec

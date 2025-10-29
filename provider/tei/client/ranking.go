@@ -1,7 +1,7 @@
-package textembeddinginference
+package tei
 
 import (
-	"go.jetify.com/ai/provider/textembeddinginference/client/option"
+	"go.jetify.com/ai/provider/tei/client/option"
 )
 
 // RankingService contains methods for document ranking.

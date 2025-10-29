@@ -1,9 +1,9 @@
-package textembeddinginference
+package tei
 
 import (
 	"os"
 
-	"go.jetify.com/ai/provider/textembeddinginference/client/option"
+	"go.jetify.com/ai/provider/tei/client/option"
 )
 
 type Client struct {

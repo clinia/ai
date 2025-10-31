@@ -62,6 +62,20 @@ func WithAPIKey(value string) RequestOption {
 	})
 }
 
+// WithDefaultBaseURL returns a RequestOption that sets the client's default Base URL.
+// This is always overridden by setting a base URL with WithBaseURL.
+// WithBaseURL should be used instead of WithDefaultBaseURL except in internal code.
+func WithDefaultBaseURL(baseURL string) RequestOption {
+	u, err := url.Parse(baseURL)
+	return RequestOptionFunc(func(r *RequestConfig) error {
+		if err != nil {
+			return err
+		}
+		r.DefaultBaseURL = u
+		return nil
+	})
+}
+
 // WithUseRawBaseURL instructs the client to use the configured BaseURL as the
 // full request URL without appending a path from the request.
 func WithUseRawBaseURL() RequestOption {

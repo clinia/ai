@@ -3,8 +3,7 @@ package jina
 import (
 	"context"
 
-	"go.jetify.com/ai/provider/jina/client/internal/requestconfig"
-	"go.jetify.com/ai/provider/jina/client/option"
+	"go.jetify.com/ai/provider/internal/requesterx"
 )
 
 // SegmentRequest models the POST body for Jina Segmenting API.
@@ -42,17 +41,17 @@ type SegmentResponse struct {
 	Chunks         []string `json:"chunks"`
 }
 
-type SegmentingService struct{ opts []option.RequestOption }
+type SegmentingService struct{ opts []requesterx.RequestOption }
 
-func NewSegmentingService(opts ...option.RequestOption) SegmentingService {
+func NewSegmentingService(opts ...requesterx.RequestOption) SegmentingService {
 	return SegmentingService{opts: opts}
 }
 
 // New performs a POST /segment request.
-func (s SegmentingService) New(ctx context.Context, body SegmentRequest, opts ...option.RequestOption) (res *SegmentResponse, err error) {
-	all := append([]option.RequestOption{}, s.opts...)
+func (s SegmentingService) New(ctx context.Context, body SegmentRequest, opts ...requesterx.RequestOption) (res *SegmentResponse, err error) {
+	all := append([]requesterx.RequestOption{}, s.opts...)
 	all = append(all, opts...)
 	path := "segment"
-	err = requestconfig.ExecuteNewRequest(ctx, "POST", path, body, &res, all...)
+	err = requesterx.ExecuteNewRequest(ctx, "POST", path, body, &res, all...)
 	return res, err
 }

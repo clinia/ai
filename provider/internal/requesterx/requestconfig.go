@@ -97,9 +97,15 @@ func (cfg *RequestConfig) Execute() error {
 		}
 	}
 
-	// If the BaseURL is set, resolve the request URL relative to it
-	u := cfg.BaseURL.ResolveReference(cfg.Request.URL)
-	cfg.Request.URL = u
+	// Build final URL
+	if cfg.UseRawBaseURL {
+		// Ignore the request path and use BaseURL as-is
+		cfg.Request.URL = cfg.BaseURL
+	} else {
+		// Resolve the request path relative to BaseURL
+		u := cfg.BaseURL.ResolveReference(cfg.Request.URL)
+		cfg.Request.URL = u
+	}
 
 	resp, err := cfg.HTTPClient.Do(cfg.Request)
 	if err != nil {
@@ -109,7 +115,7 @@ func (cfg *RequestConfig) Execute() error {
 
 	if resp.StatusCode >= 400 {
 		body, _ := io.ReadAll(resp.Body)
-		return fmt.Errorf("TEI API error: status=%d body=%s request=%s", resp.StatusCode, string(body), cfg.Request.URL.String())
+		return fmt.Errorf("PROVIDER API ERROR: status=%d body=%s request=%s", resp.StatusCode, string(body), cfg.Request.URL.String())
 	}
 
 	if cfg.ResponseBodyInto == nil {
@@ -150,18 +156,4 @@ func (cfg *RequestConfig) Apply(opts ...RequestOption) error {
 		}
 	}
 	return nil
-}
-
-// WithDefaultBaseURL returns a RequestOption that sets the client's default Base URL.
-// This is always overridden by setting a base URL with WithBaseURL.
-// WithBaseURL should be used instead of WithDefaultBaseURL except in internal code.
-func WithDefaultBaseURL(baseURL string) RequestOption {
-	u, err := url.Parse(baseURL)
-	return RequestOptionFunc(func(r *RequestConfig) error {
-		if err != nil {
-			return err
-		}
-		r.DefaultBaseURL = u
-		return nil
-	})
 }

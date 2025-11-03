@@ -6,8 +6,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"go.jetify.com/ai/api"
+	"go.jetify.com/ai/provider/internal/requesterx"
 	jina "go.jetify.com/ai/provider/jina/client"
-	"go.jetify.com/ai/provider/jina/client/option"
 	"go.jetify.com/pkg/httpmock"
 )
 
@@ -150,9 +150,9 @@ func runDoEmbedTests(t *testing.T, tests []struct {
 			defer server.Close()
 
 			// Set up client options for the Jina client
-			clientOptions := []option.RequestOption{
-				option.WithBaseURL(server.BaseURL()),
-				option.WithAPIKey("test-key"),
+			clientOptions := []requesterx.RequestOption{
+				requesterx.WithBaseURL(server.BaseURL()),
+				requesterx.WithAPIKey("test-key"),
 			}
 
 			// Create client with options

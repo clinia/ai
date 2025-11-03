@@ -4,31 +4,31 @@ import (
 	"fmt"
 
 	"go.jetify.com/ai/api"
+	"go.jetify.com/ai/provider/internal/requesterx"
 	jina "go.jetify.com/ai/provider/jina/client"
-	"go.jetify.com/ai/provider/jina/client/option"
 )
 
 // EncodeSegment prepares a Jina Segmenting request for a single text.
-func EncodeSegment(text string, opts api.TransportOptions) (jina.SegmentRequest, []option.RequestOption, error) {
+func EncodeSegment(text string, opts api.TransportOptions) (jina.SegmentRequest, []requesterx.RequestOption, error) {
 	if text == "" {
 		return jina.SegmentRequest{}, nil, fmt.Errorf("jina/segment: content is empty")
 	}
 
-	var reqOpts []option.RequestOption
+	var reqOpts []requesterx.RequestOption
 	if opts.Headers != nil {
 		reqOpts = append(reqOpts, applyHeaders(opts.Headers)...)
 	}
 
 	if opts.APIKey != "" {
-		reqOpts = append(reqOpts, option.WithAPIKey(opts.APIKey))
+		reqOpts = append(reqOpts, requesterx.WithAPIKey(opts.APIKey))
 	}
 
 	if len(opts.BaseURL) > 0 {
-		reqOpts = append(reqOpts, option.WithBaseURL(opts.BaseURL))
+		reqOpts = append(reqOpts, requesterx.WithBaseURL(opts.BaseURL))
 	}
 
 	if opts.UseRawBaseURL {
-		reqOpts = append(reqOpts, option.WithUseRawBaseURL())
+		reqOpts = append(reqOpts, requesterx.WithUseRawBaseURL())
 	}
 
 	body := jina.SegmentRequest{Content: text}

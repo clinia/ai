@@ -5,8 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"go.jetify.com/ai/provider/tei/client/internal/requestconfig"
-	"go.jetify.com/ai/provider/tei/client/option"
+	"go.jetify.com/ai/provider/internal/requesterx"
 )
 
 type SparseTextEmbeddingNewParams = EmbedSparseRequest
@@ -40,12 +39,12 @@ func validateEmbedSparseRequest(req EmbedSparseRequest) error {
 
 // NewSparse creates sparse embedding vectors representing the input text.
 // TEI uses the /embed_sparse endpoint which returns arrays of SparseValue objects.
-func (r *EmbeddingService) NewSparse(ctx context.Context, body SparseTextEmbeddingNewParams, opts ...option.RequestOption) (res *CreateSparseEmbeddingResponse, err error) {
+func (r *EmbeddingService) NewSparse(ctx context.Context, body SparseTextEmbeddingNewParams, opts ...requesterx.RequestOption) (res *CreateSparseEmbeddingResponse, err error) {
 	if err := validateEmbedSparseRequest(body); err != nil {
 		return nil, err
 	}
 	opts = append(r.Options[:], opts...)
 	path := "embed_sparse"
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
+	err = requesterx.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return res, err
 }

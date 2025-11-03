@@ -2,8 +2,8 @@ package codec
 
 import (
 	"go.jetify.com/ai/api"
+	"go.jetify.com/ai/provider/internal/requesterx"
 	tei "go.jetify.com/ai/provider/tei/client"
-	"go.jetify.com/ai/provider/tei/client/option"
 )
 
 // EncodeRank builds TEI rank params + request options from the unified API options.
@@ -11,8 +11,8 @@ func EncodeRank(
 	query string,
 	texts []string,
 	opts api.TransportOptions,
-) (tei.RankRequest, []option.RequestOption, []api.CallWarning, error) {
-	var reqOpts []option.RequestOption
+) (tei.RankRequest, []requesterx.RequestOption, []api.CallWarning, error) {
+	var reqOpts []requesterx.RequestOption
 	if opts.Headers != nil {
 		reqOpts = append(reqOpts, applyHeaders(opts.Headers)...)
 	}
@@ -23,11 +23,11 @@ func EncodeRank(
 	}
 
 	if opts.APIKey != "" {
-		reqOpts = append(reqOpts, option.WithAPIKey(opts.APIKey))
+		reqOpts = append(reqOpts, requesterx.WithAPIKey(opts.APIKey))
 	}
 
 	if len(opts.BaseURL) > 0 {
-		reqOpts = append(reqOpts, option.WithBaseURL(opts.BaseURL))
+		reqOpts = append(reqOpts, requesterx.WithBaseURL(opts.BaseURL))
 	}
 
 	applyRankProviderMetadata(&params, opts)

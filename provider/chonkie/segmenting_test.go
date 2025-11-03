@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.jetify.com/ai/api"
 	chonkieClient "go.jetify.com/ai/provider/chonkie/client"
-	"go.jetify.com/ai/provider/chonkie/client/option"
+	"go.jetify.com/ai/provider/internal/requesterx"
 	"go.jetify.com/pkg/httpmock"
 )
 
@@ -74,8 +74,8 @@ func runDoSegmentTests(t *testing.T, tests []struct {
 			defer server.Close()
 
 			client := chonkieClient.NewClient(
-				option.WithBaseURL(server.BaseURL()),
-				option.WithAPIKey("test-key"),
+				requesterx.WithBaseURL(server.BaseURL()),
+				requesterx.WithAPIKey("test-key"),
 			)
 
 			provider := NewProvider(WithClient(client))

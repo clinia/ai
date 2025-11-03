@@ -3,8 +3,7 @@ package chonkie
 import (
 	"context"
 
-	"go.jetify.com/ai/provider/chonkie/client/internal/requestconfig"
-	"go.jetify.com/ai/provider/chonkie/client/option"
+	"go.jetify.com/ai/provider/internal/requesterx"
 )
 
 // SegmentRequest models the POST body for Chonkie Segmenting API.
@@ -49,19 +48,19 @@ type SegmentResponse struct {
 	Chunks         []string `json:"chunks"`
 }
 
-type SegmentingService struct{ opts []option.RequestOption }
+type SegmentingService struct{ opts []requesterx.RequestOption }
 
-func NewSegmentingService(opts ...option.RequestOption) SegmentingService {
+func NewSegmentingService(opts ...requesterx.RequestOption) SegmentingService {
 	return SegmentingService{opts: opts}
 }
 
 // New performs a POST /segment request with a batched body where
 // content is an array of strings. The response is expected to be an array
 // of SegmentResponse objects, one per input string.
-func (s SegmentingService) New(ctx context.Context, body BatchSegmentRequest, opts ...option.RequestOption) (res []SegmentResponse, err error) {
-	all := append([]option.RequestOption{}, s.opts...)
+func (s SegmentingService) New(ctx context.Context, body BatchSegmentRequest, opts ...requesterx.RequestOption) (res []SegmentResponse, err error) {
+	all := append([]requesterx.RequestOption{}, s.opts...)
 	all = append(all, opts...)
-	err = requestconfig.ExecuteNewRequest(ctx, "POST", "", body, &res, all...)
+	err = requesterx.ExecuteNewRequest(ctx, "POST", "", body, &res, all...)
 	if err != nil {
 		return nil, err
 	}

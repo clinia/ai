@@ -76,8 +76,8 @@ func TestEmbedSparseRequestCompliance(t *testing.T) {
 // TestSparseValueCompliance verifies our SparseValue structure matches TEI OpenAPI spec
 func TestSparseValueCompliance(t *testing.T) {
 	sv := tei.SparseValue{
-		"index": 42,
-		"value": 0.75,
+		Index: 42,
+		Value: 0.75,
 	}
 
 	jsonData, err := json.Marshal(sv)
@@ -111,10 +111,12 @@ func TestResponseStructures(t *testing.T) {
 	// Test sparse embedding response
 	sparseResponse := tei.CreateSparseEmbeddingResponse{
 		{
-			"index": 10, "value": 0.5,
+			{Index: 10, Value: 0.5},
+			{Index: 20, Value: 0.8},
 		},
 		{
-			"index": 20, "value": 1.5,
+			{Index: 15, Value: 0.3},
+			{Index: 25, Value: 0.9},
 		},
 	}
 

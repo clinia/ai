@@ -6,8 +6,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"go.jetify.com/ai/api"
+	"go.jetify.com/ai/provider/internal/requesterx"
 	jinaClient "go.jetify.com/ai/provider/jina/client"
-	"go.jetify.com/ai/provider/jina/client/option"
 	"go.jetify.com/pkg/httpmock"
 )
 
@@ -61,8 +61,8 @@ func runDoSegmentTests(t *testing.T, tests []struct {
 			defer server.Close()
 
 			client := jinaClient.NewClient(
-				option.WithBaseURL(server.BaseURL()),
-				option.WithAPIKey("test-key"),
+				requesterx.WithBaseURL(server.BaseURL()),
+				requesterx.WithAPIKey("test-key"),
 			)
 
 			provider := NewProvider(WithClient(client))

@@ -5,8 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"go.jetify.com/ai/provider/tei/client/internal/requestconfig"
-	"go.jetify.com/ai/provider/tei/client/option"
+	"go.jetify.com/ai/provider/internal/requesterx"
 )
 
 // TextEmbeddingNewParams is an alias for EmbedRequest for backward compatibility
@@ -41,12 +40,12 @@ func validateEmbedRequest(req EmbedRequest) error {
 
 // New creates an embedding vector representing the input text.
 // TEI uses the /embed endpoint which returns a direct array of embedding vectors.
-func (r *EmbeddingService) New(ctx context.Context, body TextEmbeddingNewParams, opts ...option.RequestOption) (res *CreateEmbeddingResponse, err error) {
+func (r *EmbeddingService) New(ctx context.Context, body TextEmbeddingNewParams, opts ...requesterx.RequestOption) (res *CreateEmbeddingResponse, err error) {
 	if err := validateEmbedRequest(body); err != nil {
 		return nil, err
 	}
 	opts = append(r.Options[:], opts...)
 	path := "embed"
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
+	err = requesterx.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return res, err
 }

@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"go.jetify.com/ai/api"
+	"go.jetify.com/ai/provider/internal/requesterx"
 	jina "go.jetify.com/ai/provider/jina/client"
-	"go.jetify.com/ai/provider/jina/client/option"
 )
 
 // EncodeEmbedding builds Jina params + request options from the unified API options.
@@ -13,22 +13,22 @@ func EncodeMultimodalEmbedding(
 	modelID string,
 	values []api.MultimodalEmbeddingInput,
 	opts api.TransportOptions,
-) (jina.MultimodalEmbeddingNewParams, []option.RequestOption, []api.CallWarning, error) {
-	var reqOpts []option.RequestOption
+) (jina.MultimodalEmbeddingNewParams, []requesterx.RequestOption, []api.CallWarning, error) {
+	var reqOpts []requesterx.RequestOption
 	if opts.Headers != nil {
 		reqOpts = append(reqOpts, applyHeaders(opts.Headers)...)
 	}
 
 	if opts.APIKey != "" {
-		reqOpts = append(reqOpts, option.WithAPIKey(opts.APIKey))
+		reqOpts = append(reqOpts, requesterx.WithAPIKey(opts.APIKey))
 	}
 
 	if len(opts.BaseURL) > 0 {
-		reqOpts = append(reqOpts, option.WithBaseURL(opts.BaseURL))
+		reqOpts = append(reqOpts, requesterx.WithBaseURL(opts.BaseURL))
 	}
 
 	if opts.UseRawBaseURL {
-		reqOpts = append(reqOpts, option.WithUseRawBaseURL())
+		reqOpts = append(reqOpts, requesterx.WithUseRawBaseURL())
 	}
 
 	// Map API-level inputs to Jina client inputs
@@ -54,17 +54,17 @@ func EncodeEmbedding(
 	modelID string,
 	values []string,
 	opts api.TransportOptions,
-) (jina.TextEmbeddingNewParams, []option.RequestOption, []api.CallWarning, error) {
-	var reqOpts []option.RequestOption
+) (jina.TextEmbeddingNewParams, []requesterx.RequestOption, []api.CallWarning, error) {
+	var reqOpts []requesterx.RequestOption
 	if opts.Headers != nil {
 		reqOpts = append(reqOpts, applyHeaders(opts.Headers)...)
 	}
 
 	if len(opts.BaseURL) > 0 {
-		reqOpts = append(reqOpts, option.WithBaseURL(opts.BaseURL))
+		reqOpts = append(reqOpts, requesterx.WithBaseURL(opts.BaseURL))
 	}
 	if opts.UseRawBaseURL {
-		reqOpts = append(reqOpts, option.WithUseRawBaseURL())
+		reqOpts = append(reqOpts, requesterx.WithUseRawBaseURL())
 	}
 
 	params := jina.TextEmbeddingNewParams{
@@ -80,11 +80,11 @@ func EncodeEmbedding(
 }
 
 // applyHeaders applies the provided HTTP headers to the request options.
-func applyHeaders(headers http.Header) []option.RequestOption {
-	var reqOpts []option.RequestOption
+func applyHeaders(headers http.Header) []requesterx.RequestOption {
+	var reqOpts []requesterx.RequestOption
 	for k, vs := range headers {
 		for _, v := range vs {
-			reqOpts = append(reqOpts, option.WithHeaderAdd(k, v))
+			reqOpts = append(reqOpts, requesterx.WithHeaderAdd(k, v))
 		}
 	}
 	return reqOpts

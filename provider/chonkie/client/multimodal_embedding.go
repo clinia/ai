@@ -6,8 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"go.jetify.com/ai/provider/chonkie/client/internal/requestconfig"
-	"go.jetify.com/ai/provider/chonkie/client/option"
+	"go.jetify.com/ai/provider/internal/requesterx"
 )
 
 type MultimodalEmbeddingNewParams = embeddingNewParams[[]MultimodalEmbeddingInput]
@@ -51,7 +50,7 @@ func (it MultimodalEmbeddingInput) validate() error {
 }
 
 // Creates an embedding vector representing the multi-modal input.
-func (r *EmbeddingService) NewMultiModal(ctx context.Context, body MultimodalEmbeddingNewParams, opts ...option.RequestOption) (res *CreateEmbeddingResponse, err error) {
+func (r *EmbeddingService) NewMultiModal(ctx context.Context, body MultimodalEmbeddingNewParams, opts ...requesterx.RequestOption) (res *CreateEmbeddingResponse, err error) {
 	textEmb := multimodalNewParamsConcrete{
 		MultimodalEmbeddingNewParams: body,
 	}
@@ -61,7 +60,7 @@ func (r *EmbeddingService) NewMultiModal(ctx context.Context, body MultimodalEmb
 
 	opts = append(r.Options[:], opts...)
 	path := "embeddings"
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
+	err = requesterx.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create multi-modal embedding: %w", err)
 	}

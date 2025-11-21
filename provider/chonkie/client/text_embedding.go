@@ -5,8 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"go.jetify.com/ai/provider/chonkie/client/internal/requestconfig"
-	"go.jetify.com/ai/provider/chonkie/client/option"
+	"go.jetify.com/ai/provider/internal/requesterx"
 )
 
 type TextEmbeddingNewParams = embeddingNewParams[[]string]
@@ -31,7 +30,7 @@ func (p textEmbeddingNewParamsConcrete) validate() error {
 }
 
 // Creates an embedding vector representing the input text.
-func (r *EmbeddingService) New(ctx context.Context, body TextEmbeddingNewParams, opts ...option.RequestOption) (res *CreateEmbeddingResponse, err error) {
+func (r *EmbeddingService) New(ctx context.Context, body TextEmbeddingNewParams, opts ...requesterx.RequestOption) (res *CreateEmbeddingResponse, err error) {
 	textEmb := textEmbeddingNewParamsConcrete{
 		TextEmbeddingNewParams: body,
 	}
@@ -40,7 +39,7 @@ func (r *EmbeddingService) New(ctx context.Context, body TextEmbeddingNewParams,
 	}
 	opts = append(r.Options[:], opts...)
 	path := "embeddings"
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
+	err = requesterx.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	if err != nil {
 		return nil, fmt.Errorf("chonkie embedding new: %w", err)
 	}

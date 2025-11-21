@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"go.jetify.com/ai/api"
+	"go.jetify.com/ai/provider/internal/requesterx"
 	tei "go.jetify.com/ai/provider/tei/client"
-	"go.jetify.com/ai/provider/tei/client/option"
 )
 
 // EncodeEmbedding builds TEI params + request options from the unified API options.
@@ -13,8 +13,8 @@ func EncodeEmbedding(
 	modelID string,
 	values []string,
 	opts api.TransportOptions,
-) (tei.TextEmbeddingNewParams, []option.RequestOption, []api.CallWarning, error) {
-	var reqOpts []option.RequestOption
+) (tei.TextEmbeddingNewParams, []requesterx.RequestOption, []api.CallWarning, error) {
+	var reqOpts []requesterx.RequestOption
 	if opts.Headers != nil {
 		reqOpts = append(reqOpts, applyHeaders(opts.Headers)...)
 	}
@@ -24,11 +24,11 @@ func EncodeEmbedding(
 	}
 
 	if opts.APIKey != "" {
-		reqOpts = append(reqOpts, option.WithAPIKey(opts.APIKey))
+		reqOpts = append(reqOpts, requesterx.WithAPIKey(opts.APIKey))
 	}
 
 	if len(opts.BaseURL) > 0 {
-		reqOpts = append(reqOpts, option.WithBaseURL(opts.BaseURL))
+		reqOpts = append(reqOpts, requesterx.WithBaseURL(opts.BaseURL))
 	}
 
 	applyProviderMetadata(&params, opts)
@@ -39,11 +39,11 @@ func EncodeEmbedding(
 }
 
 // applyHeaders applies the provided HTTP headers to the request options.
-func applyHeaders(headers http.Header) []option.RequestOption {
-	var reqOpts []option.RequestOption
+func applyHeaders(headers http.Header) []requesterx.RequestOption {
+	var reqOpts []requesterx.RequestOption
 	for k, vs := range headers {
 		for _, v := range vs {
-			reqOpts = append(reqOpts, option.WithHeaderAdd(k, v))
+			reqOpts = append(reqOpts, requesterx.WithHeaderAdd(k, v))
 		}
 	}
 	return reqOpts

@@ -5,8 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"go.jetify.com/ai/provider/tei/client/internal/requestconfig"
-	"go.jetify.com/ai/provider/tei/client/option"
+	"go.jetify.com/ai/provider/internal/requesterx"
 )
 
 type rankRequestConcrete struct {
@@ -37,7 +36,7 @@ func (p rankRequestConcrete) validate() error {
 
 // Rank reorders the given documents based on their relevance to the query.
 // Returns documents sorted by relevance score in descending order.
-func (r *RankingService) Rank(ctx context.Context, body RankRequest, opts ...option.RequestOption) (res *RankResponse, err error) {
+func (r *RankingService) Rank(ctx context.Context, body RankRequest, opts ...requesterx.RequestOption) (res *RankResponse, err error) {
 	req := rankRequestConcrete{
 		RankRequest: body,
 	}
@@ -46,6 +45,6 @@ func (r *RankingService) Rank(ctx context.Context, body RankRequest, opts ...opt
 	}
 	opts = append(r.Options[:], opts...)
 	path := "rerank"
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
+	err = requesterx.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return res, err
 }

@@ -1,8 +1,6 @@
 package codec
 
 import (
-	"fmt"
-
 	"go.jetify.com/ai/api"
 	tei "go.jetify.com/ai/provider/tei/client"
 )
@@ -20,13 +18,7 @@ func DecodeSparseEmbedding(resp *tei.CreateSparseEmbeddingResponse) (api.SparseE
 
 	for i, sparseValues := range sparseArrays {
 		// Convert TEI sparse format to api.SparseEmbedding (map[string]float64)
-		sparseMap := make(api.SparseEmbedding)
-		for _, sv := range sparseValues {
-			// Convert index to string key
-			key := fmt.Sprintf("%d", sv.Index)
-			sparseMap[key] = sv.Value
-		}
-		sparseEmbs[i] = sparseMap
+		sparseEmbs[i] = api.SparseEmbedding(sparseValues)
 	}
 
 	// TEI doesn't return usage information in the basic response

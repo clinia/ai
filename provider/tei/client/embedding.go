@@ -20,16 +20,11 @@ type CreateEmbeddingResponse [][]float64
 
 // CreateSparseEmbeddingResponse represents the response from the TEI /embed_sparse endpoint
 // TEI returns sparse embeddings as an array of arrays of SparseValue objects
-type CreateSparseEmbeddingResponse [][]SparseValue
+type CreateSparseEmbeddingResponse []SparseValue
 
 // SparseValue represents a single non-zero value in a sparse embedding
 // This matches the TEI API SparseValue schema
-type SparseValue struct {
-	// Index is the position in the vocabulary/embedding space
-	Index int64 `json:"index"`
-	// Value is the weight/score for this index
-	Value float64 `json:"value"`
-}
+type SparseValue map[string]float64
 
 // EmbeddingModel represents a TEI model identifier
 type EmbeddingModel = string

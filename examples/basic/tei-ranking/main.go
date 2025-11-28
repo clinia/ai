@@ -21,8 +21,8 @@ func main() {
 	if err := godotenv.Load(); err != nil {
 		log.Printf("(.env load skipped) %v", err)
 	}
-	if os.Getenv("TEI_BASE_URL") == "" {
-		log.Println("TEI_BASE_URL not set; set it in .env or your shell environment.")
+	if os.Getenv("TEI_RANKING_URL") == "" {
+		log.Println("TEI_RANKING_URL not set; set it in .env or your shell environment.")
 	}
 
 	provider := tei.NewProvider()

@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"go.jetify.com/ai/api"
+	"go.jetify.com/ai/instrumentation"
 	"go.jetify.com/ai/provider/tei/internal/codec"
 )
 
@@ -23,6 +24,7 @@ func (p *Provider) SparseEmbeddingModel(modelID string) (api.EmbeddingModel[stri
 			providerName: fmt.Sprintf("%s.sparse-embedding", p.name),
 			client:       p.client,
 			apiKey:       p.apiKey,
+			instrumenter: p.instrumenter,
 		},
 	}
 
@@ -57,7 +59,24 @@ func (m *SparseEmbeddingModel) DoEmbed(
 	ctx context.Context,
 	values []string,
 	opts api.TransportOptions,
-) (api.SparseEmbeddingResponse, error) {
+) (resp api.SparseEmbeddingResponse, err error) {
+	ctx, span := m.pc.instrumenter.Start(
+		ctx,
+		"DoEmbedSparse",
+		instrumentation.Attributes{
+			"provider":   m.ProviderName(),
+			"model":      m.modelID,
+			"model_type": "sparse_embedding",
+			"operation":  string(instrumentation.OperationEmbed),
+		},
+		instrumentation.ProviderSpanInfo{
+			Provider:  m.ProviderName(),
+			Model:     m.modelID,
+			Operation: instrumentation.OperationEmbed,
+		},
+	)
+	defer instrumentation.EndSpan(span, &err)
+
 	sparseEmbeddingParams, teiOpts, _, err := codec.EncodeSparseEmbedding(
 		m.modelID,
 		values,
@@ -67,10 +86,10 @@ func (m *SparseEmbeddingModel) DoEmbed(
 		return api.SparseEmbeddingResponse{}, err
 	}
 
-	resp, err := m.pc.client.Embedding.NewSparse(ctx, sparseEmbeddingParams, teiOpts...)
+	apiResp, err := m.pc.client.Embedding.NewSparse(ctx, sparseEmbeddingParams, teiOpts...)
 	if err != nil {
 		return api.SparseEmbeddingResponse{}, err
 	}
 
-	return codec.DecodeSparseEmbedding(resp)
+	return codec.DecodeSparseEmbedding(apiResp)
 }

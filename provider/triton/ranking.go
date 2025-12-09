@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"go.jetify.com/ai/api"
+	"go.jetify.com/ai/instrumentation"
 	"go.jetify.com/ai/provider/triton/internal/codec"
 )
 
@@ -30,6 +31,7 @@ func (p *Provider) RankingModel(modelID string) (api.RankingModel, error) {
 		config: ProviderConfig{
 			providerName:  p.providerNameFor("ranker"),
 			clientOptions: p.clientOptions,
+			instrumenter:  p.instrumenter,
 			newRanker:     p.newRanker,
 		},
 	}, nil
@@ -44,6 +46,23 @@ func (m *RankingModel) ModelID() string { return m.modelID }
 func (m *RankingModel) SupportsParallelCalls() bool { return true }
 
 func (m *RankingModel) DoRank(ctx context.Context, query string, texts []string, opts api.TransportOptions) (resp api.RankingResponse, err error) {
+	ctx, span := m.config.instrumenter.Start(
+		ctx,
+		"DoRank",
+		instrumentation.Attributes{
+			"provider":   m.ProviderName(),
+			"model":      m.modelID,
+			"model_type": "ranking",
+			"operation":  string(instrumentation.OperationRank),
+		},
+		instrumentation.ProviderSpanInfo{
+			Provider:  m.ProviderName(),
+			Model:     m.modelID,
+			Operation: instrumentation.OperationRank,
+		},
+	)
+	defer instrumentation.EndSpan(span, &err)
+
 	params, err := codec.EncodeRank(query, texts, opts)
 	if err != nil {
 		return api.RankingResponse{}, err

@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"go.jetify.com/ai/api"
+	"go.jetify.com/ai/instrumentation"
 	"go.jetify.com/ai/provider/openai/internal/codec"
 )
 
@@ -24,6 +25,7 @@ func (p *Provider) LanguageModel(modelID string) (api.LanguageModel, error) {
 		pc: ProviderConfig{
 			providerName: fmt.Sprintf("%s.responses", p.name),
 			client:       p.client,
+			instrumenter: p.instrumenter,
 		},
 	}
 
@@ -52,7 +54,24 @@ func (m *LanguageModel) SupportedUrls() []api.SupportedURL {
 
 func (m *LanguageModel) Generate(
 	ctx context.Context, prompt []api.Message, opts api.CallOptions,
-) (*api.Response, error) {
+) (resp *api.Response, err error) {
+	ctx, span := m.pc.instrumenter.Start(
+		ctx,
+		"Generate",
+		instrumentation.Attributes{
+			"provider":   m.ProviderName(),
+			"model":      m.modelID,
+			"model_type": "language_model",
+			"operation":  string(instrumentation.OperationGenerate),
+		},
+		instrumentation.ProviderSpanInfo{
+			Provider:  m.ProviderName(),
+			Model:     m.modelID,
+			Operation: instrumentation.OperationGenerate,
+		},
+	)
+	defer instrumentation.EndSpan(span, &err)
+
 	params, warnings, err := codec.Encode(m.modelID, prompt, opts)
 	if err != nil {
 		return nil, err
@@ -74,7 +93,24 @@ func (m *LanguageModel) Generate(
 
 func (m *LanguageModel) Stream(
 	ctx context.Context, prompt []api.Message, opts api.CallOptions,
-) (*api.StreamResponse, error) {
+) (resp *api.StreamResponse, err error) {
+	ctx, span := m.pc.instrumenter.Start(
+		ctx,
+		"Stream",
+		instrumentation.Attributes{
+			"provider":   m.ProviderName(),
+			"model":      m.modelID,
+			"model_type": "language_model",
+			"operation":  string(instrumentation.OperationStream),
+		},
+		instrumentation.ProviderSpanInfo{
+			Provider:  m.ProviderName(),
+			Model:     m.modelID,
+			Operation: instrumentation.OperationStream,
+		},
+	)
+	defer instrumentation.EndSpan(span, &err)
+
 	// TODO: add warnings to the stream response by adding an initial StreamStart event
 	// (it could happen inside of codec.Encode)
 	params, _, err := codec.Encode(m.modelID, prompt, opts)

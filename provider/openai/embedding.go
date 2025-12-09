@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"go.jetify.com/ai/api"
+	"go.jetify.com/ai/instrumentation"
 	"go.jetify.com/ai/provider/openai/internal/codec"
 )
 
@@ -24,6 +25,7 @@ func (p *Provider) TextEmbeddingModel(modelID string) (api.EmbeddingModel[string
 		pc: ProviderConfig{
 			providerName: fmt.Sprintf("%s.embedding", p.name),
 			client:       p.client,
+			instrumenter: p.instrumenter,
 		},
 	}
 
@@ -58,7 +60,24 @@ func (m *EmbeddingModel) DoEmbed(
 	ctx context.Context,
 	values []string,
 	opts api.TransportOptions,
-) (api.DenseEmbeddingResponse, error) {
+) (resp api.DenseEmbeddingResponse, err error) {
+	ctx, span := m.pc.instrumenter.Start(
+		ctx,
+		"DoEmbed",
+		instrumentation.Attributes{
+			"provider":   m.ProviderName(),
+			"model":      m.modelID,
+			"model_type": "embedding",
+			"operation":  string(instrumentation.OperationEmbed),
+		},
+		instrumentation.ProviderSpanInfo{
+			Provider:  m.ProviderName(),
+			Model:     m.modelID,
+			Operation: instrumentation.OperationEmbed,
+		},
+	)
+	defer instrumentation.EndSpan(span, &err)
+
 	embeddingParams, openaiOpts, _, err := codec.EncodeEmbedding(
 		m.modelID,
 		values,
@@ -68,10 +87,10 @@ func (m *EmbeddingModel) DoEmbed(
 		return api.DenseEmbeddingResponse{}, err
 	}
 
-	resp, err := m.pc.client.Embeddings.New(ctx, embeddingParams, openaiOpts...)
+	apiResp, err := m.pc.client.Embeddings.New(ctx, embeddingParams, openaiOpts...)
 	if err != nil {
 		return api.DenseEmbeddingResponse{}, err
 	}
 
-	return codec.DecodeEmbedding(resp)
+	return codec.DecodeEmbedding(apiResp)
 }

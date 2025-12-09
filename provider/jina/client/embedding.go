@@ -28,9 +28,9 @@ type CreateEmbeddingResponse struct {
 // The usage information for the request.
 type CreateEmbeddingResponseUsage struct {
 	// The number of tokens used by the prompt.
-	PromptTokens int64 `json:"prompt_tokens,required"`
+	PromptTokens int64 `json:"prompt_tokens"`
 	// The total number of tokens used by the request.
-	TotalTokens int64 `json:"total_tokens,required"`
+	TotalTokens int64 `json:"total_tokens"`
 }
 
 // Represents an embedding vector returned by embedding endpoint.

@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"go.jetify.com/ai/api"
+	"go.jetify.com/ai/instrumentation"
 	"go.jetify.com/ai/provider/triton/internal/codec"
 )
 
@@ -33,6 +34,7 @@ func (p *Provider) TextEmbeddingModel(modelID string) (api.EmbeddingModel[string
 		config: ProviderConfig{
 			providerName:  p.providerNameFor("embedding"),
 			clientOptions: p.clientOptions,
+			instrumenter:  p.instrumenter,
 			newEmbedder:   p.newEmbedder,
 		},
 	}
@@ -61,6 +63,23 @@ func (m *EmbeddingModel) MaxEmbeddingsPerCall() *int {
 
 // DoEmbed executes an embedding call against the Clinia embedder.
 func (m *EmbeddingModel) DoEmbed(ctx context.Context, values []string, opts api.TransportOptions) (resp api.DenseEmbeddingResponse, err error) {
+	ctx, span := m.config.instrumenter.Start(
+		ctx,
+		"DoEmbed",
+		instrumentation.Attributes{
+			"provider":   m.ProviderName(),
+			"model":      m.modelID,
+			"model_type": "embedding",
+			"operation":  string(instrumentation.OperationEmbed),
+		},
+		instrumentation.ProviderSpanInfo{
+			Provider:  m.ProviderName(),
+			Model:     m.modelID,
+			Operation: instrumentation.OperationEmbed,
+		},
+	)
+	defer instrumentation.EndSpan(span, &err)
+
 	params, err := codec.EncodeEmbedding(values, opts)
 	if err != nil {
 		return api.DenseEmbeddingResponse{}, err

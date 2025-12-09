@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"go.jetify.com/ai/api"
+	"go.jetify.com/ai/instrumentation"
 	"go.jetify.com/ai/provider/tei/internal/codec"
 )
 
@@ -27,6 +28,7 @@ func (p *Provider) RankingModel(modelID string) (api.RankingModel, error) {
 			providerName: fmt.Sprintf("%s.ranking", p.name),
 			client:       p.client,
 			apiKey:       p.apiKey,
+			instrumenter: p.instrumenter,
 		},
 	}
 
@@ -62,17 +64,34 @@ func (m *RankingModel) DoRank(
 	query string,
 	texts []string,
 	opts api.TransportOptions,
-) (api.RankingResponse, error) {
+) (resp api.RankingResponse, err error) {
+	ctx, span := m.pc.instrumenter.Start(
+		ctx,
+		"DoRank",
+		instrumentation.Attributes{
+			"provider":   m.ProviderName(),
+			"model":      m.modelID,
+			"model_type": "ranking",
+			"operation":  string(instrumentation.OperationRank),
+		},
+		instrumentation.ProviderSpanInfo{
+			Provider:  m.ProviderName(),
+			Model:     m.modelID,
+			Operation: instrumentation.OperationRank,
+		},
+	)
+	defer instrumentation.EndSpan(span, &err)
+
 	request, reqOpts, _, err := codec.EncodeRank(query, texts, opts)
 	if err != nil {
 		return api.RankingResponse{}, err
 	}
 
 	// Call the client
-	resp, err := m.pc.client.Ranking.Rank(ctx, request, reqOpts...)
+	apiResp, err := m.pc.client.Ranking.Rank(ctx, request, reqOpts...)
 	if err != nil {
 		return api.RankingResponse{}, err
 	}
 
-	return codec.DecodeRank(resp)
+	return codec.DecodeRank(apiResp)
 }

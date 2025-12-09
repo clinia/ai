@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"go.jetify.com/ai/api"
+	"go.jetify.com/ai/instrumentation"
 	"go.jetify.com/ai/provider/triton/internal/codec"
 )
 
@@ -32,6 +33,7 @@ func (p *Provider) SegmentingModel(modelID string) (api.SegmentingModel, error) 
 		config: ProviderConfig{
 			providerName:  p.providerNameFor("segmenting"),
 			clientOptions: p.clientOptions,
+			instrumenter:  p.instrumenter,
 			newChunker:    p.newChunker, // reuse chunker implementation
 		},
 	}, nil
@@ -43,6 +45,23 @@ func (m *SegmentingModel) ModelID() string              { return m.modelID }
 func (m *SegmentingModel) SupportsParallelCalls() bool  { return true }
 
 func (m *SegmentingModel) DoSegment(ctx context.Context, texts []string, opts api.TransportOptions) (resp api.SegmentingResponse, err error) {
+	ctx, span := m.config.instrumenter.Start(
+		ctx,
+		"DoSegment",
+		instrumentation.Attributes{
+			"provider":   m.ProviderName(),
+			"model":      m.modelID,
+			"model_type": "segmenting",
+			"operation":  string(instrumentation.OperationSegment),
+		},
+		instrumentation.ProviderSpanInfo{
+			Provider:  m.ProviderName(),
+			Model:     m.modelID,
+			Operation: instrumentation.OperationSegment,
+		},
+	)
+	defer instrumentation.EndSpan(span, &err)
+
 	params, err := codec.EncodeSegment(texts, opts)
 	if err != nil {
 		return api.SegmentingResponse{}, err

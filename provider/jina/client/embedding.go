@@ -1,7 +1,7 @@
 package jina
 
 import (
-	"go.jetify.com/ai/provider/jina/client/option"
+	"go.jetify.com/ai/provider/internal/requesterx"
 )
 
 // EmbeddingService contains methods and other services that help with interacting
@@ -11,7 +11,7 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewEmbeddingService] method instead.
 type EmbeddingService struct {
-	Options []option.RequestOption
+	Options []requesterx.RequestOption
 }
 
 type CreateEmbeddingResponse struct {
@@ -107,7 +107,7 @@ const (
 // NewEmbeddingService generates a new service that applies the given options to
 // each request. These options are applied after the parent client's options (if
 // there is one), and before any request-specific options.
-func NewEmbeddingService(opts ...option.RequestOption) (r EmbeddingService) {
+func NewEmbeddingService(opts ...requesterx.RequestOption) (r EmbeddingService) {
 	r = EmbeddingService{}
 	r.Options = opts
 	return r

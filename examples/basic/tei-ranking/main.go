@@ -50,7 +50,7 @@ func main() {
 	// Example 1: Using the standard API-compliant RankingModel interface
 	fmt.Println("=== Example 1: API-Compliant Ranking (DoRank) ===")
 
-	rankingModel, err := provider.RankingModel("BAAI/bge-reranker-large")
+	rankingModel, err := provider.RankingModel("")
 	if err != nil {
 		log.Fatalf("Failed to create ranking model: %v", err)
 	}

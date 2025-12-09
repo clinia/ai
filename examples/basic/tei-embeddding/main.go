@@ -15,7 +15,7 @@ func example() error {
 	provider := teiprovider.NewProvider()
 
 	// Create a model
-	model, _ := provider.TextEmbeddingModel("BAAI/bge-base-en-v1.5")
+	model, _ := provider.TextEmbeddingModel("")
 
 	// Generate embeddings
 	response, err := ai.EmbedMany(

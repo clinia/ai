@@ -36,7 +36,7 @@ func run(ctx context.Context) error {
 	provider := tei.NewProvider()
 
 	// The model ID is used for logging/metadata; your TEI server decides which model runs.
-	model, err := provider.SparseEmbeddingModel("BAAI/bge-base-en-v1.5")
+	model, err := provider.SparseEmbeddingModel("")
 	if err != nil {
 		return err
 	}

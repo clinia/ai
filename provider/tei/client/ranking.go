@@ -1,12 +1,12 @@
 package tei
 
 import (
-	"go.jetify.com/ai/provider/tei/client/option"
+	"go.jetify.com/ai/provider/internal/requesterx"
 )
 
 // RankingService contains methods for document ranking.
 type RankingService struct {
-	Options []option.RequestOption
+	Options []requesterx.RequestOption
 }
 
 // RankRequest represents a request to rank documents
@@ -40,7 +40,7 @@ type RankResult struct {
 }
 
 // NewRankingService creates a new ranking service with the given options
-func NewRankingService(opts ...option.RequestOption) (r RankingService) {
+func NewRankingService(opts ...requesterx.RequestOption) (r RankingService) {
 	r = RankingService{}
 	r.Options = opts
 	return r

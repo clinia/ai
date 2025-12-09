@@ -5,31 +5,31 @@ import (
 
 	"go.jetify.com/ai/api"
 	chonkie "go.jetify.com/ai/provider/chonkie/client"
-	"go.jetify.com/ai/provider/chonkie/client/option"
+	"go.jetify.com/ai/provider/internal/requesterx"
 )
 
 // EncodeSegment prepares a Chonkie Segmenting request for a single text.
 // Note: Chonkie Segmenting segments one content per request; batching is handled by the model.
-func EncodeSegment(text string, opts api.TransportOptions) (chonkie.SegmentRequest, []option.RequestOption, error) {
+func EncodeSegment(text string, opts api.TransportOptions) (chonkie.SegmentRequest, []requesterx.RequestOption, error) {
 	if text == "" {
 		return chonkie.SegmentRequest{}, nil, fmt.Errorf("chonkie/segment: content is empty")
 	}
 
-	var reqOpts []option.RequestOption
+	var reqOpts []requesterx.RequestOption
 	if opts.Headers != nil {
 		reqOpts = append(reqOpts, applyHeaders(opts.Headers)...)
 	}
 
 	if opts.APIKey != "" {
-		reqOpts = append(reqOpts, option.WithAPIKey(opts.APIKey))
+		reqOpts = append(reqOpts, requesterx.WithAPIKey(opts.APIKey))
 	}
 
 	if len(opts.BaseURL) > 0 {
-		reqOpts = append(reqOpts, option.WithBaseURL(opts.BaseURL))
+		reqOpts = append(reqOpts, requesterx.WithBaseURL(opts.BaseURL))
 	}
 
 	if opts.UseRawBaseURL {
-		reqOpts = append(reqOpts, option.WithUseRawBaseURL())
+		reqOpts = append(reqOpts, requesterx.WithUseRawBaseURL())
 	}
 
 	body := chonkie.SegmentRequest{Content: text}
@@ -40,25 +40,25 @@ func EncodeSegment(text string, opts api.TransportOptions) (chonkie.SegmentReque
 
 // EncodeSegmentBatch prepares a Chonkie Segmenting request for multiple texts
 // in a single HTTP call by using an array in the "content" field.
-func EncodeSegmentBatch(texts []string, opts api.TransportOptions) (chonkie.BatchSegmentRequest, []option.RequestOption, error) {
+func EncodeSegmentBatch(texts []string, opts api.TransportOptions) (chonkie.BatchSegmentRequest, []requesterx.RequestOption, error) {
 	if len(texts) == 0 {
 		return chonkie.BatchSegmentRequest{}, nil, fmt.Errorf("chonkie/segment: texts cannot be empty")
 	}
-	var reqOpts []option.RequestOption
+	var reqOpts []requesterx.RequestOption
 	if opts.Headers != nil {
 		reqOpts = append(reqOpts, applyHeaders(opts.Headers)...)
 	}
 
 	if opts.APIKey != "" {
-		reqOpts = append(reqOpts, option.WithAPIKey(opts.APIKey))
+		reqOpts = append(reqOpts, requesterx.WithAPIKey(opts.APIKey))
 	}
 
 	if len(opts.BaseURL) > 0 {
-		reqOpts = append(reqOpts, option.WithBaseURL(opts.BaseURL))
+		reqOpts = append(reqOpts, requesterx.WithBaseURL(opts.BaseURL))
 	}
 
 	if opts.UseRawBaseURL {
-		reqOpts = append(reqOpts, option.WithUseRawBaseURL())
+		reqOpts = append(reqOpts, requesterx.WithUseRawBaseURL())
 	}
 
 	body := chonkie.BatchSegmentRequest{Content: texts}

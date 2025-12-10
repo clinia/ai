@@ -21,8 +21,8 @@ func main() {
 	if err := godotenv.Load(); err != nil {
 		log.Printf("(.env load skipped) %v", err)
 	}
-	if os.Getenv("TEI_BASE_URL") == "" {
-		log.Println("TEI_BASE_URL not set; set it in .env or your shell environment.")
+	if os.Getenv("TEI_RANKING_URL") == "" {
+		log.Println("TEI_RANKING_URL not set; set it in .env or your shell environment.")
 	}
 
 	provider := tei.NewProvider()
@@ -50,7 +50,7 @@ func main() {
 	// Example 1: Using the standard API-compliant RankingModel interface
 	fmt.Println("=== Example 1: API-Compliant Ranking (DoRank) ===")
 
-	rankingModel, err := provider.RankingModel("BAAI/bge-reranker-large")
+	rankingModel, err := provider.RankingModel("")
 	if err != nil {
 		log.Fatalf("Failed to create ranking model: %v", err)
 	}

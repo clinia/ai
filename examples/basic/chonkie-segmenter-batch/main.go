@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/joho/godotenv"
 	"github.com/k0kubun/pp/v3"
 	"go.jetify.com/ai"
 	"go.jetify.com/ai/api"
@@ -30,6 +31,7 @@ func run() error {
 	}
 
 	texts := []string{"Hello", "World"}
+	godotenv.Load()
 
 	// Enable true batching by passing provider metadata for Chonkie
 	resp, err := ai.SegmentMany(

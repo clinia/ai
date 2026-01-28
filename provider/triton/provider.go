@@ -7,12 +7,14 @@ import (
 	cliniaclient "github.com/clinia/models-client-go/cliniamodel"
 	"github.com/clinia/models-client-go/cliniamodel/common"
 	"go.jetify.com/ai/api"
+	"go.jetify.com/ai/instrumentation"
 )
 
 // Provider wires the Clinia client options with AI SDK model interfaces.
 type Provider struct {
 	name          string
 	clientOptions common.ClientOptions
+	instrumenter  instrumentation.Instrumenter
 
 	newEmbedder embeddingFactory
 	newRanker   rankerFactory
@@ -29,6 +31,7 @@ type Option func(*providerOptions)
 type providerOptions struct {
 	name          string
 	clientOptions *common.ClientOptions
+	instrumenter  instrumentation.Instrumenter
 
 	newEmbedder embeddingFactory
 	newRanker   rankerFactory
@@ -61,9 +64,22 @@ func WithClientOptions(opts common.ClientOptions) Option {
 	}
 }
 
+// WithInstrumenter configures tracing instrumentation for provider calls.
+func WithInstrumenter(instr instrumentation.Instrumenter) Option {
+	return func(o *providerOptions) {
+		if instr == nil {
+			instr = instrumentation.NopInstrumenter()
+		}
+		o.instrumenter = instr
+	}
+}
+
 // NewProvider constructs a new Clinia provider.
 func NewProvider(opts ...Option) (api.Provider, error) {
-	options := providerOptions{name: "triton"}
+	options := providerOptions{
+		name:         "triton",
+		instrumenter: instrumentation.NopInstrumenter(),
+	}
 	for _, opt := range opts {
 		opt(&options)
 	}
@@ -77,6 +93,7 @@ func NewProvider(opts ...Option) (api.Provider, error) {
 	provider := &Provider{
 		name:          options.name,
 		clientOptions: clientOpts,
+		instrumenter:  options.instrumenter,
 		newEmbedder:   options.newEmbedder,
 		newRanker:     options.newRanker,
 		newChunker:    options.newChunker,

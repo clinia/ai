@@ -2,6 +2,7 @@ package jina
 
 import (
 	"go.jetify.com/ai/api"
+	"go.jetify.com/ai/instrumentation"
 	jina "go.jetify.com/ai/provider/jina/client"
 )
 
@@ -14,6 +15,9 @@ type Provider struct {
 
 	// apiKey is the API key used for authentication.
 	apiKey string
+
+	// instrumenter handles tracing spans for provider calls.
+	instrumenter instrumentation.Instrumenter
 }
 
 var _ api.Provider = &Provider{}
@@ -28,12 +32,24 @@ func WithName(name string) ProviderOption {
 	return func(p *Provider) { p.name = name }
 }
 
+func WithInstrumenter(instr instrumentation.Instrumenter) ProviderOption {
+	return func(p *Provider) {
+		if instr == nil {
+			instr = instrumentation.NopInstrumenter()
+		}
+		p.instrumenter = instr
+	}
+}
+
 func WithAPIKey(apiKey string) ProviderOption {
 	return func(p *Provider) { p.apiKey = apiKey }
 }
 
 func NewProvider(opts ...ProviderOption) api.Provider {
-	p := &Provider{client: jina.NewClient()}
+	p := &Provider{
+		client:       jina.NewClient(),
+		instrumenter: instrumentation.NopInstrumenter(),
+	}
 
 	for _, opt := range opts {
 		opt(p)

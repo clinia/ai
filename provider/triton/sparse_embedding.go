@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"go.jetify.com/ai/api"
+	"go.jetify.com/ai/instrumentation"
 	"go.jetify.com/ai/provider/triton/internal/codec"
 )
 
@@ -31,6 +32,7 @@ func (p *Provider) SparseEmbeddingModel(modelID string) (api.EmbeddingModel[stri
 		config: ProviderConfig{
 			providerName:  p.providerNameFor("sparse_embedding"),
 			clientOptions: p.clientOptions,
+			instrumenter:  p.instrumenter,
 			newSparse:     p.newSparse,
 		},
 	}, nil
@@ -43,6 +45,23 @@ func (m *SparseEmbeddingModel) SupportsParallelCalls() bool  { return true }
 func (m *SparseEmbeddingModel) MaxEmbeddingsPerCall() *int   { return nil }
 
 func (m *SparseEmbeddingModel) DoEmbed(ctx context.Context, texts []string, opts api.TransportOptions) (resp api.SparseEmbeddingResponse, err error) {
+	ctx, span := m.config.instrumenter.Start(
+		ctx,
+		"DoEmbedSparse",
+		instrumentation.Attributes{
+			"provider":   m.ProviderName(),
+			"model":      m.modelID,
+			"model_type": "sparse_embedding",
+			"operation":  string(instrumentation.OperationEmbed),
+		},
+		instrumentation.ProviderSpanInfo{
+			Provider:  m.ProviderName(),
+			Model:     m.modelID,
+			Operation: instrumentation.OperationEmbed,
+		},
+	)
+	defer instrumentation.EndSpan(span, &err)
+
 	params, err := codec.EncodeSparseEmbedding(texts, opts)
 	if err != nil {
 		return api.SparseEmbeddingResponse{}, err

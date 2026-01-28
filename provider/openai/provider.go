@@ -3,6 +3,7 @@ package openai
 import (
 	"github.com/openai/openai-go/v2"
 	"go.jetify.com/ai/api"
+	"go.jetify.com/ai/instrumentation"
 )
 
 type Provider struct {
@@ -10,6 +11,8 @@ type Provider struct {
 	client openai.Client
 	// name is the name of the provider, overrides the default "openai".
 	name string
+	// instrumenter handles tracing spans for provider calls.
+	instrumenter instrumentation.Instrumenter
 }
 
 var _ api.Provider = &Provider{}
@@ -24,8 +27,20 @@ func WithName(name string) ProviderOption {
 	return func(p *Provider) { p.name = name }
 }
 
+func WithInstrumenter(instr instrumentation.Instrumenter) ProviderOption {
+	return func(p *Provider) {
+		if instr == nil {
+			instr = instrumentation.NopInstrumenter()
+		}
+		p.instrumenter = instr
+	}
+}
+
 func NewProvider(opts ...ProviderOption) api.Provider {
-	p := &Provider{client: openai.NewClient()}
+	p := &Provider{
+		client:       openai.NewClient(),
+		instrumenter: instrumentation.NopInstrumenter(),
+	}
 	for _, opt := range opts {
 		opt(p)
 	}

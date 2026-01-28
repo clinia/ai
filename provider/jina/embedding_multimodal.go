@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"go.jetify.com/ai/api"
+	"go.jetify.com/ai/instrumentation"
 	"go.jetify.com/ai/provider/jina/internal/codec"
 )
 
@@ -25,6 +26,7 @@ func (p *Provider) MultimodalEmbeddingModel(modelID string) (api.EmbeddingModel[
 			providerName: fmt.Sprintf("%s.embedding", p.name),
 			client:       p.client,
 			apiKey:       p.apiKey,
+			instrumenter: p.instrumenter,
 		},
 	}
 
@@ -59,7 +61,24 @@ func (m *MultimodalEmbeddingModel) DoEmbed(
 	ctx context.Context,
 	values []api.MultimodalEmbeddingInput,
 	opts api.TransportOptions,
-) (api.DenseEmbeddingResponse, error) {
+) (resp api.DenseEmbeddingResponse, err error) {
+	ctx, span := m.pc.instrumenter.Start(
+		ctx,
+		"DoEmbedMultimodal",
+		instrumentation.Attributes{
+			"provider":   m.ProviderName(),
+			"model":      m.modelID,
+			"model_type": "multimodal_embedding",
+			"operation":  string(instrumentation.OperationEmbed),
+		},
+		instrumentation.ProviderSpanInfo{
+			Provider:  m.ProviderName(),
+			Model:     m.modelID,
+			Operation: instrumentation.OperationEmbed,
+		},
+	)
+	defer instrumentation.EndSpan(span, &err)
+
 	embeddingParams, jinaOpts, _, err := codec.EncodeMultimodalEmbedding(
 		m.modelID,
 		values,
@@ -69,10 +88,10 @@ func (m *MultimodalEmbeddingModel) DoEmbed(
 		return api.DenseEmbeddingResponse{}, err
 	}
 
-	resp, err := m.pc.client.Embeddings.NewMultiModal(ctx, embeddingParams, jinaOpts...)
+	apiResp, err := m.pc.client.Embeddings.NewMultiModal(ctx, embeddingParams, jinaOpts...)
 	if err != nil {
 		return api.DenseEmbeddingResponse{}, err
 	}
 
-	return codec.DecodeEmbedding(resp)
+	return codec.DecodeEmbedding(apiResp)
 }

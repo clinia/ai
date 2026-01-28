@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"go.jetify.com/ai/api"
+	"go.jetify.com/ai/instrumentation"
 	"go.jetify.com/ai/provider/chonkie/internal/codec"
 )
 
@@ -23,6 +24,7 @@ func (p *Provider) SegmentingModel(modelID string) (api.SegmentingModel, error) 
 			providerName: p.name + ".segmenting",
 			client:       p.client,
 			apiKey:       p.apiKey,
+			instrumenter: p.instrumenter,
 		},
 	}
 	return m, nil
@@ -33,16 +35,33 @@ func (m *SegmentingModel) ProviderName() string         { return m.pc.providerNa
 func (m *SegmentingModel) ModelID() string              { return m.modelID }
 func (m *SegmentingModel) SupportsParallelCalls() bool  { return true }
 
-func (m *SegmentingModel) DoSegment(ctx context.Context, texts []string, opts api.TransportOptions) (api.SegmentingResponse, error) {
+func (m *SegmentingModel) DoSegment(ctx context.Context, texts []string, opts api.TransportOptions) (resp api.SegmentingResponse, err error) {
+	ctx, span := m.pc.instrumenter.Start(
+		ctx,
+		"DoSegment",
+		instrumentation.Attributes{
+			"provider":   m.ProviderName(),
+			"model":      m.modelID,
+			"model_type": "segmenting",
+			"operation":  string(instrumentation.OperationSegment),
+		},
+		instrumentation.ProviderSpanInfo{
+			Provider:  m.ProviderName(),
+			Model:     m.modelID,
+			Operation: instrumentation.OperationSegment,
+		},
+	)
+	defer instrumentation.EndSpan(span, &err)
+
 	body, ropts, err := codec.EncodeSegmentBatch(texts, opts)
 	if err != nil {
 		return api.SegmentingResponse{}, err
 	}
-	resp, err := m.pc.client.Segments.New(ctx, body, ropts...)
+	apiResp, err := m.pc.client.Segments.New(ctx, body, ropts...)
 	if err != nil {
 		return api.SegmentingResponse{}, err
 	}
-	groups, err := codec.DecodeSegmentBatch(resp)
+	groups, err := codec.DecodeSegmentBatch(apiResp)
 	if err != nil {
 		return api.SegmentingResponse{}, err
 	}
